@@ -30,24 +30,18 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
-    <None Include="app.ts" />
-    <None Include="routes\index.ts" />
-    <None Include="routes\user.ts" />
     <Content Include="tsconfig.json" />
     <Content Include="package.json" />
-    <Content Include="public\stylesheets\main.css" />
     <Content Include="README.md" />
-    <Content Include="views\index.pug" />
-    <Content Include="views\layout.pug" />
-    <Content Include="views\error.pug" />
   </ItemGroup>
   <ItemGroup>
-    <Folder Include="public\" />
-    <Folder Include="public\images\" />
-    <Folder Include="public\javascripts\" />
-    <Folder Include="public\stylesheets\" />
-    <Folder Include="routes\" />
-    <Folder Include="views\" />
+    <Folder Include="src\" />
+  </ItemGroup>
+  <ItemGroup>
+    <TypeScriptCompile Include="src\app.ts" />
+    <TypeScriptCompile Include="src\OPCUA_client.ts">
+      <SubType>Code</SubType>
+    </TypeScriptCompile>
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
   <ProjectExtensions>
