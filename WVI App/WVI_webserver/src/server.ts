@@ -7,6 +7,8 @@ const _OPCUAclient = new OPCUAclient();
 const app: Express = express();
 
 app.use('/OPCUA/connect', _OPCUAclient.Connect);
+app.use('/OPCUA/status', _OPCUAclient.GetStatus);
+app.use('/OPCUA/changeopt', _OPCUAclient.ChangeOptMode);
 app.set('port', process.env.PORT || 3000);
 
 app.get('/', (req: Request, res: Response) => {
