@@ -4,7 +4,7 @@
   "private": true,
   "scripts": {
     "build": "tsc --project .",
-    "start": "nodemon ./src/app.ts"
+    "start": "nodemon ./src/server.ts"
   },
   "description": "WVI_webserver",
   "author": {

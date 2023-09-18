@@ -38,7 +38,7 @@
     <Folder Include="src\" />
   </ItemGroup>
   <ItemGroup>
-    <TypeScriptCompile Include="src\app.ts" />
+    <TypeScriptCompile Include="src\server.ts" />
     <TypeScriptCompile Include="src\OPCUA_client.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
