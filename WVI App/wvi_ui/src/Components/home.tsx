@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { createBrowserRouter, Link, RouterProvider } from 'react-router-dom';
-import './tailwind.css';
-import logo from './proraillogo.png';
+import '../tailwind.css';
+import logo from '../media/proraillogo.png';
 import WVI from './WVI';
 import AddWVI from './AddWVI';
 import Accounts from './Accounts';
@@ -69,9 +69,9 @@ function Home() {
 
     return (
         <React.StrictMode>
-            <div className="bg-[#2F2F31] w-screen h-screen flex flex-col">
+            <div className="bg-[#2F2F31] w-screen h-screen flex flex-col text-gray-300">
                 <div className="bg-[#2C2C39] w-screen h-[120px] flex rounded-b-[0.5vw]">
-                    <img src={logo} alt="" width="120" height="120" />
+                    <img className="ml-[1vw]" src={logo} alt="" width="120" height="120" />
                 </div>
                 <div className="flex mt-[10px] text-[1.2rem]">
                     <div className={"rounded-t-[0.5vw] " + (WVIview ? "bg-[#2C2C39]" : "")}>

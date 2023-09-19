@@ -7,7 +7,7 @@ export default class OPCUAclient {
     async Connect(req: Request, res: Response, next) {
         let client: OPCUAClient;
         let session: ClientSession;
-        const endpoint = "opc.tcp://game-pc:53530/OPCUA/SimulationServer";
+        const endpoint = "opc.tcp://localhost:53530/OPCUA/SimulationServer";
         const nodeId = "ns=3;s=test3";
         res.setHeader('Content-Type', 'text/html');
         res.write("starting OPCUA connection...\n");
@@ -93,9 +93,10 @@ export default class OPCUAclient {
     async GetStatus(req: Request, res: Response, next) {
         let client: OPCUAClient;
         let session: ClientSession;
-        const endpoint = "opc.tcp://game-pc:53530/OPCUA/SimulationServer";
-        const nodeId = "ns=7;s=GK-MRB-01.cmdOperationMode";
+        const endpoint = "opc.tcp://localhost:53530/OPCUA/SimulationServer";
+        const nodeId = "ns=3;s=GK-MRB-01.cmdOperationMode";
         res.setHeader('Content-Type', 'text/html');
+        res.setHeader('Access-Control-Allow-Origin', '*');
 
         try {
             client = OPCUAClient.create({
@@ -123,20 +124,23 @@ export default class OPCUAclient {
                 console.log("Could not read ", nodeId);
             }
 
-            res.send(dataValue.value.toString());
+            res.send(JSON.stringify(dataValue.value.value.toString()));
         }
         catch (err)
         {
-            res.send(`Error: ${err}`);
+            res.send(JSON.stringify(`Error: ${err}`));
         }
         client.disconnect();
     }
 
-    async ChangeOptMode(req: Request, res: Response, next) {
+    async ChangeOptMode(req: Request, res: Response) {
         let client: OPCUAClient;
         let session: ClientSession;
-        const endpoint = "opc.tcp://game-pc:53530/OPCUA/SimulationServer";
-        const nodeId = "ns=7;s=GK-MRB-01.cmdOperationMode";
+        let reqData = req.body;
+        console.log(reqData);
+        return;
+        const endpoint = "opc.tcp://localhost:53530/OPCUA/SimulationServer";
+        const nodeId = "ns=3;s=GK-MRB-01.cmdOperationMode";
         res.setHeader('Content-Type', 'text/html');
 
         try {
