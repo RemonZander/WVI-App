@@ -6,8 +6,6 @@ import activityGreen from '../media/activity green.png';
 import arrow from '../media/arrow.png';
 import routes from '../Services/routes';
 
-
-
 function Dashboard() {
     const _routes = new routes();
     
@@ -15,9 +13,7 @@ function Dashboard() {
     const [status, setStatus] = useState('');
 
     function DoSetStatus() {
-        _routes.GetStatus().then((result) => {
-            console.log("setting status");
-            console.log(result);
+        _routes.GetStatus().then((result : number) => {
             if (result == 0) {
                 setStatus("uit");
             }
