@@ -1,3 +1,5 @@
+/* eslint-disable react-hooks/exhaustive-deps */
+/* eslint-disable jsx-a11y/anchor-is-valid */
 import React, { useEffect, useState } from 'react';
 import '../tailwind.css';
 import activityGreen from '../media/activity green.png';
@@ -12,7 +14,7 @@ function Dashboard() {
     const [dropDown, setDropDown] = useState(false);
     const [status, setStatus] = useState('');
 
-    useEffect(() => {
+    function DoSetStatus() {
         _routes.GetStatus().then((result) => {
             console.log("setting status");
             console.log(result);
@@ -29,9 +31,11 @@ function Dashboard() {
             else if (result == 3) {
                 setStatus("Burner test");
             }
-
-            _routes.SetStatus();
         });
+    }
+
+    useEffect(() => {
+        DoSetStatus();
     }, []);
 
 return (
@@ -71,16 +75,16 @@ return (
                 {dropDown ? <div id="dropdown" className="z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
                     <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
                         <li>
-                            <a href="#" onClick={() => { setDropDown(!dropDown) } } className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Uit</a>
+                            <a href="#" onClick={async () => { setDropDown(!dropDown); await _routes.SetStatus(0); DoSetStatus(); } } className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Uit</a>
                         </li>
                         <li>
-                            <a href="#" onClick={() => { setDropDown(!dropDown) }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Auto</a>
+                            <a href="#" onClick={async () => { setDropDown(!dropDown); await _routes.SetStatus(1); DoSetStatus(); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Auto</a>
                         </li>
                         <li>
-                            <a href="#" onClick={() => { setDropDown(!dropDown) }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">handmatig</a>
+                            <a href="#" onClick={async () => { setDropDown(!dropDown); await _routes.SetStatus(2); DoSetStatus(); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">handmatig</a>
                         </li>
                         <li>
-                            <a href="#" onClick={() => { setDropDown(!dropDown) }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Burner test</a>
+                            <a href="#" onClick={async () => { setDropDown(!dropDown); await _routes.SetStatus(3); DoSetStatus(); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Burner test</a>
                         </li>
                     </ul>
                 </div> : '' }

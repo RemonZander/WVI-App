@@ -5,14 +5,13 @@ export default class routes{
        }).then((data) => { return data });
     }
 
-    SetStatus() {
-        fetch('http://localhost:3000/OPCUA/changeopt', {
+    async SetStatus(mode: number) {
+        await fetch('http://localhost:3000/OPCUA/changeopt', {
             method: "POST",
-            mode: "no-cors",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ mode: 0 })
+            body: JSON.stringify({ mode: mode })
         });
     }
 }

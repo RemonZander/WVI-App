@@ -1,12 +1,17 @@
 import express, { Express, Request, Response } from 'express';
 import { AddressInfo } from "net";
 import OPCUAclient from './OPCUA_client';
+import cors from "cors";
+
 const bodyParser = require('body-parser');
 
 const _OPCUAclient = new OPCUAclient();
 
 const app: Express = express();
 
+app.use(cors({
+    origin: "*"
+}));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use('/OPCUA/connect', _OPCUAclient.Connect);
@@ -19,9 +24,6 @@ app.post('/OPCUA/changeopt', (req: Request, res: Response) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', '*');
     console.log("entering route");
-    console.log(req.body);
-    res.sendStatus(200);
-    return;
     _OPCUAclient.ChangeOptMode(req, res);
 })
 

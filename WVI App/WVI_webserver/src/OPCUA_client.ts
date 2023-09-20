@@ -136,9 +136,7 @@ export default class OPCUAclient {
     async ChangeOptMode(req: Request, res: Response) {
         let client: OPCUAClient;
         let session: ClientSession;
-        let reqData = req.body;
-        console.log(reqData);
-        return;
+
         const endpoint = "opc.tcp://localhost:53530/OPCUA/SimulationServer";
         const nodeId = "ns=3;s=GK-MRB-01.cmdOperationMode";
         res.setHeader('Content-Type', 'text/html');
@@ -170,7 +168,7 @@ export default class OPCUAclient {
                 value: {
                     value: {
                         dataType: DataType.Int16,
-                        value: 2
+                        value: req.body.mode
                     }
                 }
             };
@@ -183,5 +181,6 @@ export default class OPCUAclient {
         catch (err) {
             res.send(`Error: ${err}`);
         }
+        client.disconnect();
     }
 }
