@@ -12,6 +12,8 @@
   },
   "main": "app.js",
   "dependencies": {
+    "body-parser": "^1.20.2",
+    "cors": "^2.8.5",
     "debug": "^2.2.0",
     "express": "^4.14.0",
     "node-opcua-client": "^2.113.0",
