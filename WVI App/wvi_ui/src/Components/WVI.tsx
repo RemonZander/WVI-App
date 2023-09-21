@@ -20,16 +20,19 @@ function Dashboard() {
         _routes.GetStatus().then((result : number) => {
             if (result == 0) {
                 setStatus("uit");
+                setActivityLed(activityWhite);
             }
             else if (result == 1) {
                 setStatus("Auto");
+                setActivityLed(activityGreen);
             }
             else if (result == 2) {
-                console.log("setting status to: Handmatig");
                 setStatus("Handmatig");
+                setActivityLed(activityOrange);
             }
             else if (result == 3) {
                 setStatus("Burner test");
+                setActivityLed(activityRed);
             }
         });
     }
@@ -46,7 +49,7 @@ return (
                 <span className="text-white ml-[121px] mr-[50px]">GK-MRB-01</span>
                 <div className="flex items-center">
                     <span className="text-white ml-[20px]">Status:</span>
-                    <span className="text-white ml-[54px]"> Auto</span>
+                    <span className="text-white ml-[54px]"> {status}</span>
                     <img className="ml-[15px]" src={activityLed} alt="" width="10" height="10" />
                 </div>
                 <div>
@@ -75,16 +78,16 @@ return (
                 {dropDown ? <div id="dropdown" className="z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
                     <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
                         <li>
-                            <a href="#" onClick={async () => { setDropDown(!dropDown); await _routes.SetStatus(0); DoSetStatus(); setActivityLed(activityWhite); } } className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Uit</a>
+                            <a href="#" onClick={async () => { setDropDown(!dropDown); await _routes.SetStatus(0); DoSetStatus(); } } className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Uit</a>
                         </li>
                         <li>
-                            <a href="#" onClick={async () => { setDropDown(!dropDown); await _routes.SetStatus(1); DoSetStatus(); setActivityLed(activityGreen); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Auto</a>
+                            <a href="#" onClick={async () => { setDropDown(!dropDown); await _routes.SetStatus(1); DoSetStatus(); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Auto</a>
                         </li>
                         <li>
-                            <a href="#" onClick={async () => { setDropDown(!dropDown); await _routes.SetStatus(2); DoSetStatus(); setActivityLed(activityOrange); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">handmatig</a>
+                            <a href="#" onClick={async () => { setDropDown(!dropDown); await _routes.SetStatus(2); DoSetStatus();}} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">handmatig</a>
                         </li>
                         <li>
-                            <a href="#" onClick={async () => { setDropDown(!dropDown); await _routes.SetStatus(3); DoSetStatus(); setActivityLed(activityRed); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Burner test</a>
+                            <a href="#" onClick={async () => { setDropDown(!dropDown); await _routes.SetStatus(3); DoSetStatus(); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Burner test</a>
                         </li>
                     </ul>
                 </div> : '' }
