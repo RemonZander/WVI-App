@@ -90,7 +90,7 @@ export default class OPCUAclient {
         }
     }
 
-    async GetStatus(req: Request, res: Response, next) {
+    async GetStatus(req: Request, res: Response) {
         let client: OPCUAClient;
         let session: ClientSession;
         const endpoint = "opc.tcp://localhost:53530/OPCUA/SimulationServer";
