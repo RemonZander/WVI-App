@@ -4,13 +4,12 @@ import { AttributeIds, BrowseResult, ClientSession, DataType, DataValue, OPCUACl
 
 export default class OPCUAclient {
 
-    async Connect(req: Request, res: Response, next) {
+    async Connect(req: Request, res: Response) {
         let client: OPCUAClient;
         let session: ClientSession;
         const endpoint = "opc.tcp://localhost:53530/OPCUA/SimulationServer";
         const nodeId = "ns=3;s=test3";
         res.setHeader('Content-Type', 'text/html');
-        res.write("starting OPCUA connection...\n");
 
         try {
             client = OPCUAClient.create({
@@ -23,7 +22,6 @@ export default class OPCUAclient {
             });
             client.on("backoff", () => console.log("retrying connection"));
 
-
             await client.connect(endpoint);
 
             session = await client.createSession({
@@ -32,62 +30,33 @@ export default class OPCUAclient {
                 password: "admin",
             });
 
-            res.write("connected!\n");
-            
-            const browseResult: BrowseResult = await session.browse("RootFolder") as BrowseResult;
+            const browseResult: BrowseResult = await session.browse("i=85") as BrowseResult;
 
-            console.log(browseResult.references.map((r: ReferenceDescription) => r.browseName.toString()).join("\n"));
-
-            const dataValue = await session.read({ nodeId, attributeId: AttributeIds.Value });
-
-            if (dataValue.statusCode !== StatusCodes.Good) {
-                console.log("Could not read ", nodeId);
-            }
-            console.log(` value = ${dataValue.value.toString()}`);
-
-            const subscription = await session.createSubscription2({
-                requestedPublishingInterval: 1000,
-                requestedLifetimeCount: 100,
-                requestedMaxKeepAliveCount: 20,
-                maxNotificationsPerPublish: 10,
-                publishingEnabled: true,
-                priority: 10
+            browseResult.references.forEach(async (reference) => {
+                let browseResult: BrowseResult = await session.browse(reference.nodeId.toString()) as BrowseResult;
+                console.log(browseResult.toString());
+                res.write(browseResult.references.toString());
             });
 
-            subscription
-                .on("started", () => console.log("subscription started - subscriptionId=", subscription.subscriptionId))
-                .on("keepalive", () => console.log("keepalive"))
-                .on("terminated", () => console.log("subscription terminated"));
-
-            const monitoredItem = await subscription.monitor({
-                nodeId,
-                attributeId: AttributeIds.Value
-            },
-                {
-                    samplingInterval: 100,
-                    discardOldest: true,
-                    queueSize: 10
-                }, TimestampsToReturn.Both);
-
-
-            monitoredItem.on("changed", (dataValue: DataValue) => {
-                console.log(` value = ${dataValue.value.value.toString()}`),
-                    res.write(` value = ${dataValue.value.value.toString()}\n`)
-            });
-
-            await new Promise((resolve) => setTimeout(resolve, 10000));
-            await subscription.terminate();
-
-            res.write("done!\n");
-            res.end();
+            //res.send(browseResult.references.map((r: ReferenceDescription) => r.browseName.toString()).join("\n"));
+            //res.send(browseResult);
         }
         catch (err) {
             res.write(`Error !!! ${err}\n`);
             res.end();
             console.log("Error !!!", err);
-            session.close();
-            client.disconnect();
         }
+        session.close();
+        client.disconnect();
+    }
+
+    private RecursiveBrowse(browseResult: BrowseResult, session) {
+        let result = [];
+        browseResult.references.forEach(async (reference) => {
+            result = this.RecursiveBrowse(await session.browse(reference.nodeId.toString()) as BrowseResult, session);
+        });
+
+        return browseResult.references;
     }
 
     async GetStatus(req: Request, res: Response) {
