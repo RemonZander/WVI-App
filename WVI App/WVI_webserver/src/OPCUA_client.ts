@@ -183,4 +183,53 @@ export default class OPCUAclient {
         }
         client.disconnect();
     }
+
+    async GetData(req: Request, res: Response) {
+        let client: OPCUAClient;
+        let session: ClientSession;
+        const endpoint = "opc.tcp://localhost:53530/OPCUA/SimulationServer";
+        const nodeId = "ns=3;s=test3";
+        res.setHeader('Content-Type', 'text/html');
+
+        try {
+            client = OPCUAClient.create({
+                endpointMustExist: false,
+                connectionStrategy: {
+                    maxRetry: 2,
+                    initialDelay: 2000,
+                    maxDelay: 10 * 1000
+                },
+            });
+            client.on("backoff", () => console.log("retrying connection"));
+
+
+            await client.connect(endpoint);
+
+            session = await client.createSession({
+                type: UserTokenType.UserName,
+                userName: "admin",
+                password: "admin",
+            });
+
+            this.ReadData(session, ["ns=7;s=GK-MRB-01.BatteryVoltage"]).then((data) => console.log(data));
+
+        }
+        catch (err) {
+            res.send(JSON.stringify(`Error: ${err}`));
+        }
+        client.disconnect();
+
+    }
+
+    private async ReadData(session: ClientSession, nodes) {
+        let dataValues = [];
+        for (var a = 0; a < nodes.length; a++) {
+            const nodeId = nodes[a];
+            await session.read({ nodeId, attributeId: AttributeIds.Value }).then((data) => {
+                dataValues.push(data.value.value);
+            });
+        }
+
+        return dataValues;
+    }
 }

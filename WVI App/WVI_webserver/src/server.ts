@@ -23,7 +23,13 @@ app.post('/OPCUA/changeopt', (req: Request, res: Response) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', '*');
     _OPCUAclient.ChangeOptMode(req, res);
-})
+});
+
+app.use('/OPCUA/GetData', (req: Request, res: Response) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    _OPCUAclient.GetData(req, res);
+});
 
 const server = app.listen(app.get('port'), function () {
     console.log(`Express server listening on port ${(server.address() as AddressInfo).port}`);
