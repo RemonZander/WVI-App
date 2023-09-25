@@ -1,6 +1,7 @@
 import { Request, Response } from "express";
 import { Session } from "inspector";
 import { AttributeIds, BrowseResult, ClientSession, DataType, DataValue, OPCUAClient, ReferenceDescription, StatusCodes, TimestampsToReturn, UserTokenType } from "node-opcua-client";
+import { Interface } from "readline";
 
 export default class OPCUAclient {
 
@@ -30,13 +31,20 @@ export default class OPCUAclient {
                 password: "admin",
             });
 
-            const browseResult: BrowseResult = await session.browse("i=85") as BrowseResult;
+/*            const browseResult: BrowseResult = await session.browse("i=85") as BrowseResult;
 
             browseResult.references.forEach(async (reference) => {
                 let browseResult: BrowseResult = await session.browse(reference.nodeId.toString()) as BrowseResult;
                 console.log(browseResult.toString());
                 res.write(browseResult.references.toString());
-            });
+            });*/
+
+            const results = await this.RecursiveBrowse(await session.browse("i=85") as BrowseResult, session);
+            console.log(results);
+/*            results.forEach((result) => {
+                console.log(result);
+                res.write(result.toString());
+            });*/
 
             //res.send(browseResult.references.map((r: ReferenceDescription) => r.browseName.toString()).join("\n"));
             //res.send(browseResult);
@@ -50,13 +58,16 @@ export default class OPCUAclient {
         client.disconnect();
     }
 
-    private RecursiveBrowse(browseResult: BrowseResult, session) {
+    private async RecursiveBrowse(browseResult: BrowseResult, session: ClientSession) {
         let result = [];
-        browseResult.references.forEach(async (reference) => {
-            result = this.RecursiveBrowse(await session.browse(reference.nodeId.toString()) as BrowseResult, session);
+        await browseResult.references.forEach(async (reference) => {
+            result.push({ browseName: reference.browseName.toString(), NodeId: reference.nodeId.toString() });
+
+            const browseResultNested = await session.browse(reference.nodeId.toString()) as BrowseResult;
+            result = await result.concat(this.RecursiveBrowse(browseResultNested, session));
         });
 
-        return browseResult.references;
+        return result;
     }
 
     async GetStatus(req: Request, res: Response) {
