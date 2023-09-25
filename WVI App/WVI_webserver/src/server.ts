@@ -36,7 +36,7 @@ app.all('/test', (req: Request, res: Response) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
 });
 
-app.all('/OPCUA/test', (req: Request, res: Response) => {
+app.get('/OPCUA/test', (req: Request, res: Response) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     _OPCUAclient.Connect(req, res);
 });

@@ -31,41 +31,36 @@ export default class OPCUAclient {
                 password: "admin",
             });
 
-/*            const browseResult: BrowseResult = await session.browse("i=85") as BrowseResult;
+            await this.RecursiveBrowse(await session.browse("ns=7;s=GK-MRB-01") as BrowseResult, session).then((results) => {
+                results.forEach((result) => {
+                    res.write(result.NodeId + "\n");
+                });
 
-            browseResult.references.forEach(async (reference) => {
-                let browseResult: BrowseResult = await session.browse(reference.nodeId.toString()) as BrowseResult;
-                console.log(browseResult.toString());
-                res.write(browseResult.references.toString());
-            });*/
-
-            const results = await this.RecursiveBrowse(await session.browse("i=85") as BrowseResult, session);
-            console.log(results);
-/*            results.forEach((result) => {
-                console.log(result);
-                res.write(result.toString());
-            });*/
-
-            //res.send(browseResult.references.map((r: ReferenceDescription) => r.browseName.toString()).join("\n"));
-            //res.send(browseResult);
+            });
         }
         catch (err) {
             res.write(`Error !!! ${err}\n`);
             res.end();
             console.log("Error !!!", err);
         }
+        res.end();
         session.close();
         client.disconnect();
     }
 
     private async RecursiveBrowse(browseResult: BrowseResult, session: ClientSession) {
         let result = [];
-        await browseResult.references.forEach(async (reference) => {
-            result.push({ browseName: reference.browseName.toString(), NodeId: reference.nodeId.toString() });
 
-            const browseResultNested = await session.browse(reference.nodeId.toString()) as BrowseResult;
-            result = await result.concat(this.RecursiveBrowse(browseResultNested, session));
-        });
+        for (var a = 0; a < browseResult.references.length; a++) {
+            result.push({ browseName: browseResult.references[a].browseName.toString(), NodeId: browseResult.references[a].nodeId.toString() });
+
+            const browseResultNested = await session.browse(browseResult.references[a].nodeId.toString()) as BrowseResult;
+
+            await this.RecursiveBrowse(browseResultNested, session).then((data) => {
+                console.log(result);
+                result = result.concat(data);
+            });
+        }
 
         return result;
     }
@@ -74,7 +69,7 @@ export default class OPCUAclient {
         let client: OPCUAClient;
         let session: ClientSession;
         const endpoint = "opc.tcp://localhost:53530/OPCUA/SimulationServer";
-        const nodeId = "ns=3;s=GK-MRB-01.cmdOperationMode";
+        const nodeId = "ns=7;s=GK-MRB-01.cmdOperationMode";
         res.setHeader('Content-Type', 'text/html');
         res.setHeader('Access-Control-Allow-Origin', '*');
 
@@ -118,7 +113,7 @@ export default class OPCUAclient {
         let session: ClientSession;
 
         const endpoint = "opc.tcp://localhost:53530/OPCUA/SimulationServer";
-        const nodeId = "ns=3;s=GK-MRB-01.cmdOperationMode";
+        const nodeId = "ns=7;s=GK-MRB-01.cmdOperationMode";
         res.setHeader('Content-Type', 'text/html');
 
         try {
