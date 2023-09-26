@@ -8,6 +8,7 @@ import activityRed from '../media/activity red.png';
 import activityWhite from '../media/activity white.png';
 import arrow from '../media/arrow.png';
 import routes from '../Services/routes';
+import refreshArrow from '../media/refreshArrow.png';
 
 function Dashboard() {
     const _routes = new routes();
@@ -15,6 +16,7 @@ function Dashboard() {
     const [dropDown, setDropDown] = useState(false);
     const [status, setStatus] = useState('');
     const [activityLed, setActivityLed] = useState(activityGreen);
+    const [nodeData, setNodeData] = useState([{ DisplayName: "", Nodes: "", Data: "", dataType: "" }]);
         
     function DoSetStatus() {
         _routes.GetStatus().then((result : number) => {
@@ -39,6 +41,10 @@ function Dashboard() {
 
     useEffect(() => {
         DoSetStatus();
+
+        _routes.GetData().then((data) => {
+            setNodeData(data);
+        });
     }, []);
 
 return (
@@ -61,14 +67,41 @@ return (
         </div>
 
         <div className="mt-[5vh] flex flex-grow">
-            <div className="ml-[10%]">
+            <div className="w-[40%] h-[70vh] flex flex-col">
+                <div className="flex justify-between">                  
+                    <span className="text-lg ml-[42%]">WVI Data</span>
+                    <button className="mr-[2vw] self-center" onClick={() => {
+                        _routes.GetData().then((data) => {
+                            setNodeData(data);
+                        });
+                    }}><img src={refreshArrow} alt="" width="30" height="30" /></button> 
+                </div>
+                <div className="ml-[1%] overflow-y-scroll">
+                    <table className="w-full text-sm text-left text-white mt-[1vh]">
+                        <tbody>
+                            {nodeData.map((datapoint) => <tr className="bg-[#262739] border-b border-gray-700">
+                                <th scope="row" className="px-6 py-4 text-white">
+                                    {datapoint.DisplayName}
+                                </th>
+                                <td className="px-6 py-4">
+                                    {datapoint.dataType === "Float" ? Number(datapoint.Data).toFixed(1) : datapoint.Data }
+                                </td>
+                                <td className="px-6 py-4">
+                                    {datapoint.dataType}
+                                </td>
+                            </tr>)}
+                        </tbody>
+                    </table>
+                    </div>
+            </div>
+            <div className="ml-[10%] h-[10vh]">
                 <span className="text-white text-[1.5rem]">Huidige operatie modes:</span>
                 <div className="flex items-center">
                     <span>{status }</span>
                     <img className="ml-[15px]" src={activityLed} alt="" width="10" height="10" />
                 </div>      
             </div>
-            <div className="ml-[10%] flex flex-col items-start">
+            <div className="ml-[10%] flex flex-col items-start h-[10vh]">
                 <span className="text-white text-[1.5rem]">Set operatie modes:</span>
 
                 <button id="dropdownDefaultButton" onClick={() => { setDropDown(!dropDown) }} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">Dropdown button
@@ -90,7 +123,7 @@ return (
                             <a href="#" onClick={async () => { setDropDown(!dropDown); await _routes.SetStatus(3); DoSetStatus(); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Burner test</a>
                         </li>
                     </ul>
-                </div> : '' }
+                </div> : ''}
             </div>
         </div>
     </div>

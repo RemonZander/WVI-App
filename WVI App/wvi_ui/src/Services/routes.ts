@@ -14,4 +14,12 @@ export default class routes{
             body: JSON.stringify({ mode: mode })
         });
     }
+
+    async GetData() {
+        return await fetch('http://localhost:3000/OPCUA/data', {
+            method: "GET",
+        }).then((res) => {
+            return res.json();
+        });
+    }
 }
