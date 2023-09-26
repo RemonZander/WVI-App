@@ -5,49 +5,6 @@ import { Interface } from "readline";
 
 export default class OPCUAclient {
 
-    async Connect(req: Request, res: Response) {
-        let client: OPCUAClient;
-        let session: ClientSession;
-        const endpoint = "opc.tcp://localhost:53530/OPCUA/SimulationServer";
-        const nodeId = "ns=3;s=test3";
-        res.setHeader('Content-Type', 'text/html');
-
-        try {
-            client = OPCUAClient.create({
-                endpointMustExist: false,
-                connectionStrategy: {
-                    maxRetry: 2,
-                    initialDelay: 2000,
-                    maxDelay: 10 * 1000
-                },
-            });
-            client.on("backoff", () => console.log("retrying connection"));
-
-            await client.connect(endpoint);
-
-            session = await client.createSession({
-                type: UserTokenType.UserName,
-                userName: "admin",
-                password: "admin",
-            });
-
-            await this.RecursiveBrowse(await session.browse("ns=7;s=GK-MRB-01") as BrowseResult, session).then((results) => {
-                results.forEach((result) => {
-                    res.write(result.NodeId + "\n");
-                });
-
-            });
-        }
-        catch (err) {
-            res.write(`Error !!! ${err}\n`);
-            res.end();
-            console.log("Error !!!", err);
-        }
-        res.end();
-        session.close();
-        client.disconnect();
-    }
-
     private async RecursiveBrowse(browseResult: BrowseResult, session: ClientSession) {
         let result = [];
 
@@ -57,7 +14,6 @@ export default class OPCUAclient {
             const browseResultNested = await session.browse(browseResult.references[a].nodeId.toString()) as BrowseResult;
 
             await this.RecursiveBrowse(browseResultNested, session).then((data) => {
-                console.log(result);
                 result = result.concat(data);
             });
         }
@@ -114,7 +70,6 @@ export default class OPCUAclient {
 
         const endpoint = "opc.tcp://localhost:53530/OPCUA/SimulationServer";
         const nodeId = "ns=7;s=GK-MRB-01.cmdOperationMode";
-        res.setHeader('Content-Type', 'text/html');
 
         try {
             client = OPCUAClient.create({
@@ -164,7 +119,7 @@ export default class OPCUAclient {
         let session: ClientSession;
         const endpoint = "opc.tcp://localhost:53530/OPCUA/SimulationServer";
         const nodeId = "ns=3;s=test3";
-        res.setHeader('Content-Type', 'text/html');
+        res.setHeader('Content-Type', 'application/json');
 
         try {
             client = OPCUAClient.create({
@@ -186,12 +141,25 @@ export default class OPCUAclient {
                 password: "admin",
             });
 
-            this.ReadData(session, ["ns=7;s=GK-MRB-01.BatteryVoltage"]).then((data) => console.log(data));
+            let nodes = {DisplayNames: [], Nodes: [], Data: []};
+            await this.RecursiveBrowse(await session.browse("ns=3;s=GK-MRB-01") as BrowseResult, session).then((results) => {
+                results.forEach((result) => {
+                    console.log(result);
+                    if (result.NodeId.includes("ns=3")) {
+                        nodes.DisplayNames.push(result.browseName);
+                        nodes.Nodes.push(result.NodeId);
+                    }                 
+                });
 
+            });
+
+            await this.ReadData(session, nodes.Nodes).then((data) => nodes.Data.push(data));
+            res.send(JSON.stringify(nodes));
         }
         catch (err) {
             res.send(JSON.stringify(`Error: ${err}`));
         }
+        res.end();
         client.disconnect();
 
     }

@@ -1,6 +1,6 @@
 import express, { Express, Request, Response } from 'express';
 import { AddressInfo } from "net";
-import OPCUAclient from './OPCUA_client';
+import OPCUAclient from './modules/OPCUA_client';
 import cors from "cors";
 import { WVIService } from './services/WVIService';
 
@@ -32,13 +32,9 @@ app.get('/OPCUA/status', (req: Request, res: Response) => {
     _OPCUAclient.GetStatus(req, res);
 });
 
-app.all('/test', (req: Request, res: Response) => {
+app.get('/OPCUA/data', (req: Request, res: Response) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
-});
-
-app.get('/OPCUA/test', (req: Request, res: Response) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    _OPCUAclient.Connect(req, res);
+    _OPCUAclient.GetData(req, res);
 });
 
 const server = app.listen(app.get('port'), function () {

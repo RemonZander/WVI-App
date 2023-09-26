@@ -36,12 +36,13 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\" />
+    <Folder Include="src\modules\" />
     <Folder Include="src\services\" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="src\services\DBService.ts" />
     <TypeScriptCompile Include="src\server.ts" />
-    <TypeScriptCompile Include="src\OPCUA_client.ts">
+    <TypeScriptCompile Include="src\modules\OPCUA_client.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
     <TypeScriptCompile Include="src\services\UserService.ts" />
