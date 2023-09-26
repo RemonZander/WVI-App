@@ -2,6 +2,7 @@ import express, { Express, Request, Response } from 'express';
 import { AddressInfo } from "net";
 import OPCUAclient from './OPCUA_client';
 import cors from "cors";
+import { WVIService } from './services/WVIService';
 
 const bodyParser = require('body-parser');
 
@@ -14,8 +15,6 @@ app.use(cors({
 }));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
-app.use('/OPCUA/connect', _OPCUAclient.Connect);
-app.use('/OPCUA/status', _OPCUAclient.GetStatus);
 app.set('port', process.env.PORT || 3000);
 
 app.post('/OPCUA/changeopt', (req: Request, res: Response) => {
@@ -25,10 +24,21 @@ app.post('/OPCUA/changeopt', (req: Request, res: Response) => {
     _OPCUAclient.ChangeOptMode(req, res);
 });
 
-app.use('/OPCUA/GetData', (req: Request, res: Response) => {
+app.get('/OPCUA/status', (req: Request, res: Response) => {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
-    _OPCUAclient.GetData(req, res);
+    res.setHeader('Access-Control-Allow-Headers', '*');
+
+    _OPCUAclient.GetStatus(req, res);
+});
+
+app.all('/test', (req: Request, res: Response) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+});
+
+app.get('/OPCUA/test', (req: Request, res: Response) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    _OPCUAclient.Connect(req, res);
 });
 
 const server = app.listen(app.get('port'), function () {

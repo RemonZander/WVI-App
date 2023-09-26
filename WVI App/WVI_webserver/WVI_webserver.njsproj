@@ -36,12 +36,17 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\" />
+    <Folder Include="src\services\" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="src\services\DBService.ts" />
     <TypeScriptCompile Include="src\server.ts" />
     <TypeScriptCompile Include="src\OPCUA_client.ts">
       <SubType>Code</SubType>
     </TypeScriptCompile>
+    <TypeScriptCompile Include="src\services\UserService.ts" />
+    <TypeScriptCompile Include="src\services\WVIService.ts" />
+    <TypeScriptCompile Include="src\SetupDatabase.ts" />
   </ItemGroup>
   <Import Project="$(VSToolsPath)\Node.js Tools\Microsoft.NodejsToolsV2.targets" />
   <ProjectExtensions>
