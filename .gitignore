@@ -397,3 +397,4 @@ FodyWeavers.xsd
 # JetBrains Rider
 *.sln.iml
 /WVI App/wvi_ui/.vscode
+/WVI App/OPCUAServer/env
