@@ -30,6 +30,7 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="src\modules\B64EncoderDecoder.ts" />
     <Content Include="tsconfig.json" />
     <Content Include="package.json" />
     <Content Include="README.md" />
@@ -37,9 +38,11 @@
   <ItemGroup>
     <Folder Include="src\" />
     <Folder Include="src\modules\" />
+    <Folder Include="src\enums\" />
     <Folder Include="src\services\" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="src\enums\datamodel.ts" />
     <TypeScriptCompile Include="src\services\DBService.ts" />
     <TypeScriptCompile Include="src\server.ts" />
     <TypeScriptCompile Include="src\modules\OPCUA_client.ts">

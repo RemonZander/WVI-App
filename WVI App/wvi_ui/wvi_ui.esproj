@@ -13,6 +13,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Folder Include="dist\" />
+    <Folder Include="src\modules\" />
     <Folder Include="src\Services\" />
   </ItemGroup>
 </Project>
