@@ -6,12 +6,20 @@ export class UserService {
         return QueryNoParams(`SELECT * FROM Accounts`).all();
     }
 
-    public static GetOne(columns, filterColumn, value): string {
+    public static GetOne(columns: string, filterColumn: string, value: string): string {
         return All(`SELECT ${columns} FROM Accounts WHERE "${filterColumn}" = ?`, [value]);
     }
 
-    public static GetOneAllColumns(filterColumn, value): string {
-        return All(`SELECT * FROM Accounts WHERE "${filterColumn}" = ?`, [value]);
+    public static GetOneByEmailSelectColumns(columns: string, value: string): string {
+        return All(`SELECT ${columns} FROM Accounts WHERE "Email" = ?`, [value]);
+    }
+
+    public static GetOneByEmailAllColumns(value: string): string {
+        return All(`SELECT * FROM Accounts WHERE "Email" = ?`, [value]);
+    }
+
+    public static GetOneByEmailAndPassword(email: string, passsword: string): string {
+        return All(`SELECT * FROM Accounts WHERE "Email" = ? AND "Wachtwoord" = ?`, [email, passsword]);
     }
 
     public static InsertOne(data): string {

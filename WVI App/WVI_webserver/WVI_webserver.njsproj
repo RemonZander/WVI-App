@@ -43,6 +43,7 @@
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="src\enums\datamodel.ts" />
+    <TypeScriptCompile Include="src\modules\routerModule.ts" />
     <TypeScriptCompile Include="src\services\DBService.ts" />
     <TypeScriptCompile Include="src\server.ts" />
     <TypeScriptCompile Include="src\modules\OPCUA_client.ts">

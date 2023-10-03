@@ -6,12 +6,13 @@ import WVI from './WVI';
 import AddWVI from './AddWVI';
 import Accounts from './Accounts';
 import Addaccount from './Addaccount';
+import Login from './Login';
 
 
 const router = createBrowserRouter([
     {
         path: "/",
-        element: <></>,
+        element: <Login />,
     },
     {
         path: "/WVI",
@@ -36,32 +37,44 @@ function Home() {
     const [AddWVIview, setAddWVIview] = useState(false);
     const [AccountView, setAccountView] = useState(false);
     const [Addaccountview, setAddaccountview] = useState(false);
+    const [showButtons, setShowButtons] = useState(false);
 
     useEffect(() => {
         switch (window.location.href.replace(window.location.host, '').replace(window.location.protocol + "//", '')) {
+            case '/':
+                setShowButtons(false);
+                setWVIview(false);
+                setAddWVIview(false);
+                setAccountView(false);
+                setAddaccountview(false);
+                break;
             case "/WVI":
                 setWVIview(true);
                 setAddWVIview(false);
                 setAccountView(false);
                 setAddaccountview(false);
+                setShowButtons(true);
                 break;
             case "/AddWVI":
                 setWVIview(false);
                 setAddWVIview(true);
                 setAccountView(false);
                 setAddaccountview(false);
+                setShowButtons(true);
                 break;
             case "/Accounts":
                 setWVIview(false);
                 setAddWVIview(false);
                 setAccountView(true);
                 setAddaccountview(false);
+                setShowButtons(true);
                 break;
             case "/Addaccount":
                 setWVIview(false);
                 setAddWVIview(false);
                 setAccountView(false);
                 setAddaccountview(true);
+                setShowButtons(true);
                 break;
         }
     }, []);
@@ -74,7 +87,7 @@ function Home() {
                     <img className="ml-[1vw]" src={logo} alt="" width="120" height="120" />
                 </div>
                 <div className="flex mt-[10px] text-[1.2rem]">
-                    <div className={"rounded-t-[0.5vw] " + (WVIview ? "bg-[#2C2C39]" : "")}>
+                    <div className={(showButtons ? "" : "hidden ") + "rounded-t-[0.5vw] " + (WVIview ? "bg-[#2C2C39]" : "")}>
                         <button className="px-[5px]" onClick={() => {
                             window.location.replace('/WVI');
                             setWVIview(true);
@@ -84,7 +97,7 @@ function Home() {
                         }}>WVI's</button>
                     </div>
                     <div>
-                        <button className={"px-[5px] rounded-t-[0.5vw] " + (AddWVIview ? "bg-[#2C2C39]" : "")} onClick={() => {
+                        <button className={(showButtons ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (AddWVIview ? "bg-[#2C2C39]" : "")} onClick={() => {
                             window.location.replace('/AddWVI');
                             setWVIview(false);
                             setAddWVIview(true);
@@ -93,7 +106,7 @@ function Home() {
                         }}>WVI toevoegen</button>
                     </div>
                     <div>
-                        <button className={"px-[5px] rounded-t-[0.5vw] " + (AccountView ? "bg-[#2C2C39]" : "")} onClick={() => {
+                        <button className={(showButtons ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (AccountView ? "bg-[#2C2C39]" : "")} onClick={() => {
                             window.location.replace('/Accounts');
                             setWVIview(false);
                             setAddWVIview(false);
@@ -102,7 +115,7 @@ function Home() {
                         }}>Accounts</button>
                     </div>
                     <div>
-                        <button className={"px-[5px] rounded-t-[0.5vw] " + (Addaccountview ? "bg-[#2C2C39]" : "")} onClick={() => {
+                        <button className={(showButtons ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (Addaccountview ? "bg-[#2C2C39]" : "")} onClick={() => {
                             window.location.replace('/Addaccount');
                             setWVIview(false);
                             setAddWVIview(false);

@@ -3,12 +3,12 @@ const path = require('path');
 const fs = require('fs');
 
 try {
-	fs.unlinkSync(path.resolve('./src/database.db'));
+	fs.unlinkSync(path.resolve('./database.db'));
 } catch (e) {
 
 }
-
-const db = new sqlite(path.resolve('./src/database.db'), { fileMustExist: false, verbose: console.log });
+console.log(path.resolve('./database.db'));
+const db = new sqlite(path.resolve('./database.db'), { fileMustExist: false, verbose: console.log });
 
 //create WVi table
 db.prepare(`CREATE TABLE "WVIs" (
@@ -28,6 +28,15 @@ db.prepare(`CREATE TABLE "WVIs" (
 	PRIMARY KEY("ID" AUTOINCREMENT)
 ); `).run();
 
+//Create accounts table
+db.prepare(`CREATE TABLE "Accounts" (
+	"ID"	INTEGER NOT NULL UNIQUE,
+	"Email"	NOT NULL UNIQUE,
+	"Wachtwoord" NOT NULL,
+	"Onderhoudsaannemer"	TEXT,
+	PRIMARY KEY("ID" AUTOINCREMENT)
+);`).run();
+
 //create Aannemers table
 db.prepare(`CREATE TABLE "Aannemers" (
 	"ID"	INTEGER NOT NULL UNIQUE,
@@ -35,13 +44,6 @@ db.prepare(`CREATE TABLE "Aannemers" (
 	"Onderhoudsaannemer"	TEXT NOT NULL,
 	PRIMARY KEY("ID" AUTOINCREMENT)
 ); `).run();
-
-db.prepare(`CREATE TABLE "Accounts" (
-	"ID"	INTEGER NOT NULL UNIQUE,
-	"Email"	NOT NULL UNIQUE,
-	"Wachtwoord" NOT NULL,
-	PRIMARY KEY("ID" AUTOINCREMENT)
-);`).run();
 
 
 //first insert aannemers data because of foreign key
@@ -52,6 +54,11 @@ db.prepare(`INSERT INTO "Aannemers" ("Contractgebiednummer", Onderhoudsaannemer)
 db.prepare(`INSERT INTO "Aannemers" ("Contractgebiednummer", Onderhoudsaannemer) VALUES(?, ?)`).run(["32", "VolkerRail"]);
 db.prepare(`INSERT INTO "Aannemers" ("Contractgebiednummer", Onderhoudsaannemer) VALUES(?, ?)`).run(["27", "ASSET Rail"]);
 db.prepare(`INSERT INTO "Aannemers" ("Contractgebiednummer", Onderhoudsaannemer) VALUES(?, ?)`).run(["19", "Strukton Rail"]);
+
+//insert accounts
+db.prepare(`INSERT INTO "Accounts" ("Email", "Wachtwoord", "Onderhoudsaannemer") VALUES(?, ?, ?)`).run(["Strukton@test.nl", "Strukton", "Strukton Rail"]);
+db.prepare(`INSERT INTO "Accounts" ("Email", "Wachtwoord", "Onderhoudsaannemer") VALUES(?, ?, ?)`).run(["ASSETRail@test.nl", "ASSETRail", "ASSET Rail"]);
+db.prepare(`INSERT INTO "Accounts" ("Email", "Wachtwoord") VALUES(?, ?)`).run(["beheer@prorail.nl", "beheer"]);
 
 //insert WVI data
 db.prepare(`INSERT INTO "WVIs" ("PMP enkelvoudige objectnaam", "PPLG", "Objecttype", "Geocode", "Contractgebiednummer", "Equipmentnummer", "RD X-coordinaat", "RD Y-coordinaat", "Template", "Producent") 

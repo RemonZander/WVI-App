@@ -1,5 +1,6 @@
 export default class routes{
-    GetStatus(nodeId: string) {
+
+    static GetStatus(nodeId: string) {
         return fetch('http://localhost:3000/OPCUA/status', {
             method: "POST",
             headers: {
@@ -11,7 +12,7 @@ export default class routes{
        }).then((data : number) => { return data });
     }
 
-    async SetStatus(mode: number, nodeId: string) {
+    static async SetStatus(mode: number, nodeId: string) {
         await fetch('http://localhost:3000/OPCUA/write', {
             method: "PUT",
             headers: {
@@ -21,7 +22,7 @@ export default class routes{
         });
     }
 
-    async GetData(nodeId: string) {
+    static async GetData(nodeId: string) {
         return await fetch('http://localhost:3000/OPCUA/data', {
             method: "POST",
             headers: {
@@ -34,7 +35,7 @@ export default class routes{
         });
     }
 
-    async IsOnline() {
+    static async IsOnline() {
         return await fetch('http://localhost:3000/OPCUA/isonline', {
             method: "GET",
         }).then((res) => {
@@ -42,7 +43,7 @@ export default class routes{
         });
     }
 
-    async SetHeatingCurve(SetPointHigh : number, SetPointLow : number, nodeId: string) {
+    static async SetHeatingCurve(SetPointHigh : number, SetPointLow : number, nodeId: string) {
         await fetch('http://localhost:3000/OPCUA/write', {
             method: "PUT",
             headers: {
@@ -52,13 +53,25 @@ export default class routes{
         });
     }
 
-    async SetDefaultHeatingCurve(SetPointHigh: number, SetPointLow: number, nodeId: string) {
+    static async SetDefaultHeatingCurve(SetPointHigh: number, SetPointLow: number, nodeId: string) {
         await fetch('http://localhost:3000/OPCUA/write', {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({ data: [SetPointHigh, SetPointLow], nodes: [`${nodeId}.Params.DefaultHeatingCurve.SetPointHigh`, `${nodeId}.Params.DefaultHeatingCurve.SetPointLow`], datatypes: [6, 6] })
+        });
+    }
+
+    static async Login(email: string, password: string) {
+        return await fetch('http://localhost:3000/login', {
+            method: "POST",
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email: email, password: password })
+        }).then((res) => {
+            return res.status;
         });
     }
 }
