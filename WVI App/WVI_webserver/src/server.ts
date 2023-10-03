@@ -17,14 +17,7 @@ app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set('port', process.env.PORT || 3000);
 
-app.post('/OPCUA/changeopt', (req: Request, res: Response) => {
-    res.setHeader('Content-Type', 'application/json');
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Headers', '*');
-    _OPCUAclient.ChangeOptMode(req, res);
-});
-
-app.get('/OPCUA/status', (req: Request, res: Response) => {
+app.post('/OPCUA/status', (req: Request, res: Response) => {
     res.setHeader('Content-Type', 'application/json');
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Headers', '*');
@@ -32,11 +25,23 @@ app.get('/OPCUA/status', (req: Request, res: Response) => {
     _OPCUAclient.GetStatus(req, res);
 });
 
-app.get('/OPCUA/data', (req: Request, res: Response) => {
+app.post('/OPCUA/data', (req: Request, res: Response) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     _OPCUAclient.GetData(req, res);
 });
 
+app.get('/OPCUA/isonline', (req: Request, res: Response) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Content-Type', 'text/html');
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    _OPCUAclient.IsOnline(req, res);
+});
+
+app.put('/OPCUA/write', (req: Request, res: Response) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    _OPCUAclient.WriteToWVI(req, res);
+});
+    
 const server = app.listen(app.get('port'), function () {
     console.log(`Express server listening on port ${(server.address() as AddressInfo).port}`);
 });
