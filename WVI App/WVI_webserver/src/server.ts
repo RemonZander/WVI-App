@@ -3,7 +3,6 @@ import { AddressInfo } from "net";
 import OPCUAclient from './modules/OPCUA_client';
 import cors from "cors";
 import { WVIService } from './services/WVIService';
-import { request } from 'http';
 
 const bodyParser = require('body-parser');
 

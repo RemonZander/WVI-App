@@ -11,7 +11,8 @@ import arrow from '../media/arrow.png';
 import routes from '../Services/routes';
 import refreshArrow from '../media/refreshArrow.png';
 import noActivity from '../media/no activity.png';
-import { stat } from 'fs';
+
+
 function Dashboard() {
     const _routes = new routes();
     
@@ -24,29 +25,29 @@ function Dashboard() {
     const [currentNode, setCurrentNode] = useState("");
     const [status, setStatus] = useState([{ status: "", activityLed: noActivity }, { status: "", activityLed: noActivity }]);
 
-    const WVIs = [{ Name: "GK-MBR-01", NodeId: "ns=7;s=GK-MRB-01" }, { Name: "GK.AKM.03", NodeId: "ns=7;s=GK.AKM.03" }];
+    const WVIs = [{ Name: "GK-MBR-01", NodeId: "ns=3;s=GK-MRB-01" }, { Name: "GK.AKM.03", NodeId: "ns=3;s=GK.AKM.03" }];
         
     async function DoSetStatus(pos: number, node: string) {
         await _routes.GetStatus(node).then((result: number) => {
             if (result == 0) {
                 let newStatus = status;
                 newStatus[pos] = { status: "uit", activityLed: activityWhite };
-                setStatus(newStatus);
+                setStatus([...newStatus]);
             }
             else if (result == 1) {
                 let newStatus = status;
                 newStatus[pos] = { status: "auto", activityLed: activityGreen };
-                setStatus(newStatus);
+                setStatus([...newStatus]);
             }
             else if (result == 2) {
                 let newStatus = status;
                 newStatus[pos] = { status: "handmatig", activityLed: activityOrange };
-                setStatus(newStatus);
+                setStatus([...newStatus]);
             }
             else if (result == 3) {
                 let newStatus = status;
                 newStatus[pos] = { status: "burner test", activityLed: activityRed };
-                setStatus(newStatus);
+                setStatus([...newStatus]);
             }
         });
     }
@@ -96,7 +97,7 @@ return (
     <div className="bg-[#2C2C39] w-screen flex flex-grow">
         <div className="ml-[10vw] mt-[5vh] flex-col items-center gap-y-1 max-h-[60vh] w-[280px] overflow-y-scroll">
             <span className="text-white text-[2rem]">WVI's</span>
-            {WVIs.map((WVI, index) => <div className="flex flex-col relative bg-[#262739]">
+            {WVIs.map((WVI, index) => <div className="flex flex-col relative bg-[#262739] mb-[1vh]">
                 <span className="text-white ml-[87px]">{WVI.Name}</span>
                 <div className="flex items-center">
                     <span className="text-white ml-[20px]">Status:</span>
@@ -108,6 +109,7 @@ return (
                     <span className="text-white ml-[16px]"> Geen</span>
                 </div>
                 <button className="absolute self-end left[100%] top-[20px]" onClick={() => {
+                    setOperationChoice("");
                     GetData(WVI.NodeId);
                     setCurrentNode(WVI.NodeId);
                 }}>
@@ -152,18 +154,21 @@ return (
                     {dropDown ? <div id="dropdown" className="z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
                         <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
                             <li>                          
-                                <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" onClick={async () => { setOperationChoice("OperationMode"); setDropDown(!dropDown); }}>OperationMode</a>
+                                <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" onClick={async () => {
+                                    setOperationChoice(operationChoice === "OperationMode" ? "" : "OperationMode");
+                                    setDropDown(!dropDown);
+                                }}>OperationMode</a>
                             </li>
                             <li>
                                 <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" onClick={async () => {
-                                    setOperationChoice("Heating curve");
+                                    setOperationChoice(operationChoice === "Heating curve" ? "" : "Heating curve");
                                     setDropDown(!dropDown);
                                     setHeatingCurve([nodeData.filter(node => node.Nodes.includes("HeatingCurve.SetPointHigh"))[0].Data, nodeData.filter(node => node.Nodes.includes("HeatingCurve.SetPointLow"))[0].Data]);
                                 }}>Heating curve</a>                              
                             </li>
                             <li>
                                 <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" onClick={async () => {
-                                    setOperationChoice("Default heating curve");
+                                    setOperationChoice(operationChoice === "Default heating curve" ? "" : "Default heating curve");
                                     setDropDown(!dropDown);
                                     setDefaultHeatingCurve([nodeData.filter(node => node.Nodes.includes("DefaultHeatingCurve.SetPointHigh"))[0].Data, nodeData.filter(node => node.Nodes.includes("DefaultHeatingCurve.SetPointLow"))[0].Data]);
                                 }}>Default heating curve</a>
@@ -181,16 +186,16 @@ return (
                     {dropDownOperationChoice ? <div id="dropdown" className="z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
                         <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
                             <li>
-                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await _routes.SetStatus(0, currentNode); GetData(currentNode); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Uit</a>
+                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await _routes.SetStatus(0, currentNode); GetData(currentNode); setOperationChoice("");  }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Uit</a>
                             </li>
                             <li>
-                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await _routes.SetStatus(1, currentNode); GetData(currentNode); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Auto</a>
+                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await _routes.SetStatus(1, currentNode); GetData(currentNode); setOperationChoice(""); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Auto</a>
                             </li>
                             <li>
-                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await _routes.SetStatus(2, currentNode); GetData(currentNode); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">handmatig</a>
+                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await _routes.SetStatus(2, currentNode); GetData(currentNode); setOperationChoice(""); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">handmatig</a>
                             </li>
                             <li>
-                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await _routes.SetStatus(3, currentNode); GetData(currentNode); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Burner test</a>
+                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await _routes.SetStatus(3, currentNode); GetData(currentNode); setOperationChoice(""); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Burner test</a>
                             </li>
                         </ul>
                     </div> : ''}

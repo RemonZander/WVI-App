@@ -1,7 +1,6 @@
 import { Request, Response } from "express";
 import { AttributeIds, BrowseResult, ClientSession, DataType, DataValue, OPCUAClient, ReferenceDescription, StatusCodes, TimestampsToReturn, UserTokenType, DataTypeIds, FilterContextOnAddressSpace } from "node-opcua-client";
 import { Datamodel } from '../enums/datamodel';
-import { encodeBase64 } from "./B64EncoderDecoder";
 
 export default class OPCUAclient {
 
@@ -79,56 +78,6 @@ export default class OPCUAclient {
         client.disconnect();
     }
 
-    async ChangeOptMode(req: Request, res: Response) {
-        let client: OPCUAClient;
-        let session: ClientSession;
-
-        const endpoint = "opc.tcp://localhost:53530/OPCUA/SimulationServer";
-        const nodeId = "ns=7;s=GK-MRB-01.cmdOperationMode";
-
-        try {
-            client = OPCUAClient.create({
-                endpointMustExist: false,
-                connectionStrategy: {
-                    maxRetry: 2,
-                    initialDelay: 2000,
-                    maxDelay: 10 * 1000
-                },
-            });
-            client.on("backoff", () => console.log("retrying connection"));
-
-
-            await client.connect(endpoint);
-
-            session = await client.createSession({
-                type: UserTokenType.UserName,
-                userName: "admin",
-                password: "admin",
-            });
-
-            var nodeToWrite = {
-                nodeId: nodeId,
-                attributeId: AttributeIds.Value,
-                indexRange: null,
-                value: {
-                    value: {
-                        dataType: DataType.Int16,
-                        value: req.body.mode
-                    }
-                }
-            };
-
-            session.write(nodeToWrite);
-
-            res.sendStatus(200);
-
-        }
-        catch (err) {
-            res.send(`Error: ${err}`);
-        }
-        client.disconnect();
-    }
-
     async GetData(req: Request, res: Response) {
         let client: OPCUAClient;
         let session: ClientSession;
@@ -158,7 +107,7 @@ export default class OPCUAclient {
             let nodes = [];
             await this.RecursiveBrowse(await session.browse(req.body.nodeId) as BrowseResult, session).then((results) => {
                 results.forEach((result) => {
-                    if (result.NodeId.includes("ns=7")) {
+                    if (result.NodeId.includes("ns=3")) {
                         nodes.push({ DisplayName: result.browseName, Nodes: result.NodeId, Data: "", dataType: result.dataType })
                     }                 
                 });
@@ -187,8 +136,6 @@ export default class OPCUAclient {
         const nodes = req.body.nodes;
 
         const endpoint = "opc.tcp://localhost:53530/OPCUA/SimulationServer";
-
-        console.log(req.body);
 
         try {
             client = OPCUAClient.create({
