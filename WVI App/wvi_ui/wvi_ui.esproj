@@ -18,6 +18,9 @@
     <TypeScriptConfiguration Remove="src\modules\**" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="package.json" />
+  </ItemGroup>
+  <ItemGroup>
     <None Remove="src\modules\**" />
   </ItemGroup>
   <ItemGroup>

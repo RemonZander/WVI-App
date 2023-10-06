@@ -1,9 +1,11 @@
-import { Request, Response } from 'express';
+import express, { Request, Response } from 'express';
 import { Router } from 'express-serve-static-core';
 import OPCUAclient from './OPCUA_client';
 import { UserService } from '../services/UserService';
-var router: Router = require('express').Router();
+import bcrypt from "bcrypt";
+import { IAccount } from '../interfaces/interfaces';
 
+const router: Router = express.Router();
 
 const _OPCUAclient = new OPCUAclient();
 
@@ -34,12 +36,15 @@ router.put('/OPCUA/write', (req: Request, res: Response) => {
 
 router.post('/login', (req: Request, res: Response) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
-    const result = UserService.GetOneByEmailAndPassword(req.body.email, req.body.password);
+    
+    const account: IAccount[] = UserService.GetOneByEmailAllColumns(req.body.email);
+    if (account.length === 0) res.sendStatus(404);
 
-    if (result.length > 0) {
-        res.sendStatus(200);
-    }
-    res.sendStatus(401);
+    bcrypt.compare(req.body.password, account[0].Wachtwoord).then(async hashResult => {
+        if (hashResult) res.sendStatus(200);
+        else res.sendStatus(401);
+        console.log(hashResult);
+    }).catch(error => { throw error })
 });
 
 export default router;

@@ -39,10 +39,12 @@
     <Folder Include="src\" />
     <Folder Include="src\modules\" />
     <Folder Include="src\enums\" />
+    <Folder Include="src\interfaces\" />
     <Folder Include="src\services\" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptCompile Include="src\enums\datamodel.ts" />
+    <TypeScriptCompile Include="src\interfaces\interfaces.ts" />
     <TypeScriptCompile Include="src\modules\routerModule.ts" />
     <TypeScriptCompile Include="src\services\DBService.ts" />
     <TypeScriptCompile Include="src\server.ts" />

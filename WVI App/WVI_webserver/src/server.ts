@@ -4,8 +4,6 @@ import OPCUAclient from './modules/OPCUA_client';
 import cors from "cors";
 import router from './modules/routerModule';
 
-//var router = require('./modules/router');
-
 const bodyParser = require('body-parser');
 
 const _OPCUAclient = new OPCUAclient();

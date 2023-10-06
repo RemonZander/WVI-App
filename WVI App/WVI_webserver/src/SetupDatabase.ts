@@ -56,9 +56,9 @@ db.prepare(`INSERT INTO "Aannemers" ("Contractgebiednummer", Onderhoudsaannemer)
 db.prepare(`INSERT INTO "Aannemers" ("Contractgebiednummer", Onderhoudsaannemer) VALUES(?, ?)`).run(["19", "Strukton Rail"]);
 
 //insert accounts
-db.prepare(`INSERT INTO "Accounts" ("Email", "Wachtwoord", "Onderhoudsaannemer") VALUES(?, ?, ?)`).run(["Strukton@test.nl", "Strukton", "Strukton Rail"]);
-db.prepare(`INSERT INTO "Accounts" ("Email", "Wachtwoord", "Onderhoudsaannemer") VALUES(?, ?, ?)`).run(["ASSETRail@test.nl", "ASSETRail", "ASSET Rail"]);
-db.prepare(`INSERT INTO "Accounts" ("Email", "Wachtwoord") VALUES(?, ?)`).run(["beheer@prorail.nl", "beheer"]);
+db.prepare(`INSERT INTO "Accounts" ("Email", "Wachtwoord", "Onderhoudsaannemer") VALUES(?, ?, ?)`).run(["Strukton@test.nl", "$2b$10$mn06oPdHs0f2euVp2adqo.hMq9BT9IXwXj7mkIZoNGyfnRVkgLpFy", "Strukton Rail"]);
+db.prepare(`INSERT INTO "Accounts" ("Email", "Wachtwoord", "Onderhoudsaannemer") VALUES(?, ?, ?)`).run(["ASSETRail@test.nl", "$2b$10$BQ5nvVrm57ebFc8VykTsDe5nno32uXQOqdsZFdt3eovJWVaQwuwkq", "ASSET Rail"]);
+db.prepare(`INSERT INTO "Accounts" ("Email", "Wachtwoord") VALUES(?, ?)`).run(["beheer@prorail.nl", "$2b$10$pPT4Ai0egvTwhoCJ4bw4CuknQkCkmp8QA3cY7/GHpoaighK/PeSN2"]);
 
 //insert WVI data
 db.prepare(`INSERT INTO "WVIs" ("PMP enkelvoudige objectnaam", "PPLG", "Objecttype", "Geocode", "Contractgebiednummer", "Equipmentnummer", "RD X-coordinaat", "RD Y-coordinaat", "Template", "Producent") 

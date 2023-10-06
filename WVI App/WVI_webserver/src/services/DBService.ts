@@ -2,7 +2,7 @@
 import sqlite from 'better-sqlite3';
 import path from 'path';
 //const path = require('path');
-const db = new sqlite(path.resolve('./src/database.db'), { fileMustExist: true, verbose: console.log });
+const db = new sqlite(path.resolve('./database.db'), { fileMustExist: true, verbose: console.log });
 
 export function All(sql, params) {
     return db.prepare(sql).all(params);
