@@ -64,8 +64,9 @@ export default class routes{
     }
 
     static async Login(email: string, password: string) {
-        return await fetch('http://localhost:3000/login', {
+        return await fetch('http://localhost:3000/login/password', {
             method: "POST",
+            credentials: 'include',
             headers: {
                 "Content-Type": "application/json"
             },

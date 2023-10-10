@@ -12,16 +12,25 @@
   },
   "main": "app.js",
   "dependencies": {
+    "@types/cookie-parser": "^1.4.4",
+    "@types/passport": "^1.0.13",
     "bcrypt": "^5.1.1",
     "better-sqlite3": "^8.6.0",
     "body-parser": "^1.20.2",
+    "casbin": "^5.27.1",
+    "cookie-parser": "^1.4.6",
     "cors": "^2.8.5",
+    "date-and-time": "^3.0.3",
     "debug": "^2.2.0",
     "express": "^4.14.0",
+    "express-session": "^1.17.3",
     "node-opcua-client": "^2.113.0",
     "nodemon": "^3.0.1",
+    "passport": "^0.6.0",
+    "passport-local": "^1.0.0",
     "pug": "^3.0.2",
-    "ts-node": "^10.9.1"
+    "ts-node": "^10.9.1",
+    "ts-token-generator": "^1.0.4"
   },
   "devDependencies": {
     "@types/debug": "0.0.30",

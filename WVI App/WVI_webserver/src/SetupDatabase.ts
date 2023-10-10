@@ -46,6 +46,17 @@ db.prepare(`CREATE TABLE "Aannemers" (
 ); `).run();
 
 
+db.prepare(`CREATE TABLE "Tokens" (
+	"ID"	INTEGER NOT NULL UNIQUE,
+	"Email"	TEXT NOT NULL UNIQUE,
+	"Token"	TEXT NOT NULL UNIQUE,
+	"CreationDate"	TEXT NOT NULL,
+	"ExpirationDate"	TEXT NOT NULL,
+	FOREIGN KEY("Email") REFERENCES "Accounts"("Email"),
+	PRIMARY KEY("ID" AUTOINCREMENT)
+)`).run();
+
+
 //first insert aannemers data because of foreign key
 db.prepare(`INSERT INTO "Aannemers" ("Contractgebiednummer", Onderhoudsaannemer) VALUES(?, ?)`).run(["36", "Strukton Rail"]);
 db.prepare(`INSERT INTO "Aannemers" ("Contractgebiednummer", Onderhoudsaannemer) VALUES(?, ?)`).run(["28", "ASSET Rail"]);

@@ -2,6 +2,7 @@ import React, { Component, useEffect, useState } from 'react';
 import '../tailwind.css';
 import prorailLogo from '../media/proraillogo.png';
 import routes from '../Services/routes';
+import { setCookie } from '../Modules/CookieModule';
 
 
 function Login() {
@@ -28,9 +29,6 @@ function Login() {
                     }
                     else if (status === 401) {
                         setResult("Onjuiste login gegevens");
-                    }
-                    else {
-                        setResult("Account niet gevonden");
                     }
             }); } }>login</button>
         </div>

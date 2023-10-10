@@ -4,6 +4,9 @@ import OPCUAclient from './OPCUA_client';
 import { UserService } from '../services/UserService';
 import bcrypt from "bcrypt";
 import { IAccount } from '../interfaces/interfaces';
+import passport from 'passport';
+
+const LocalStrategy = require("passport-local");
 
 const router: Router = express.Router();
 
@@ -34,7 +37,7 @@ router.put('/OPCUA/write', (req: Request, res: Response) => {
     _OPCUAclient.WriteToWVI(req, res);
 });
 
-router.post('/login', (req: Request, res: Response) => {
+/*router.post('/login', (req: Request, res: Response) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     
     const account: IAccount[] = UserService.GetOneByEmailAllColumns(req.body.email);
@@ -45,6 +48,6 @@ router.post('/login', (req: Request, res: Response) => {
         else res.sendStatus(401);
         console.log(hashResult);
     }).catch(error => { throw error })
-});
+});*/
 
 export default router;

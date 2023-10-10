@@ -12,16 +12,8 @@
     <BuildOutputFolder>$(MSBuildProjectDirectory)\build</BuildOutputFolder>
   </PropertyGroup>
   <ItemGroup>
+    <Folder Include="src\Modules\" />
     <Folder Include="src\Services\" />
-  </ItemGroup>
-  <ItemGroup>
-    <TypeScriptConfiguration Remove="src\modules\**" />
-  </ItemGroup>
-  <ItemGroup>
-    <Content Include="package.json" />
-  </ItemGroup>
-  <ItemGroup>
-    <None Remove="src\modules\**" />
   </ItemGroup>
   <ItemGroup>
     <TypeScriptConfiguration Remove="dist\**" />
