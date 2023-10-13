@@ -17,7 +17,7 @@ steps:
 
 - script: |
     cd "WVI App/wvi_ui"
-    ls
+    ip addr
     npm install
     npm run start
   displayName: 'npm install and start'
