@@ -16,6 +16,7 @@ steps:
   displayName: 'Install Node.js'
 
 - script: |
+    cd "WVI App/wvi_ui"
     ls
     npm install
     npm run start
