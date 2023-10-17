@@ -1,0 +1,109 @@
+#######################################################################################
+## Kubernetes configuratiefile - bedoelt om de message broker service (SVP-550) te deployen naar Kubernetes.
+## Deployment configuratie - dummyhomepage. 
+## #{ variabelen }# worden door Azure pipelines vervangen tijdens de deployment.
+#######################################################################################
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: dummyhomepage
+spec: 
+  replicas: 1
+  selector:
+    matchLabels:
+      app: dummyhomepage
+  template:
+    metadata:
+      labels:
+        app: dummyhomepage
+        deploymentdate: #{ datetime }#
+        devops-project: #{ SYSTEM_TEAMPROJECT }#
+        jira: SVP-550
+        pipeline: 'test'
+        versie: #{ releaseVersion }#
+    spec:
+      affinity:
+        podAntiAffinity:
+          requiredDuringSchedulingIgnoredDuringExecution:
+          - labelSelector:
+              matchExpressions:
+              - key: app
+                operator: In
+                values:
+                - store
+            topologyKey: "kubernetes.io/hostname"
+      nodeSelector:
+        "kubernetes.io/os": linux
+      containers:
+      - name: dummyhomepage
+        #image: prorailot.azurecr.io/dummyhomepage:linux.#{ BUILD_BUILDID }#
+        image: mcr.microsoft.com/azuredocs/aks-helloworld:v1
+        # Validate if the pod is still functioning properly
+        livenessProbe:
+          httpGet: 
+            path: /
+            port: home-port
+          failureThreshold: 1
+          timeoutSeconds: 30
+          periodSeconds: 10
+        # Validate if the pod is functioning properly after spawning. 
+        startupProbe:
+          httpGet:
+            path: /
+            port: home-port
+          failureThreshold: 30
+          timeoutSeconds: 10
+          periodSeconds: 10
+        # Before terminating the pod, wait for x seconds to finish uncompleted requests. Then die.
+        lifecycle:
+          preStop:
+            exec: 
+              command: ["/bin/bash", "-c", "sleep 20"]
+        env:
+          - name: TITLE 
+            value: "#{ MICROSERVICE-AKS-NAMESPACE }# - Microservices - SVP-550"
+        resources:
+          requests:
+            memory: "64Mi"
+            cpu: "100m" #0.1 CPU Core
+          limits:
+            memory: "256Mi"
+            cpu: "500m" #0.5 CPU Core
+        ports:
+        - name: home-port
+          containerPort: 80
+---
+#######################################################################################
+## Service configuratie - Maak deployment bereikbaar voor andere pods binnen de namespace ovv de servicenaam dummyhomepage.
+## dummyhomepage omvat het docker-image met Apache en is compatible met Linux.
+## De service dummyhomepage (herkenbaar aan metadata -> name) ontsluit de deployments op basis van het label dummyhomepage (herkenbaar aan  selector -> matchlabels -> app) naar andere pods. 
+#######################################################################################
+apiVersion: v1
+kind: Service
+metadata:
+  name: dummyhomepage
+spec:
+  type: ClusterIP
+  ports:
+  - port: 80
+  selector:
+    app: dummyhomepage
+---
+apiVersion: autoscaling/v2
+kind: HorizontalPodAutoscaler
+metadata:
+  name: dummyhomepage
+spec:
+  scaleTargetRef:
+    apiVersion: apps/v1
+    kind: Deployment
+    name: dummyhomepage
+  minReplicas: 1
+  maxReplicas: 10
+  metrics:
+  - type: Resource
+    resource:
+      name: cpu
+      target:
+        type: Utilization
+        averageUtilization: 50
