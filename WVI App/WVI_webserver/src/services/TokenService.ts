@@ -2,6 +2,7 @@ import { All, Run, QueryNoParams } from './DBService';
 import date from 'date-and-time';
 
 export class TokenService {
+
     public static InsertOne(Email: string, token: string) {
         const CreationDate = new Date();
         const ExpirationDate = date.addHours(CreationDate, 1);
@@ -16,9 +17,6 @@ export class TokenService {
 
         if (results.length === 0) return false;
         if (results[0].ExpirationDate < new Date()) {
-            console.log("ExpirationDate: " + results[0].ExpirationDate);
-            console.log("new Date()" + new Date());
-
             this.RemoveToken(token);
             return false;
         }
@@ -31,9 +29,6 @@ export class TokenService {
 
         if (results.length === 0) return false;
         if (results[0].ExpirationDate < new Date()) {
-            console.log("ExpirationDate: " + results[0].ExpirationDate);
-            console.log("new Date()" + new Date());
-
             this.RemoveToken(token);
             return false;
         }
@@ -52,6 +47,11 @@ export class TokenService {
 
     public static UpdateTokenNoEmail(token: string) {
         return Run(`UPDATE "Tokens" Set ExpirationDate = ? WHERE Token = ?`, [date.format(date.addHours(new Date(), 1), "DD/MM/YYYY hh:mm:s:SSS"), token]);
+    }
+
+    public static GetEmail(token: string): any[] {
+        return All(`SELECT "Email" FROM "Tokens" WHERE Token = ?`,
+            [token]);
     }
 }
 

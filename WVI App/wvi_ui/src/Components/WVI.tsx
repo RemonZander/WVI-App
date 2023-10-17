@@ -12,7 +12,6 @@ import routes from '../Services/routes';
 import refreshArrow from '../media/refreshArrow.png';
 import noActivity from '../media/no activity.png';
 
-
 function Dashboard() {
     const [dropDownOperationChoice, setDropDownOperationChoice] = useState(false);
     const [dropDown, setDropDown] = useState(false);

@@ -4,6 +4,7 @@ import OPCUAclient from './OPCUA_client';
 import passport from 'passport';
 import { TokenService } from '../services/TokenService';
 import { TokenGenerator } from 'ts-token-generator';
+import { UserService } from '../services/UserService';
 
 const router: Router = express.Router();
 
@@ -51,6 +52,20 @@ router.get('/logout', (req: Request, res: Response) => {
     res.sendStatus(200);
 });
 
+router.get('/role', (req: Request, res: Response) => {
+    const results = TokenService.GetEmail(req.cookies.login);
+    if (results.length === 0) {
+        res.sendStatus(401);
+        return;
+    }
+    const user = UserService.GetOneByEmailSelectColumns(`"Role"`, results[0].Email);
+    if (user.length === 0) {
+        res.sendStatus(404);
+        return;
+    }
+    res.send(JSON.stringify(user[0].Role));
+});
+
 router.post('/login',
     passport.authenticate('local'),
     function (req, res: Response) {
@@ -67,5 +82,9 @@ router.post('/login',
         res.sendStatus(200);
     }
 );
+
+router.get('/accounts', (req: Request, res: Response) => {
+    res.send(JSON.stringify(UserService.GetAll()));
+});
 
 export default router;

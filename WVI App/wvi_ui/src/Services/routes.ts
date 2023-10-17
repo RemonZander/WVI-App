@@ -9,7 +9,7 @@ export default class routes {
             body: JSON.stringify({ nodeId: nodeId })
         }).then((res) => {
            return res.json();
-       }).then((data : number) => { return data });
+       }).then((data: number) => { return data });
     }
 
     static async SetStatus(mode: number, nodeId: string) {
@@ -30,7 +30,7 @@ export default class routes {
             },
             body: JSON.stringify({ nodeId: nodeId })
         }).then((res) => {
-            if (res.status == 404) return "404";
+            if (res.status === 404) return "404";
             return res.json();
         });
     }
@@ -91,6 +91,24 @@ export default class routes {
             credentials: 'include'
         }).then((res) => {
             return res.status;
+        });
+    }
+
+    static async GetRole() {
+        return await fetch('http://localhost:3000/role', {
+            method: "GET",
+            credentials: 'include'
+        }).then((res) => {
+            return res;
+        });
+    }
+
+    static async GetAllAccounts() {
+        return await fetch('http://localhost:3000/accounts', {
+            method: "GET",
+            credentials: 'include'
+        }).then((res) => {
+            return res.json();
         });
     }
 }
