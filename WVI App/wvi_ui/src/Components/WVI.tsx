@@ -1,7 +1,7 @@
 /* eslint-disable no-loop-func */
 /* eslint-disable react-hooks/exhaustive-deps */
 /* eslint-disable jsx-a11y/anchor-is-valid */
-import React, { Component, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../tailwind.css';
 import activityGreen from '../media/activity green.png';
 import activityOrange from '../media/activity orange.png';
@@ -23,7 +23,7 @@ function Dashboard() {
     const [currentNode, setCurrentNode] = useState("");
     const [status, setStatus] = useState([{ status: "", activityLed: noActivity }, { status: "", activityLed: noActivity }]);
 
-    const WVIs = [{ Name: "GK-MBR-01", NodeId: "ns=3;s=GK-MRB-01" }, { Name: "GK.AKM.03", NodeId: "ns=3;s=GK.AKM.03" }];
+    const WVIs = [{ Name: "GK-MBR-01", NodeId: "ns=7;s=GK-MRB-01" }, { Name: "GK.AKM.03", NodeId: "ns=7;s=GK.AKM.03" }];
         
     async function DoSetStatus(pos: number, node: string) {
         await routes.GetStatus(node).then((result: number) => {
@@ -74,6 +74,10 @@ function Dashboard() {
     }
 
     useEffect(() => {
+        routes.ValidateToken().then((status) => {
+            if (status === 401) window.location.replace('/');
+        });
+
         (async () => {
             for (var a = 0; a < WVIs.length; a++) {
                 await routes.IsOnline().then((statuscode) => {
@@ -86,8 +90,6 @@ function Dashboard() {
                     DoSetStatus(a, WVIs[a].NodeId);
                 });
             }
-
-            console.log(status);
         })();
     }, []);
 

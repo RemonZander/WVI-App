@@ -1,4 +1,4 @@
-export default class routes{
+export default class routes {
 
     static GetStatus(nodeId: string) {
         return fetch('http://localhost:3000/OPCUA/status', {
@@ -64,13 +64,22 @@ export default class routes{
     }
 
     static async Login(email: string, password: string) {
-        return await fetch('http://localhost:3000/login/password', {
+        return await fetch('http://localhost:3000/login', {
             method: "POST",
             credentials: 'include',
             headers: {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({ email: email, password: password })
+        }).then((res) => {
+            return res.status;
+        });
+    }
+
+    static async ValidateToken() {
+        return await fetch('http://localhost:3000/validatetoken', {
+            method: "GET",
+            credentials: 'include'
         }).then((res) => {
             return res.status;
         });

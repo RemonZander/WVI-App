@@ -3,12 +3,12 @@ const path = require('path');
 const fs = require('fs');
 
 try {
-	fs.unlinkSync(path.resolve('./database.db'));
+	fs.unlinkSync(path.resolve('./src/database.db'));
 } catch (e) {
 
 }
 console.log(path.resolve('./database.db'));
-const db = new sqlite(path.resolve('./database.db'), { fileMustExist: false, verbose: console.log });
+const db = new sqlite(path.resolve('./src/database.db'), { fileMustExist: false, verbose: console.log });
 
 //create WVi table
 db.prepare(`CREATE TABLE "WVIs" (
@@ -34,6 +34,7 @@ db.prepare(`CREATE TABLE "Accounts" (
 	"Email"	NOT NULL UNIQUE,
 	"Wachtwoord" NOT NULL,
 	"Onderhoudsaannemer"	TEXT,
+	"Role"	TEXT,
 	PRIMARY KEY("ID" AUTOINCREMENT)
 );`).run();
 
@@ -67,9 +68,9 @@ db.prepare(`INSERT INTO "Aannemers" ("Contractgebiednummer", Onderhoudsaannemer)
 db.prepare(`INSERT INTO "Aannemers" ("Contractgebiednummer", Onderhoudsaannemer) VALUES(?, ?)`).run(["19", "Strukton Rail"]);
 
 //insert accounts
-db.prepare(`INSERT INTO "Accounts" ("Email", "Wachtwoord", "Onderhoudsaannemer") VALUES(?, ?, ?)`).run(["Strukton@test.nl", "$2b$10$mn06oPdHs0f2euVp2adqo.hMq9BT9IXwXj7mkIZoNGyfnRVkgLpFy", "Strukton Rail"]);
-db.prepare(`INSERT INTO "Accounts" ("Email", "Wachtwoord", "Onderhoudsaannemer") VALUES(?, ?, ?)`).run(["ASSETRail@test.nl", "$2b$10$BQ5nvVrm57ebFc8VykTsDe5nno32uXQOqdsZFdt3eovJWVaQwuwkq", "ASSET Rail"]);
-db.prepare(`INSERT INTO "Accounts" ("Email", "Wachtwoord") VALUES(?, ?)`).run(["beheer@prorail.nl", "$2b$10$pPT4Ai0egvTwhoCJ4bw4CuknQkCkmp8QA3cY7/GHpoaighK/PeSN2"]);
+db.prepare(`INSERT INTO "Accounts" ("Email", "Wachtwoord", "Onderhoudsaannemer", "Role") VALUES(?, ?, ?, ?)`).run(["Strukton@test.nl", "$2b$10$mn06oPdHs0f2euVp2adqo.hMq9BT9IXwXj7mkIZoNGyfnRVkgLpFy", "Strukton Rail", "aannemer"]);
+db.prepare(`INSERT INTO "Accounts" ("Email", "Wachtwoord", "Onderhoudsaannemer", "Role") VALUES(?, ?, ?, ?)`).run(["ASSETRail@test.nl", "$2b$10$BQ5nvVrm57ebFc8VykTsDe5nno32uXQOqdsZFdt3eovJWVaQwuwkq", "ASSET Rail", "aannemer"]);
+db.prepare(`INSERT INTO "Accounts" ("Email", "Wachtwoord", "Role") VALUES(?, ?, ?)`).run(["beheer@prorail.nl", "$2b$10$pPT4Ai0egvTwhoCJ4bw4CuknQkCkmp8QA3cY7/GHpoaighK/PeSN2", "beheerder"]);
 
 //insert WVI data
 db.prepare(`INSERT INTO "WVIs" ("PMP enkelvoudige objectnaam", "PPLG", "Objecttype", "Geocode", "Contractgebiednummer", "Equipmentnummer", "RD X-coordinaat", "RD Y-coordinaat", "Template", "Producent") 

@@ -1,16 +1,15 @@
 import express, { Request, Response } from 'express';
 import { Router } from 'express-serve-static-core';
 import OPCUAclient from './OPCUA_client';
-import { UserService } from '../services/UserService';
-import bcrypt from "bcrypt";
-import { IAccount } from '../interfaces/interfaces';
 import passport from 'passport';
-
-const LocalStrategy = require("passport-local");
+import { TokenService } from '../services/TokenService';
+import { TokenGenerator } from 'ts-token-generator';
 
 const router: Router = express.Router();
 
 const _OPCUAclient = new OPCUAclient();
+
+const tokgen = new TokenGenerator();
 
 router.post('/OPCUA/status', (req: Request, res: Response) => {
     res.setHeader('Content-Type', 'application/json');
@@ -37,17 +36,30 @@ router.put('/OPCUA/write', (req: Request, res: Response) => {
     _OPCUAclient.WriteToWVI(req, res);
 });
 
-/*router.post('/login', (req: Request, res: Response) => {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    
-    const account: IAccount[] = UserService.GetOneByEmailAllColumns(req.body.email);
-    if (account.length === 0) res.sendStatus(404);
+router.get('/validatetoken', (req: Request, res: Response) => {
+    if (TokenService.TokenExistsByToken(req.cookies["login"])) {
+        TokenService.UpdateTokenNoEmail(req.cookies.login);
+        res.sendStatus(200);
+        return;
+    }
+    res.sendStatus(401);
+});
 
-    bcrypt.compare(req.body.password, account[0].Wachtwoord).then(async hashResult => {
-        if (hashResult) res.sendStatus(200);
-        else res.sendStatus(401);
-        console.log(hashResult);
-    }).catch(error => { throw error })
-});*/
+router.post('/login',
+    passport.authenticate('local'),
+    function (req, res: Response) {
+
+        const token = tokgen.generate();
+        if (TokenService.TokenExists(req.body.email, req.cookies.login)) {
+            TokenService.UpdateToken(req.body.email, req.cookies.login);
+            res.sendStatus(200);
+            return;
+        }
+        TokenService.RemoveToken(req.body.email);
+        TokenService.InsertOne(req.body.email, token);
+        res.cookie('login', token, { path: '/', httpOnly: true, maxAge: 3600000 });
+        res.sendStatus(200);
+    }
+);
 
 export default router;

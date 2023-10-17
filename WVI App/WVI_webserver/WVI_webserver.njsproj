@@ -46,6 +46,7 @@
     <TypeScriptCompile Include="src\enums\datamodel.ts" />
     <TypeScriptCompile Include="src\interfaces\interfaces.ts" />
     <TypeScriptCompile Include="src\modules\routerModule.ts" />
+    <TypeScriptCompile Include="src\passportStragegies.ts" />
     <TypeScriptCompile Include="src\services\AuthenticationService.ts" />
     <TypeScriptCompile Include="src\services\DBService.ts" />
     <TypeScriptCompile Include="src\server.ts" />

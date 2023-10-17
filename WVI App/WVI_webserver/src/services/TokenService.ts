@@ -11,16 +11,47 @@ export class TokenService {
     }
 
     public static TokenExists(Email: string, token: string): boolean {
-        const results = All(`SELECT "Email", "Token" FROM "Tokens" WHERE Email = ? AND Token = ?`,
+        const results = All(`SELECT "Email", "Token", "ExpirationDate" FROM "Tokens" WHERE Email = ? AND Token = ?`,
             [Email, token]);
 
         if (results.length === 0) return false;
+        if (results[0].ExpirationDate < new Date()) {
+            console.log("ExpirationDate: " + results[0].ExpirationDate);
+            console.log("new Date()" + new Date());
+
+            this.RemoveToken(Email);
+            return false;
+        }
         return true;
     }
 
+    public static TokenExistsByToken(token: string): boolean {
+        const results = All(`SELECT "Email", "Token", "ExpirationDate" FROM "Tokens" WHERE Token = ?`,
+            [token]);
+
+        if (results.length === 0) return false;
+        if (results[0].ExpirationDate < new Date()) {
+            console.log("ExpirationDate: " + results[0].ExpirationDate);
+            console.log("new Date()" + new Date());
+
+            this.RemoveToken(results.Email);
+            return false;
+        }
+        return true;
+    }
+
+    public static RemoveToken(Email: string) {
+        Run(`DELETE FROM "Tokens" WHERE "Email" = ?`, [Email]);
+
+        return 200;
+    }
+
     public static UpdateToken(Email: string, Token: string) {
-        const ExpirationDate = date.parse(All(`SELECT "ExpirationDate" from "Tokens" WHERE Email = ? AND Token = ?`, [Email, Token])[0].ExpirationDate, "DD/MM/YYYY hh:mm:s:SSS");
-        return Run(`UPDATE "Tokens" Set ExpirationDate = ? WHERE Email = ? AND Token = ?`, [date.format(date.addHours(ExpirationDate, 1), "DD/MM/YYYY hh:mm:s:SSS"), Email, Token]);
+        return Run(`UPDATE "Tokens" Set ExpirationDate = ? WHERE Email = ? AND Token = ?`, [date.format(date.addHours(new Date(), 1), "DD/MM/YYYY hh:mm:s:SSS"), Email, Token]);
+    }
+
+    public static UpdateTokenNoEmail(token: string) {
+        return Run(`UPDATE "Tokens" Set ExpirationDate = ? WHERE Token = ?`, [date.format(date.addHours(new Date(), 1), "DD/MM/YYYY hh:mm:s:SSS"), token]);
     }
 }
 
