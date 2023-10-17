@@ -1,3 +1,4 @@
+import { IAccount } from '../interfaces/interfaces';
 import { All, Run, QueryNoParams } from './DBService';
 
 export class UserService {
@@ -6,12 +7,16 @@ export class UserService {
         return QueryNoParams(`SELECT * FROM Accounts`).all();
     }
 
-    public static GetOne(columns, filterColumn, value): string {
+    public static GetOne(columns: string, filterColumn: string, value: string): string {
         return All(`SELECT ${columns} FROM Accounts WHERE "${filterColumn}" = ?`, [value]);
     }
 
-    public static GetOneAllColumns(filterColumn, value): string {
-        return All(`SELECT * FROM Accounts WHERE "${filterColumn}" = ?`, [value]);
+    public static GetOneByEmailSelectColumns(columns: string, value: string): string {
+        return All(`SELECT ${columns} FROM Accounts WHERE "Email" = ?`, [value]);
+    }
+
+    public static GetOneByEmailAllColumns(email: string): IAccount[] {
+        return All(`SELECT * FROM Accounts WHERE "Email" = ?`, [email]);
     }
 
     public static InsertOne(data): string {

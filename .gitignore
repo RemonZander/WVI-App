@@ -399,3 +399,4 @@ FodyWeavers.xsd
 /WVI App/wvi_ui/.vscode
 /WVI App/OPCUAServer/env
 /WVI App/WVI_webserver/src/database.db
+/WVI App/WVI_webserver/src/database.db-journal
