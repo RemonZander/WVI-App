@@ -23,7 +23,7 @@ function Dashboard() {
     const [currentNode, setCurrentNode] = useState("");
     const [status, setStatus] = useState([{ status: "", activityLed: noActivity }, { status: "", activityLed: noActivity }]);
 
-    const WVIs = [{ Name: "GK-MBR-01", NodeId: "ns=7;s=GK-MRB-01" }, { Name: "GK.AKM.03", NodeId: "ns=7;s=GK.AKM.03" }];
+    const WVIs = [{ Name: "GK-MBR-01", NodeId: "ns=3;s=GK-MRB-01" }, { Name: "GK.AKM.03", NodeId: "ns=3;s=GK.AKM.03" }];
         
     async function DoSetStatus(pos: number, node: string) {
         await routes.GetStatus(node).then((result: number) => {

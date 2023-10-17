@@ -76,6 +76,15 @@ export default class routes {
         });
     }
 
+    static async Logout() {
+        return await fetch('http://localhost:3000/logout', {
+            method: "GET",
+            credentials: 'include'
+        }).then((res) => {
+            return res.status;
+        });
+    }
+
     static async ValidateToken() {
         return await fetch('http://localhost:3000/validatetoken', {
             method: "GET",

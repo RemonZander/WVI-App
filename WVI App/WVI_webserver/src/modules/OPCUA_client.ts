@@ -107,7 +107,7 @@ export default class OPCUAclient {
             let nodes = [];
             await this.RecursiveBrowse(await session.browse(req.body.nodeId) as BrowseResult, session).then((results) => {
                 results.forEach((result) => {
-                    if (result.NodeId.includes("ns=7")) {
+                    if (result.NodeId.includes("ns=3")) {
                         nodes.push({ DisplayName: result.browseName, Nodes: result.NodeId, Data: "", dataType: result.dataType })
                     }                 
                 });

@@ -19,7 +19,7 @@ export class TokenService {
             console.log("ExpirationDate: " + results[0].ExpirationDate);
             console.log("new Date()" + new Date());
 
-            this.RemoveToken(Email);
+            this.RemoveToken(token);
             return false;
         }
         return true;
@@ -34,14 +34,14 @@ export class TokenService {
             console.log("ExpirationDate: " + results[0].ExpirationDate);
             console.log("new Date()" + new Date());
 
-            this.RemoveToken(results.Email);
+            this.RemoveToken(token);
             return false;
         }
         return true;
     }
 
-    public static RemoveToken(Email: string) {
-        Run(`DELETE FROM "Tokens" WHERE "Email" = ?`, [Email]);
+    public static RemoveToken(token: string) {
+        Run(`DELETE FROM "Tokens" WHERE "Token" = ?`, [token]);
 
         return 200;
     }

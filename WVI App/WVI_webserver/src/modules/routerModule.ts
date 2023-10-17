@@ -45,6 +45,12 @@ router.get('/validatetoken', (req: Request, res: Response) => {
     res.sendStatus(401);
 });
 
+router.get('/logout', (req: Request, res: Response) => {
+    TokenService.RemoveToken(req.cookies.login);
+    res.clearCookie("login");
+    res.sendStatus(200);
+});
+
 router.post('/login',
     passport.authenticate('local'),
     function (req, res: Response) {
