@@ -16,7 +16,7 @@ export class UserService {
     }
 
     public static GetOneByEmailAllColumns(email: string): IAccount[] {
-        return All(`SELECT "Email", "Onderhoudsaannemer", "Role" FROM Accounts WHERE "Email" = ?`, [email]);
+        return All(`SELECT "Email", "Onderhoudsaannemer", "Role", "Wachtwoord" FROM Accounts WHERE "Email" = ?`, [email]);
     }
 
     public static InsertOne(data): string {

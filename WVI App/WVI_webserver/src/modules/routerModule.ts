@@ -76,9 +76,9 @@ router.post('/login',
             res.sendStatus(200);
             return;
         }
-        TokenService.RemoveToken(req.body.email);
+        TokenService.RemoveTokenByEmail(req.body.email);
         TokenService.InsertOne(req.body.email, token);
-        res.cookie('login', token, { path: '/', httpOnly: true, maxAge: 3600000 });
+        res.cookie('login', token, { path: '/', httpOnly: true, maxAge: 3600000, sameSite: "strict" });
         res.sendStatus(200);
     }
 );

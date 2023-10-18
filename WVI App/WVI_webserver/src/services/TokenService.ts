@@ -41,6 +41,12 @@ export class TokenService {
         return 200;
     }
 
+    public static RemoveTokenByEmail(token: string) {
+        Run(`DELETE FROM "Tokens" WHERE "Email" = ?`, [token]);
+
+        return 200;
+    }
+
     public static UpdateToken(Email: string, Token: string) {
         return Run(`UPDATE "Tokens" Set ExpirationDate = ? WHERE Email = ? AND Token = ?`, [date.format(date.addHours(new Date(), 1), "DD/MM/YYYY hh:mm:s:SSS"), Email, Token]);
     }

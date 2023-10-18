@@ -12,11 +12,18 @@ const bodyParser = require('body-parser');
 
 const app: Express = express();
 
+
+//https://www.npmjs.com/package/csrf-csrf
+//https://www.npmjs.com/package/react-helmet    ook X-XSS-Protection
+
+app.disable('x-powered-by');
+
 app.use(cors({
     origin: "http://localhost:3001",
     withCredentials: true,
     credentials: true,
 }));
+
 app.use(session({
     secret: "keyboard cat",
     resave: true,
