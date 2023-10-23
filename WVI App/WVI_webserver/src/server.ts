@@ -1,12 +1,14 @@
 import express, { Express } from 'express';
 import { AddressInfo } from "net";
 import cors from "cors";
-import router from './modules/routerModule';
+import Accountrouter from './modules/AccountrouterRouterModule';
 import session from 'express-session';
 import passport from 'passport';
 import { IAccount } from './interfaces/interfaces';
 import cookieParser from 'cookie-parser';
 import localStrategy from './passportStragegies';
+import authenticationRouter from './modules/authenticationRouterModule';
+import OPCUARouter from './modules/OPCUARouterModule';
 
 const bodyParser = require('body-parser');
 
@@ -40,7 +42,9 @@ app.use(bodyParser.json());
 app.use(cookieParser());
 app.use(bodyParser.urlencoded({ extended: true }));
 app.set('port', process.env.PORT || 3000);
-app.use(router);
+app.use(Accountrouter);
+app.use(authenticationRouter);
+app.use(OPCUARouter);
 
 app.use(passport.initialize());
 app.use(passport.authenticate('session'));

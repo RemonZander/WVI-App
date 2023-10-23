@@ -24,8 +24,20 @@ export class UserService {
             VALUES (?,?)`, data);
     }
 
-    public static RemoveOne(column, value): string {
-        return Run(`DELETE FROM "Accounts" WHERE "${column}" = ?`, value);
+    public static RemoveOne(value): string {
+        return Run(`DELETE FROM "Accounts" WHERE "Email" = ?`, value);
+    }
+
+    public static UpdateOnderhoudsaannemer(onderhoudsaannemer: string, email: string) {
+        return Run('UPDATE "Accounts" Set Onderhoudsaannemer = ? WHERE Email = ?', [onderhoudsaannemer, email]);
+    }
+
+    public static ListRoles() {
+        return QueryNoParams('SELECT "Role" FROM Roles').all();
+    }
+
+    public static UpdateRole(role: string, email: string) {
+        return Run(`UPDATE "Accounts" Set Role = ? WHERE Email = ?`, [role, email]);
     }
 }
 

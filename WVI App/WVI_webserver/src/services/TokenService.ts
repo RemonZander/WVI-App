@@ -48,7 +48,7 @@ export class TokenService {
     }
 
     public static UpdateToken(Email: string, Token: string) {
-        return Run(`UPDATE "Tokens" Set ExpirationDate = ? WHERE Email = ? AND Token = ?`, [date.format(date.addHours(new Date(), 1), "DD/MM/YYYY hh:mm:s:SSS"), Email, Token]);
+        return Run(`UPDATE "Tokens" Set ExpirationDate = ? WHERE Email = ? AND Token = ?`, [date.format(date.addMinutes(new Date(), 10), "DD/MM/YYYY hh:mm:s:SSS"), Email, Token]);
     }
 
     public static UpdateTokenNoEmail(token: string) {
@@ -58,6 +58,7 @@ export class TokenService {
     public static GetEmail(token: string): any[] {
         return All(`SELECT "Email" FROM "Tokens" WHERE Token = ?`,
             [token]);
+
     }
 }
 

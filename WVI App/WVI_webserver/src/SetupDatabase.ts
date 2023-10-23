@@ -28,13 +28,22 @@ db.prepare(`CREATE TABLE "WVIs" (
 	PRIMARY KEY("ID" AUTOINCREMENT)
 ); `).run();
 
+//Create table roles
+db.prepare(`CREATE TABLE "Roles" (
+	"ID"			INTEGER NOT NULL UNIQUE,
+	"Role"			TEXT NOT NULL UNIQUE,
+	"Permissions"	TEXT,
+	PRIMARY KEY("ID" AUTOINCREMENT)
+);`).run();
+
 //Create accounts table
 db.prepare(`CREATE TABLE "Accounts" (
 	"ID"	INTEGER NOT NULL UNIQUE,
 	"Email"	NOT NULL UNIQUE,
 	"Wachtwoord" NOT NULL,
 	"Onderhoudsaannemer"	TEXT,
-	"Role"	TEXT,
+	"Role"	TEXT NOT NULL,
+	FOREIGN KEY("Role") REFERENCES "Roles"("Role"),
 	PRIMARY KEY("ID" AUTOINCREMENT)
 );`).run();
 
@@ -53,7 +62,7 @@ db.prepare(`CREATE TABLE "Tokens" (
 	"Token"	TEXT NOT NULL UNIQUE,
 	"CreationDate"	TEXT NOT NULL,
 	"ExpirationDate"	TEXT NOT NULL,
-	FOREIGN KEY("Email") REFERENCES "Accounts"("Email"),
+	FOREIGN KEY("Email") REFERENCES "Accounts"("Email") ON DELETE CASCADE,
 	PRIMARY KEY("ID" AUTOINCREMENT)
 )`).run();
 
@@ -66,6 +75,10 @@ db.prepare(`INSERT INTO "Aannemers" ("Contractgebiednummer", Onderhoudsaannemer)
 db.prepare(`INSERT INTO "Aannemers" ("Contractgebiednummer", Onderhoudsaannemer) VALUES(?, ?)`).run(["32", "VolkerRail"]);
 db.prepare(`INSERT INTO "Aannemers" ("Contractgebiednummer", Onderhoudsaannemer) VALUES(?, ?)`).run(["27", "ASSET Rail"]);
 db.prepare(`INSERT INTO "Aannemers" ("Contractgebiednummer", Onderhoudsaannemer) VALUES(?, ?)`).run(["19", "Strukton Rail"]);
+
+//inset roles
+db.prepare(`INSERT INTO "Roles" ("Role") VALUES(?)`).run(["aannemer"]);
+db.prepare(`INSERT INTO "Roles" ("Role") VALUES(?)`).run(["beheerder"]);
 
 //insert accounts
 db.prepare(`INSERT INTO "Accounts" ("Email", "Wachtwoord", "Onderhoudsaannemer", "Role") VALUES(?, ?, ?, ?)`).run(["Strukton@test.nl", "$2b$10$mn06oPdHs0f2euVp2adqo.hMq9BT9IXwXj7mkIZoNGyfnRVkgLpFy", "Strukton Rail", "aannemer"]);

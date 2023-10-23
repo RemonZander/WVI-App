@@ -111,4 +111,52 @@ export default class routes {
             return res.json();
         });
     }
+
+    static async DeleteAccount(email: string) {
+        return await fetch('http://localhost:3000/removeAccount', {
+            method: "DELETE",
+            credentials: 'include',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ email: email })
+        }).then((res => {
+            return res.status;
+        }));
+    }
+
+    static async UpdateOnderhoudsaannemer(email: string, onderhoudsaannemer: string) {
+        return await fetch('http://localhost:3000/removeOnderhoudsaannemer', {
+            method: "POST",
+            credentials: 'include',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ onderhoudsaannemer: onderhoudsaannemer, email: email })
+        }).then((res => {
+            return res.status;
+        }));
+    }
+
+    static async ListRoles() {
+        return await fetch('http://localhost:3000/listRoles', {
+            method: "GET",
+            credentials: 'include'
+        }).then((res) => {
+            return res.json();
+        });
+    }
+
+    static async UpdateRole(email: string, role: string) {
+        return await fetch('http://localhost:3000/updateRole', {
+            method: "POST",
+            credentials: 'include',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ role: role, email: email })
+        }).then((res => {
+            return res.status;
+        }));
+    }
 }

@@ -8,8 +8,6 @@ import Accounts from './Accounts';
 import Addaccount from './Addaccount';
 import Login from './Login';
 import routes from '../Services/routes';
-import { Cookies } from 'react-cookie';
-
 
 const router = createBrowserRouter([
     {
@@ -60,7 +58,7 @@ function Home() {
             });
         }));
 
-        switch (window.location.href.replace(window.location.host, '').replace(window.location.protocol + "//", '')) {
+        switch (window.location.href.replace(window.location.host, '').replace(window.location.protocol + "//", '').replace("#", "")) {
             case '/':
                 setShowButtons(false);
                 setWVIview(false);
@@ -100,8 +98,7 @@ function Home() {
     }, []);
 
 
-    return (
-        <React.StrictMode>
+    return (       
             <div className="bg-[#2F2F31] w-screen h-screen flex flex-col text-gray-300">
                 <div className="bg-[#2C2C39] w-screen h-[120px] flex justify-between rounded-b-[0.5vw]">
                     <img className="ml-[1vw]" src={logo} alt="" width="120" height="120" />
@@ -184,8 +181,7 @@ function Home() {
                 <div className="bg-[#2C2C39] w-screen flex flex-grow">
                     <RouterProvider router={router} />
                 </div>
-            </div>
-        </React.StrictMode>
+            </div>        
     )
 }
 
