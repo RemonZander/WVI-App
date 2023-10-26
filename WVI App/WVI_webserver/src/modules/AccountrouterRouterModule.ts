@@ -43,4 +43,9 @@ Accountrouter.post('/updateRole', (req: Request, res: Response) => {
     res.sendStatus(200);
 });
 
+Accountrouter.get('/listOnderhoudsaannemers', (req: Request, res: Response) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(JSON.stringify(UserService.ListOnderhoudsaannemers()));
+});
+
 export default Accountrouter;
