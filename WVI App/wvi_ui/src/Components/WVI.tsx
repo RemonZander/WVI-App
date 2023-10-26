@@ -11,6 +11,7 @@ import arrow from '../media/arrow.png';
 import routes from '../Services/routes';
 import refreshArrow from '../media/refreshArrow.png';
 import noActivity from '../media/no activity.png';
+import { IWVI, IWVIStatus } from '../interfaces/interfaces';
 
 function Dashboard() {
     const [dropDownOperationChoice, setDropDownOperationChoice] = useState(false);
@@ -19,13 +20,13 @@ function Dashboard() {
     const [nodeData, setNodeData] = useState([{ DisplayName: "", Nodes: "", Data: "", dataType: "" }]);
     const [heatingCurve, setHeatingCurve] = useState([""]);
     const [defaultHeatingCurve, setDefaultHeatingCurve] = useState([""]);
-    const [currentNode, setCurrentNode] = useState("");
-    const [status, setStatus] = useState([{ status: "", activityLed: noActivity }, { status: "", activityLed: noActivity }]);
-
-    const WVIs = [{ Name: "GK-MBR-01", NodeId: "ns=3;s=GK-MRB-01" }, { Name: "GK.AKM.03", NodeId: "ns=3;s=GK.AKM.03" }];
+    const [currentNode, setCurrentNode] = useState({ Node: "", endpoint: "" });
+    const [status, setStatus] = useState<IWVIStatus[]>([]);
+    const [WVIs, setWVIs] = useState<IWVI[]>([]);
+    const [showWVIs, setShowWVIs] = useState(false);
         
-    async function DoSetStatus(pos: number, node: string) {
-        await routes.GetStatus(node).then((result: number) => {
+    async function DoSetStatus(pos: number, node: string, eindpoint: string) {
+        await routes.GetStatus(node, eindpoint).then((result: number) => {
             if (result == 0) {
                 let newStatus = status;
                 newStatus[pos] = { status: "uit", activityLed: activityWhite };
@@ -49,8 +50,8 @@ function Dashboard() {
         });
     }
 
-    async function GetData(nodeId: string) {
-        await routes.GetData(nodeId).then((data: [{ DisplayName: string, Nodes: string, Data: string, dataType: string }]) => {
+    async function GetData(nodeId: string, eindpoint: string) {
+        await routes.GetData(nodeId, eindpoint).then((data: [{ DisplayName: string, Nodes: string, Data: string, dataType: string }]) => {
             let newdata = [];
             let removeIndexes = [];
             for (var a = 0; a < data.length; a++) {
@@ -69,7 +70,7 @@ function Dashboard() {
             setNodeData(newdata);
         });
 
-        DoSetStatus(WVIs.findIndex(wvi => wvi.NodeId === currentNode), currentNode);
+        DoSetStatus(WVIs.findIndex(wvi => wvi.PMP_enkelvoudige_objectnaam === currentNode.Node), currentNode.Node, eindpoint);
     }
 
     useEffect(() => {
@@ -77,27 +78,41 @@ function Dashboard() {
             if (status === 401) window.location.replace('/');
         });
 
-        (async () => {
-            for (var a = 0; a < WVIs.length; a++) {
-                await routes.IsOnline().then((statuscode) => {
-                    if (statuscode == 404) {
-                        let newStatus = status;
-                        newStatus[a] = { status: "Geen verbinding", activityLed: noActivity };
-                        setStatus(newStatus);
-                        return;
-                    }
-                    DoSetStatus(a, WVIs[a].NodeId);
-                });
+        routes.GetWVIs().then((data: IWVI[]) => {
+            setWVIs(data);
+        
+            let newStatus: any[] = [];
+            for (var b = 0; b < data.length; b++) { 
+                newStatus.push({ status: "Geen verbinding", activityLed: noActivity });
             }
-        })();
+
+            setStatus(newStatus);
+
+            (async () => {
+                for (var a = 0; a < data.length; a++) {
+                    //let newStatus: any[] = [];
+                    await routes.IsOnline(data[a].Endpoint).then((statuscode) => {
+                        if (statuscode == 404) {  
+                            let newStatus = status;
+                            newStatus[a] = { status: "Geen verbinding", activityLed: noActivity };
+                            setStatus(newStatus);
+                            return;
+                        }
+                        DoSetStatus(a, data[a].PMP_enkelvoudige_objectnaam, data[a].Endpoint);
+                    });
+                }
+
+                setShowWVIs(true);
+            })();
+        });
     }, []);
 
 return (
     <div className="bg-[#2C2C39] w-screen flex flex-grow">
         <div className="ml-[10vw] mt-[5vh] flex-col items-center gap-y-1 max-h-[60vh] w-[280px] overflow-y-scroll">
             <span className="text-white text-[2rem]">WVI's</span>
-            {WVIs.map((WVI, index) => <div className="flex flex-col relative bg-[#262739] mb-[1vh]">
-                <span className="text-white ml-[87px]">{WVI.Name}</span>
+            {showWVIs ? WVIs.map((WVI, index) => <div className="flex flex-col relative bg-[#262739] mb-[1vh]">
+                <span className="text-white ml-[87px]">{WVI.PMP_enkelvoudige_objectnaam}</span>
                 <div className="flex items-center">
                     <span className="text-white ml-[20px]">Status:</span>
                     <span className="text-white ml-[20px]"> {status[index].status}</span>
@@ -109,19 +124,19 @@ return (
                 </div>
                 <button className="absolute self-end left[100%] top-[20px]" onClick={() => {
                     setOperationChoice("");
-                    GetData(WVI.NodeId);
-                    setCurrentNode(WVI.NodeId);
+                    GetData(WVI.PMP_enkelvoudige_objectnaam, WVI.Endpoint);
+                    setCurrentNode({ Node: WVI.PMP_enkelvoudige_objectnaam, endpoint: WVI.Endpoint });
                 }}>
                     <img src={arrow} alt="" width="40" height="40" /></button>
-            </div>) }
+            </div>) : '' }
         </div>
 
-        {currentNode !== "" && nodeData.length > 1 ? <div className="mt-[5vh] hidden md:flex flex-grow">
+        {currentNode?.Node !== "" && nodeData.length > 1 ? <div className="mt-[5vh] hidden md:flex flex-grow">
             <div className="w-[40%] h-[70vh] flex flex-col">
                 <div className="flex justify-between">
                     <span className="text-lg ml-[42%]">WVI Data</span>
                     <button className="mr-[2vw] self-center" onClick={() => {
-                        GetData(currentNode);
+                        GetData(currentNode.Node, currentNode.endpoint);
                     }}><img src={refreshArrow} alt="" width="30" height="30" /></button>
                 </div>
                 <div className="ml-[1%] overflow-y-scroll">
@@ -185,16 +200,16 @@ return (
                     {dropDownOperationChoice ? <div id="dropdown" className="z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
                         <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
                             <li>
-                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(0, currentNode); GetData(currentNode); setOperationChoice("");  }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Uit</a>
+                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(0, currentNode.Node, currentNode.endpoint); GetData(currentNode.Node, currentNode.endpoint); setOperationChoice("");  }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Uit</a>
                             </li>
                             <li>
-                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(1, currentNode); GetData(currentNode); setOperationChoice(""); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Auto</a>
+                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(1, currentNode.Node, currentNode.endpoint); GetData(currentNode.Node, currentNode.endpoint); setOperationChoice(""); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Auto</a>
                             </li>
                             <li>
-                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(2, currentNode); GetData(currentNode); setOperationChoice(""); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">handmatig</a>
+                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(2, currentNode.Node, currentNode.endpoint); GetData(currentNode.Node, currentNode.endpoint); setOperationChoice(""); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">handmatig</a>
                             </li>
                             <li>
-                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(3, currentNode); GetData(currentNode); setOperationChoice(""); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Burner test</a>
+                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(3, currentNode.Node, currentNode.endpoint); GetData(currentNode.Node, currentNode.endpoint); setOperationChoice(""); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Burner test</a>
                             </li>
                         </ul>
                     </div> : ''}
@@ -207,7 +222,7 @@ return (
                         <span>SetPointLow: </span>
                             <input onChange={e => setHeatingCurve([heatingCurve[0], e.target.value])} className="text-black max-w-[50px]" value={heatingCurve[1]}></input>
                         </div>
-                        <button onClick={() => { routes.SetHeatingCurve(Number(heatingCurve[0]), Number(heatingCurve[1]), currentNode); GetData(currentNode); setOperationChoice(""); } } className="font-medium text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-sm px-5 py-2.5 text-center items-center">toepassen</button>
+                        <button onClick={() => { routes.SetHeatingCurve(Number(heatingCurve[0]), Number(heatingCurve[1]), currentNode.Node); GetData(currentNode.Node, currentNode.endpoint); setOperationChoice(""); } } className="font-medium text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-sm px-5 py-2.5 text-center items-center">toepassen</button>
                     </div> : operationChoice === "Default heating curve" ? <div className="flex flex-col gap-[20px]">
                         <div className="flex justify-between">
                             <span>SetPointHigh: </span>
@@ -217,7 +232,7 @@ return (
                             <span>SetPointLow: </span>
                                 <input onChange={e => setDefaultHeatingCurve([defaultHeatingCurve[0], e.target.value])} className="text-black max-w-[50px]" value={defaultHeatingCurve[1]}></input>
                         </div>
-                            <button onClick={() => { routes.SetDefaultHeatingCurve(Number(defaultHeatingCurve[0]), Number(defaultHeatingCurve[1]), currentNode); GetData(currentNode); setOperationChoice(""); }} className="font-medium text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-sm px-5 py-2.5 text-center items-center">toepassen</button>
+                            <button onClick={() => { routes.SetDefaultHeatingCurve(Number(defaultHeatingCurve[0]), Number(defaultHeatingCurve[1]), currentNode.Node); GetData(currentNode.Node, currentNode.endpoint); setOperationChoice(""); }} className="font-medium text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-sm px-5 py-2.5 text-center items-center">toepassen</button>
                     </div> : '' }
             </div>
         </div> : ""}

@@ -7,11 +7,11 @@ export default class OPCUAclient {
     async IsOnline(req: Request, res: Response) {
         let client: OPCUAClient;
         let session: ClientSession;
-        const endpoint = "opc.tcp://localhost:53530/OPCUA/SimulationServer";
+        //const endpoint = "opc.tcp://game-pc:10000/OPCUA-Player";
 
         try {
             client = OPCUAClient.create({
-                endpointMustExist: false,
+                endpointMustExist: true,
                 connectionStrategy: {
                     maxRetry: 2,
                     initialDelay: 2000,
@@ -19,14 +19,14 @@ export default class OPCUAclient {
                 },
             });
             client.on("backoff", () => console.log("retrying connection"));
-            await client.connect(endpoint);
+            await client.connect(req.body.endpoint);
 
             session = await client.createSession({
-                type: UserTokenType.UserName,
-                userName: "admin",
-                password: "admin",
+                type: UserTokenType.Anonymous
             });
+
         } catch (e) {
+            console.log(e);
             res.sendStatus(404);
             return;
         }
@@ -38,14 +38,13 @@ export default class OPCUAclient {
     async GetStatus(req: Request, res: Response) {
         let client: OPCUAClient;
         let session: ClientSession;
-        const endpoint = "opc.tcp://localhost:53530/OPCUA/SimulationServer";
+        const endpoint = "opc.tcp://game-pc:10000/OPCUA-Player";
         const nodeId = `${req.body.nodeId}.cmdOperationMode`;
         res.setHeader('Content-Type', 'text/html');
-        res.setHeader('Access-Control-Allow-Origin', '*');
 
         try {
             client = OPCUAClient.create({
-                endpointMustExist: false,
+                endpointMustExist: true,
                 connectionStrategy: {
                     maxRetry: 2,
                     initialDelay: 2000,
@@ -54,15 +53,20 @@ export default class OPCUAclient {
             });
             client.on("backoff", () => console.log("retrying connection"));
 
+            await client.connect(req.body.endpoint);
 
-            await client.connect(endpoint);
-
-            session = await client.createSession({
+/*            session = await client.createSession({
                 type: UserTokenType.UserName,
                 userName: "admin",
                 password: "admin",
+            });*/
+
+            session = await client.createSession({
+                type: UserTokenType.Anonymous
             });
 
+            console.log(req.body.endpoint);
+            console.log(nodeId);
             let dataValue = await session.read({ nodeId, attributeId: AttributeIds.Value });
 
             if (dataValue.statusCode !== StatusCodes.Good) {
@@ -73,6 +77,7 @@ export default class OPCUAclient {
         }
         catch (err)
         {
+            console.log(err);
             res.send(JSON.stringify(`Error: ${err}`));
         }
         client.disconnect();
@@ -81,7 +86,7 @@ export default class OPCUAclient {
     async GetData(req: Request, res: Response) {
         let client: OPCUAClient;
         let session: ClientSession;
-        const endpoint = "opc.tcp://localhost:53530/OPCUA/SimulationServer";
+        const endpoint = "opc.tcp://game-pc:10000/OPCUA-Player";
         res.setHeader('Content-Type', 'application/json');
 
         try {
@@ -99,15 +104,13 @@ export default class OPCUAclient {
             await client.connect(endpoint);
 
             session = await client.createSession({
-                type: UserTokenType.UserName,
-                userName: "admin",
-                password: "admin",
+                type: UserTokenType.Anonymous
             });
 
             let nodes = [];
             await this.RecursiveBrowse(await session.browse(req.body.nodeId) as BrowseResult, session).then((results) => {
                 results.forEach((result) => {
-                    if (result.NodeId.includes("ns=3")) {
+                    if (result.NodeId.includes("ns=2") && !result.NodeId.includes("/0:Id")) {
                         nodes.push({ DisplayName: result.browseName, Nodes: result.NodeId, Data: "", dataType: result.dataType })
                     }                 
                 });
@@ -135,7 +138,7 @@ export default class OPCUAclient {
         let session: ClientSession;
         const nodes = req.body.nodes;
 
-        const endpoint = "opc.tcp://localhost:53530/OPCUA/SimulationServer";
+        const endpoint = "opc.tcp://game-pc:10000/OPCUA-Player";
 
         try {
             client = OPCUAClient.create({
@@ -152,9 +155,7 @@ export default class OPCUAclient {
             await client.connect(endpoint);
 
             session = await client.createSession({
-                type: UserTokenType.UserName,
-                userName: "admin",
-                password: "admin",
+                type: UserTokenType.Anonymous
             });
 
             for (var a = 0; a < nodes.length; a++) {

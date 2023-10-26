@@ -39,6 +39,10 @@ export class UserService {
     public static UpdateRole(role: string, email: string) {
         return Run(`UPDATE "Accounts" Set Role = ? WHERE Email = ?`, [role, email]);
     }
+
+    public static GetContractgebiednummers(onderhoudsaannemer: string) {
+        return All(`SELECT "Contractgebiednummer" FROM Aannemers WHERE "Onderhoudsaannemer" = ?`, [onderhoudsaannemer]);
+    }
 }
 
 module.exports = {

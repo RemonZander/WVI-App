@@ -1,43 +1,58 @@
 export default class routes {
 
-    static GetStatus(nodeId: string) {
+    static GetStatus(nodeId: string, endpoint: string) {
         return fetch('http://localhost:3000/OPCUA/status', {
             method: "POST",
+            credentials: 'include',
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ nodeId: nodeId })
+            body: JSON.stringify({ endpoint: endpoint, nodeId: nodeId })
         }).then((res) => {
            return res.json();
        }).then((data: number) => { return data });
     }
 
-    static async SetStatus(mode: number, nodeId: string) {
+    static async SetStatus(mode: number, nodeId: string, endpoint: string) {
         await fetch('http://localhost:3000/OPCUA/write', {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ data: [mode], nodes: [`${nodeId}.cmdOperationMode`], datatypes: [4] })
+            body: JSON.stringify({ endpoint: endpoint, data: [mode], nodes: [`${nodeId}.cmdOperationMode`], datatypes: [4] })
         });
     }
 
-    static async GetData(nodeId: string) {
+    static async GetWVIs() {
+        return await fetch('http://localhost:3000/getWVIs', {
+            method: "GET",
+            credentials: 'include',
+        }).then((res) => {
+            return res.json();
+        });
+    }
+
+    static async GetData(nodeId: string, endpoint: string) {
         return await fetch('http://localhost:3000/OPCUA/data', {
             method: "POST",
-            headers: {
+            headers: {  
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ nodeId: nodeId })
+            body: JSON.stringify({ endpoint: endpoint, nodeId: nodeId })
         }).then((res) => {
             if (res.status === 404) return "404";
             return res.json();
         });
     }
 
-    static async IsOnline() {
+    static async IsOnline(endpoint: string) {
         return await fetch('http://localhost:3000/OPCUA/isonline', {
-            method: "GET",
+            method: "POST",
+            credentials: 'include',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ endpoint: endpoint})
         }).then((res) => {
             return res.status;
         });
