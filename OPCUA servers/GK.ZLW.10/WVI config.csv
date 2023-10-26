@@ -1,0 +1,10 @@
+﻿AssetID,AssetName,AssetNodeId,MeasurementPointID,MeasurementPointName,PhysicalQuantity,Unit of Measure,Prefix,AccessRights,DataType
+1064,Cabinet,GK.ZLW.10,1,BatteryVoltage,Voltage,Voltage,NoPrefix,Read,Float
+1065,Cabinet,GK.ZLW.10,2,CabinetDoorIsOpen,NoQuantity,NoUoM,NoPrefix,Read,Boolean
+1066,Cabinet,GK.ZLW.10,3,cmdcontrolIsLocal,NoQuantity,NoUoM,NoPrefix,Read,Boolean
+1067,Cabinet,GK.ZLW.10,4,cmdOperationMode,NoQuantity,NoUoM,NoPrefix,Both,Int16
+1068,Cabinet,GK.ZLW.10,5,ControlTemperature,NoQuantity,NoUoM,NoPrefix,Read,Float
+1069,Cabinet,GK.ZLW.10,6,HeatingCurve.SetPointHigh,NoQuantity,NoUoM,NoPrefix,Both,Float
+1070,Cabinet,GK.ZLW.10,7,HeatingCurve.SetPointLow,NoQuantity,NoUoM,NoPrefix,Both,Float
+1071,Cabinet,GK.ZLW.10,8,Params.DefaultHeatingCurve.SetPointHigh,NoQuantity,NoUoM,NoPrefix,Both,Int32
+1072,Cabinet,GK.ZLW.10,9,Params.DefaultHeatingCurve.SetPointLow,NoQuantity,NoUoM,NoPrefix,Both,Int32
