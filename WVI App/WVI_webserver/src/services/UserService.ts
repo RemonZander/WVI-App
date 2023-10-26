@@ -39,6 +39,10 @@ export class UserService {
     public static UpdateRole(role: string, email: string) {
         return Run(`UPDATE "Accounts" Set Role = ? WHERE Email = ?`, [role, email]);
     }
+
+    public static ListOnderhoudsaannemers() {
+        return QueryNoParams('SELECT DISTINCT "Onderhoudsaannemer" FROM Aannemers').all();
+    }
 }
 
 module.exports = {

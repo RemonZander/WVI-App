@@ -147,6 +147,15 @@ export default class routes {
         });
     }
 
+    static async ListOnderhoudsaannemers() {
+        return await fetch('http://localhost:3000/listOnderhoudsaannemers', {
+            method: "GET",
+            credentials: 'include'
+        }).then((res) => {
+            return res.json();
+        });
+    }
+
     static async UpdateRole(email: string, role: string) {
         return await fetch('http://localhost:3000/updateRole', {
             method: "POST",
