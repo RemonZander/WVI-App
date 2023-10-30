@@ -32,6 +32,10 @@ export class UserService {
         return Run('UPDATE "Accounts" Set Onderhoudsaannemer = ? WHERE Email = ?', [onderhoudsaannemer, email]);
     }
 
+    public static ListOnderhoudsaannemers() {
+        return QueryNoParams(`SELECT DISTINCT * FROm "Aannemers"`).all();
+    }
+
     public static ListRoles() {
         return QueryNoParams('SELECT "Role" FROM Roles').all();
     }

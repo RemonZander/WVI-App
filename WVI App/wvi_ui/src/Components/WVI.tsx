@@ -25,33 +25,30 @@ function Dashboard() {
     const [WVIs, setWVIs] = useState<IWVI[]>([]);
     const [showWVIs, setShowWVIs] = useState(false);
         
-    async function DoSetStatus(pos: number, node: string, eindpoint: string) {
+    async function DoSetStatus(pos: number, node: string, eindpoint: string, newStatus: IWVIStatus[]) {
         await routes.GetStatus(node, eindpoint).then((result: number) => {
             if (result == 0) {
-                let newStatus = status;
                 newStatus[pos] = { status: "uit", activityLed: activityWhite };
-                setStatus([...newStatus]);
             }
             else if (result == 1) {
-                let newStatus = status;
                 newStatus[pos] = { status: "auto", activityLed: activityGreen };
-                setStatus([...newStatus]);
             }
             else if (result == 2) {
-                let newStatus = status;
                 newStatus[pos] = { status: "handmatig", activityLed: activityOrange };
-                setStatus([...newStatus]);
             }
             else if (result == 3) {
-                let newStatus = status;
                 newStatus[pos] = { status: "burner test", activityLed: activityRed };
-                setStatus([...newStatus]);
             }
+            else {
+                newStatus[pos] = { status: "Geen verbinding", activityLed: noActivity };
+            }
+            setStatus([...newStatus]);
         });
     }
 
-    async function GetData(nodeId: string, eindpoint: string) {
+    async function GetData(nodeId: string, eindpoint: string, status: IWVIStatus[]) {
         await routes.GetData(nodeId, eindpoint).then((data: [{ DisplayName: string, Nodes: string, Data: string, dataType: string }]) => {
+            console.log(data);
             let newdata = [];
             let removeIndexes = [];
             for (var a = 0; a < data.length; a++) {
@@ -70,7 +67,8 @@ function Dashboard() {
             setNodeData(newdata);
         });
 
-        DoSetStatus(WVIs.findIndex(wvi => wvi.PMP_enkelvoudige_objectnaam === currentNode.Node), currentNode.Node, eindpoint);
+        console.log(currentNode);
+        DoSetStatus(WVIs.findIndex(wvi => wvi.PMP_enkelvoudige_objectnaam === currentNode.Node), "ns=2;s=" + currentNode.Node, eindpoint, status);
     }
 
     useEffect(() => {
@@ -81,28 +79,25 @@ function Dashboard() {
         routes.GetWVIs().then((data: IWVI[]) => {
             setWVIs(data);
         
-            let newStatus: any[] = [];
+            let newStatus: IWVIStatus[] = [];
             for (var b = 0; b < data.length; b++) { 
                 newStatus.push({ status: "Geen verbinding", activityLed: noActivity });
             }
 
-            setStatus(newStatus);
-
             (async () => {
                 for (var a = 0; a < data.length; a++) {
-                    //let newStatus: any[] = [];
                     await routes.IsOnline(data[a].Endpoint).then((statuscode) => {
-                        if (statuscode == 404) {  
-                            let newStatus = status;
-                            newStatus[a] = { status: "Geen verbinding", activityLed: noActivity };
-                            setStatus(newStatus);
-                            return;
+                        console.log(statuscode);
+                        if (statuscode != 404) {  
+                            DoSetStatus(a, "ns=2;s=" + data[a].PMP_enkelvoudige_objectnaam, data[a].Endpoint, newStatus);
                         }
-                        DoSetStatus(a, data[a].PMP_enkelvoudige_objectnaam, data[a].Endpoint);
                     });
-                }
+                }   
 
                 setShowWVIs(true);
+                console.log(newStatus);
+                setStatus([...newStatus]);
+                console.log(status);
             })();
         });
     }, []);
@@ -124,7 +119,7 @@ return (
                 </div>
                 <button className="absolute self-end left[100%] top-[20px]" onClick={() => {
                     setOperationChoice("");
-                    GetData(WVI.PMP_enkelvoudige_objectnaam, WVI.Endpoint);
+                    GetData("ns=2;s=" + WVI.PMP_enkelvoudige_objectnaam, WVI.Endpoint, status);
                     setCurrentNode({ Node: WVI.PMP_enkelvoudige_objectnaam, endpoint: WVI.Endpoint });
                 }}>
                     <img src={arrow} alt="" width="40" height="40" /></button>
@@ -136,7 +131,7 @@ return (
                 <div className="flex justify-between">
                     <span className="text-lg ml-[42%]">WVI Data</span>
                     <button className="mr-[2vw] self-center" onClick={() => {
-                        GetData(currentNode.Node, currentNode.endpoint);
+                        GetData(currentNode.Node, currentNode.endpoint, status);
                     }}><img src={refreshArrow} alt="" width="30" height="30" /></button>
                 </div>
                 <div className="ml-[1%] overflow-y-scroll">
@@ -200,16 +195,16 @@ return (
                     {dropDownOperationChoice ? <div id="dropdown" className="z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
                         <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
                             <li>
-                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(0, currentNode.Node, currentNode.endpoint); GetData(currentNode.Node, currentNode.endpoint); setOperationChoice("");  }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Uit</a>
+                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(0, currentNode.Node, currentNode.endpoint); GetData(currentNode.Node, currentNode.endpoint, status); setOperationChoice("");  }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Uit</a>
                             </li>
                             <li>
-                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(1, currentNode.Node, currentNode.endpoint); GetData(currentNode.Node, currentNode.endpoint); setOperationChoice(""); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Auto</a>
+                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(1, currentNode.Node, currentNode.endpoint); GetData(currentNode.Node, currentNode.endpoint, status); setOperationChoice(""); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Auto</a>
                             </li>
                             <li>
-                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(2, currentNode.Node, currentNode.endpoint); GetData(currentNode.Node, currentNode.endpoint); setOperationChoice(""); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">handmatig</a>
+                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(2, currentNode.Node, currentNode.endpoint); GetData(currentNode.Node, currentNode.endpoint, status); setOperationChoice(""); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">handmatig</a>
                             </li>
                             <li>
-                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(3, currentNode.Node, currentNode.endpoint); GetData(currentNode.Node, currentNode.endpoint); setOperationChoice(""); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Burner test</a>
+                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(3, currentNode.Node, currentNode.endpoint); GetData(currentNode.Node, currentNode.endpoint, status); setOperationChoice(""); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Burner test</a>
                             </li>
                         </ul>
                     </div> : ''}
@@ -222,7 +217,7 @@ return (
                         <span>SetPointLow: </span>
                             <input onChange={e => setHeatingCurve([heatingCurve[0], e.target.value])} className="text-black max-w-[50px]" value={heatingCurve[1]}></input>
                         </div>
-                        <button onClick={() => { routes.SetHeatingCurve(Number(heatingCurve[0]), Number(heatingCurve[1]), currentNode.Node); GetData(currentNode.Node, currentNode.endpoint); setOperationChoice(""); } } className="font-medium text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-sm px-5 py-2.5 text-center items-center">toepassen</button>
+                        <button onClick={() => { routes.SetHeatingCurve(Number(heatingCurve[0]), Number(heatingCurve[1]), currentNode.Node); GetData(currentNode.Node, currentNode.endpoint, status); setOperationChoice(""); } } className="font-medium text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-sm px-5 py-2.5 text-center items-center">toepassen</button>
                     </div> : operationChoice === "Default heating curve" ? <div className="flex flex-col gap-[20px]">
                         <div className="flex justify-between">
                             <span>SetPointHigh: </span>
@@ -232,7 +227,7 @@ return (
                             <span>SetPointLow: </span>
                                 <input onChange={e => setDefaultHeatingCurve([defaultHeatingCurve[0], e.target.value])} className="text-black max-w-[50px]" value={defaultHeatingCurve[1]}></input>
                         </div>
-                            <button onClick={() => { routes.SetDefaultHeatingCurve(Number(defaultHeatingCurve[0]), Number(defaultHeatingCurve[1]), currentNode.Node); GetData(currentNode.Node, currentNode.endpoint); setOperationChoice(""); }} className="font-medium text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-sm px-5 py-2.5 text-center items-center">toepassen</button>
+                            <button onClick={() => { routes.SetDefaultHeatingCurve(Number(defaultHeatingCurve[0]), Number(defaultHeatingCurve[1]), currentNode.Node); GetData(currentNode.Node, currentNode.endpoint, status); setOperationChoice(""); }} className="font-medium text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-sm px-5 py-2.5 text-center items-center">toepassen</button>
                     </div> : '' }
             </div>
         </div> : ""}

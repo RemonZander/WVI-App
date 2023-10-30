@@ -7,11 +7,10 @@ export default class OPCUAclient {
     async IsOnline(req: Request, res: Response) {
         let client: OPCUAClient;
         let session: ClientSession;
-        //const endpoint = "opc.tcp://game-pc:10000/OPCUA-Player";
 
         try {
             client = OPCUAClient.create({
-                endpointMustExist: true,
+                endpointMustExist: false,
                 connectionStrategy: {
                     maxRetry: 2,
                     initialDelay: 2000,
@@ -44,7 +43,7 @@ export default class OPCUAclient {
 
         try {
             client = OPCUAClient.create({
-                endpointMustExist: true,
+                endpointMustExist: false,
                 connectionStrategy: {
                     maxRetry: 2,
                     initialDelay: 2000,
@@ -55,18 +54,10 @@ export default class OPCUAclient {
 
             await client.connect(req.body.endpoint);
 
-/*            session = await client.createSession({
-                type: UserTokenType.UserName,
-                userName: "admin",
-                password: "admin",
-            });*/
-
             session = await client.createSession({
                 type: UserTokenType.Anonymous
             });
 
-            console.log(req.body.endpoint);
-            console.log(nodeId);
             let dataValue = await session.read({ nodeId, attributeId: AttributeIds.Value });
 
             if (dataValue.statusCode !== StatusCodes.Good) {
@@ -86,7 +77,6 @@ export default class OPCUAclient {
     async GetData(req: Request, res: Response) {
         let client: OPCUAClient;
         let session: ClientSession;
-        const endpoint = "opc.tcp://game-pc:10000/OPCUA-Player";
         res.setHeader('Content-Type', 'application/json');
 
         try {
@@ -100,8 +90,7 @@ export default class OPCUAclient {
             });
             client.on("backoff", () => console.log("retrying connection"));
 
-
-            await client.connect(endpoint);
+            await client.connect(req.body.endpoint);
 
             session = await client.createSession({
                 type: UserTokenType.Anonymous
@@ -138,8 +127,6 @@ export default class OPCUAclient {
         let session: ClientSession;
         const nodes = req.body.nodes;
 
-        const endpoint = "opc.tcp://game-pc:10000/OPCUA-Player";
-
         try {
             client = OPCUAClient.create({
                 endpointMustExist: false,
@@ -152,7 +139,7 @@ export default class OPCUAclient {
             client.on("backoff", () => console.log("retrying connection"));
 
 
-            await client.connect(endpoint);
+            await client.connect(req.body.endpoint);
 
             session = await client.createSession({
                 type: UserTokenType.Anonymous
