@@ -12,6 +12,7 @@ import routes from '../Services/routes';
 import refreshArrow from '../media/refreshArrow.png';
 import noActivity from '../media/no activity.png';
 import { IWVI, IWVIStatus } from '../interfaces/interfaces';
+import loadingGif from '../media/loading.gif';
 
 function Dashboard() {
     const [dropDownOperationChoice, setDropDownOperationChoice] = useState(false);
@@ -48,27 +49,26 @@ function Dashboard() {
 
     async function GetData(nodeId: string, eindpoint: string, status: IWVIStatus[]) {
         await routes.GetData(nodeId, eindpoint).then((data: [{ DisplayName: string, Nodes: string, Data: string, dataType: string }]) => {
-            console.log(data);
             let newdata = [];
-            let removeIndexes = [];
+            let removeIndexes: string[] = [];
             for (var a = 0; a < data.length; a++) {
-                if (data[a].DisplayName === "cmdOperationMode" || data[a].DisplayName === "SetPointHigh" || data[a].DisplayName === "SetPointLow") {
-                    if (data[a].Nodes.includes("DefaultHeatingCurve")) data[a].DisplayName = "DefaultHeatingCurve." + data[a].DisplayName;
+                if (data[a].DisplayName === "cmdOperationMode" || data[a].DisplayName === "HeatingCurve.SetPointHigh" || data[a].DisplayName === "HeatingCurve.SetPointLow" ||
+                    data[a].DisplayName === "Params.DefaultHeatingCurve.SetPointHigh" || data[a].DisplayName === "Params.DefaultHeatingCurve.SetPointLow") {
 
                     newdata.push(data[a]);
-                    removeIndexes.push(a);
+                    removeIndexes.push(data[a].DisplayName);
                 }
             }
+
             newdata.push({ DisplayName: "", Nodes: "", Data: "", dataType: "" });
             for (var b = 0; b < removeIndexes.length; b++) {
-                data.splice(removeIndexes[b], 1);
+                data.splice(data.findIndex(d => d.DisplayName === removeIndexes[b]), 1);
             }
             newdata = newdata.concat(data);
             setNodeData(newdata);
         });
 
-        console.log(currentNode);
-        DoSetStatus(WVIs.findIndex(wvi => wvi.PMP_enkelvoudige_objectnaam === currentNode.Node), "ns=2;s=" + currentNode.Node, eindpoint, status);
+        DoSetStatus(WVIs.findIndex(wvi => nodeId.includes(wvi.PMP_enkelvoudige_objectnaam)), nodeId, eindpoint, status);
     }
 
     useEffect(() => {
@@ -77,7 +77,7 @@ function Dashboard() {
         });
 
         routes.GetWVIs().then((data: IWVI[]) => {
-            setWVIs(data);
+            setWVIs([...data]);
         
             let newStatus: IWVIStatus[] = [];
             for (var b = 0; b < data.length; b++) { 
@@ -87,7 +87,6 @@ function Dashboard() {
             (async () => {
                 for (var a = 0; a < data.length; a++) {
                     await routes.IsOnline(data[a].Endpoint).then((statuscode) => {
-                        console.log(statuscode);
                         if (statuscode != 404) {  
                             DoSetStatus(a, "ns=2;s=" + data[a].PMP_enkelvoudige_objectnaam, data[a].Endpoint, newStatus);
                         }
@@ -95,9 +94,7 @@ function Dashboard() {
                 }   
 
                 setShowWVIs(true);
-                console.log(newStatus);
                 setStatus([...newStatus]);
-                console.log(status);
             })();
         });
     }, []);
@@ -119,19 +116,19 @@ return (
                 </div>
                 <button className="absolute self-end left[100%] top-[20px]" onClick={() => {
                     setOperationChoice("");
-                    GetData("ns=2;s=" + WVI.PMP_enkelvoudige_objectnaam, WVI.Endpoint, status);
                     setCurrentNode({ Node: WVI.PMP_enkelvoudige_objectnaam, endpoint: WVI.Endpoint });
+                    GetData("ns=2;s=" + WVI.PMP_enkelvoudige_objectnaam, WVI.Endpoint, status);
                 }}>
                     <img src={arrow} alt="" width="40" height="40" /></button>
-            </div>) : '' }
+            </div>) : <img className="relative translate-y-[-30%] translate-x-[-50%] top-[30%] left-[50%]" src={loadingGif} width="40" height="40" alt="loading..." /> }
         </div>
 
         {currentNode?.Node !== "" && nodeData.length > 1 ? <div className="mt-[5vh] hidden md:flex flex-grow">
             <div className="w-[40%] h-[70vh] flex flex-col">
                 <div className="flex justify-between">
-                    <span className="text-lg ml-[42%]">WVI Data</span>
+                    <span className="text-lg ml-[42%]">{ currentNode.Node }</span>
                     <button className="mr-[2vw] self-center" onClick={() => {
-                        GetData(currentNode.Node, currentNode.endpoint, status);
+                        GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status);
                     }}><img src={refreshArrow} alt="" width="30" height="30" /></button>
                 </div>
                 <div className="ml-[1%] overflow-y-scroll">
@@ -158,7 +155,7 @@ return (
                     <span className="text-white text-[1.5rem]">Operate WVI:</span>
                     <button id="dropdownDefaultButton" onClick={() => { setDropDown(!dropDown) }} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">Operation menu
                         <svg className="w-2.5 h-2.5 ml-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
+                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4" />
                         </svg></button>
                     {dropDown ? <div id="dropdown" className="z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
                         <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
@@ -190,21 +187,21 @@ return (
 
                     <button id="dropdownDefaultButton" onClick={() => { setDropDownOperationChoice(!dropDownOperationChoice) }} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">Operation modes
                         <svg className="w-2.5 h-2.5 ml-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
+                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4" />
                         </svg></button>
                     {dropDownOperationChoice ? <div id="dropdown" className="z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
                         <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
                             <li>
-                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(0, currentNode.Node, currentNode.endpoint); GetData(currentNode.Node, currentNode.endpoint, status); setOperationChoice("");  }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Uit</a>
+                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(0, "ns=2;s=" + currentNode.Node, currentNode.endpoint); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status); setOperationChoice("");  }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Uit</a>
                             </li>
                             <li>
-                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(1, currentNode.Node, currentNode.endpoint); GetData(currentNode.Node, currentNode.endpoint, status); setOperationChoice(""); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Auto</a>
+                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(1, "ns=2;s=" + currentNode.Node, currentNode.endpoint); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status); setOperationChoice(""); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Auto</a>
                             </li>
                             <li>
-                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(2, currentNode.Node, currentNode.endpoint); GetData(currentNode.Node, currentNode.endpoint, status); setOperationChoice(""); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">handmatig</a>
+                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(2, "ns=2;s=" + currentNode.Node, currentNode.endpoint); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status); setOperationChoice(""); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">handmatig</a>
                             </li>
                             <li>
-                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(3, currentNode.Node, currentNode.endpoint); GetData(currentNode.Node, currentNode.endpoint, status); setOperationChoice(""); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Burner test</a>
+                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(3, "ns=2;s=" + currentNode.Node, currentNode.endpoint); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status); setOperationChoice(""); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Burner test</a>
                             </li>
                         </ul>
                     </div> : ''}
@@ -217,7 +214,7 @@ return (
                         <span>SetPointLow: </span>
                             <input onChange={e => setHeatingCurve([heatingCurve[0], e.target.value])} className="text-black max-w-[50px]" value={heatingCurve[1]}></input>
                         </div>
-                        <button onClick={() => { routes.SetHeatingCurve(Number(heatingCurve[0]), Number(heatingCurve[1]), currentNode.Node); GetData(currentNode.Node, currentNode.endpoint, status); setOperationChoice(""); } } className="font-medium text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-sm px-5 py-2.5 text-center items-center">toepassen</button>
+                        <button onClick={() => { routes.SetHeatingCurve(Number(heatingCurve[0]), Number(heatingCurve[1]), "ns=2;s=" + currentNode.Node, currentNode.endpoint); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status); setOperationChoice(""); } } className="font-medium text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-sm px-5 py-2.5 text-center items-center">toepassen</button>
                     </div> : operationChoice === "Default heating curve" ? <div className="flex flex-col gap-[20px]">
                         <div className="flex justify-between">
                             <span>SetPointHigh: </span>
@@ -227,7 +224,7 @@ return (
                             <span>SetPointLow: </span>
                                 <input onChange={e => setDefaultHeatingCurve([defaultHeatingCurve[0], e.target.value])} className="text-black max-w-[50px]" value={defaultHeatingCurve[1]}></input>
                         </div>
-                            <button onClick={() => { routes.SetDefaultHeatingCurve(Number(defaultHeatingCurve[0]), Number(defaultHeatingCurve[1]), currentNode.Node); GetData(currentNode.Node, currentNode.endpoint, status); setOperationChoice(""); }} className="font-medium text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-sm px-5 py-2.5 text-center items-center">toepassen</button>
+                            <button onClick={() => { routes.SetDefaultHeatingCurve(Number(defaultHeatingCurve[0]), Number(defaultHeatingCurve[1]), "ns=2;s=" + currentNode.Node, currentNode.endpoint); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status); setOperationChoice(""); }} className="font-medium text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-sm px-5 py-2.5 text-center items-center">toepassen</button>
                     </div> : '' }
             </div>
         </div> : ""}

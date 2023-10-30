@@ -13,7 +13,6 @@ const localStrategy = new LocalStrategy(
         try {
             const account: IAccount[] = UserService.GetOneByEmailAllColumns(email);
             if (account.length === 0) {
-                console.log("not found");
                 return done(null, false);
             }
 

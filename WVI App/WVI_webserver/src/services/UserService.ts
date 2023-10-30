@@ -33,7 +33,7 @@ export class UserService {
     }
 
     public static ListOnderhoudsaannemers() {
-        return QueryNoParams(`SELECT DISTINCT * FROm "Aannemers"`).all();
+        return QueryNoParams(`SELECT DISTINCT Onderhoudsaannemer FROM "Aannemers"`).all();
     }
 
     public static ListRoles() {

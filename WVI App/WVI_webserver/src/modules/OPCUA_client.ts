@@ -68,6 +68,7 @@ export default class OPCUAclient {
         }
         catch (err)
         {
+            console.log("error in: GetStatus");
             console.log(err);
             res.send(JSON.stringify(`Error: ${err}`));
         }
@@ -115,6 +116,8 @@ export default class OPCUAclient {
             res.send(JSON.stringify(nodes));
         }
         catch (err) {
+            console.log("error in: GetData");
+            console.log(err);
             res.sendStatus(404);
         }
         res.end();

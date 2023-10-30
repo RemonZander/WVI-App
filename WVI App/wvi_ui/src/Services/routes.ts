@@ -58,23 +58,23 @@ export default class routes {
         });
     }
 
-    static async SetHeatingCurve(SetPointHigh : number, SetPointLow : number, nodeId: string) {
+    static async SetHeatingCurve(SetPointHigh: number, SetPointLow: number, nodeId: string, endpoint: string) {
         await fetch('http://localhost:3000/OPCUA/write', {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ data: [SetPointHigh, SetPointLow], nodes: [`${nodeId}.HeatingCurve.SetPointHigh`, `${nodeId}.HeatingCurve.SetPointLow`], datatypes: [10, 10] })
+            body: JSON.stringify({ endpoint: endpoint, data: [SetPointHigh, SetPointLow], nodes: [`${nodeId}.HeatingCurve.SetPointHigh`, `${nodeId}.HeatingCurve.SetPointLow`], datatypes: [10, 10] })
         });
     }
 
-    static async SetDefaultHeatingCurve(SetPointHigh: number, SetPointLow: number, nodeId: string) {
+    static async SetDefaultHeatingCurve(SetPointHigh: number, SetPointLow: number, nodeId: string, endpoint: string) {
         await fetch('http://localhost:3000/OPCUA/write', {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ data: [SetPointHigh, SetPointLow], nodes: [`${nodeId}.Params.DefaultHeatingCurve.SetPointHigh`, `${nodeId}.Params.DefaultHeatingCurve.SetPointLow`], datatypes: [6, 6] })
+            body: JSON.stringify({ endpoint: endpoint, data: [SetPointHigh, SetPointLow], nodes: [`${nodeId}.Params.DefaultHeatingCurve.SetPointHigh`, `${nodeId}.Params.DefaultHeatingCurve.SetPointLow`], datatypes: [6, 6] })
         });
     }
 

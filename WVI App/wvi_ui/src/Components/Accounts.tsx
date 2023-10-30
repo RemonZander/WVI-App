@@ -37,6 +37,7 @@ function Accounts() {
         });
 
         routes.ListOnderhoudsaannemers().then((data) => {
+            console.log(data);
             setOnderhoudsaannemers(data.map((a: { Onderhoudsaannemer: any; }) => a.Onderhoudsaannemer));
         });
     }, []);
@@ -65,7 +66,7 @@ function Accounts() {
                             {addOnderhoudsaannemer[index] ? 
                                 <><button id="dropdownDefaultButton" onClick={() => { setShowOnderhoudsaannemers(!showOnderhoudsaannemers); } } className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">Onderhoudsaannemers
                                     <svg className="w-2.5 h-2.5 ml-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                                        <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
+                                        <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4" />
                                     </svg>
                                 </button>
                                     {showOnderhoudsaannemers ? <div className="z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
@@ -98,7 +99,7 @@ function Accounts() {
                                 <>
                                     <button id="dropdownDefaultButton" onClick={() => { setShowRoles(!showRoles); } } className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">Rollen
                                         <svg className="w-2.5 h-2.5 ml-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                                            <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
+                                            <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4" />
                                         </svg>
                                     </button>
                                     {showRoles ? <div className="z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
@@ -142,9 +143,14 @@ function Accounts() {
                                     setShowOnderhoudsaannemers(false);
                                 }
                                 setDropDown([...boolarray]);
+                                boolarray[index] = false;
+                                setChangeRole([...boolarray]);
+                                setAddOnderhoudsaannemer([...boolarray]);
+                                setShowRoles(false);
+                                setShowOnderhoudsaannemers(false);
                             }} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">Acties
                                 <svg className="w-2.5 h-2.5 ml-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
-                                    <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 1 4 4 4-4" />
+                                    <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4" />
                                 </svg>
                             </button>
                             {dropDown[index] ? <div className="z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
@@ -173,7 +179,6 @@ function Accounts() {
                                                 }
                                                 boolarray[a] = false;
                                             }
-                                            console.log(boolarray);
                                             setChangeRole([...boolarray]);
                                             setShowRoles(false);
                                         }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Rol aanpassen</a>
