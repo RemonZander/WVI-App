@@ -1,8 +1,22 @@
-FROM node:20.9
-WORKDIR /usr/src/app
-
-COPY wvi_ui ./
-RUN npm i
+FROM node:18.18-bookworm as WVI_UI
 EXPOSE 3001
 EXPOSE 3000
+RUN apt-get update
+RUN apt-get install iputils-ping -y
+WORKDIR /usr/src/UI
+COPY wvi_ui ./
+RUN npm i
+CMD npm run startlinux
+
+
+
+FROM node:18.18-bookworm as WVI_Webserver
+EXPOSE 3001
+EXPOSE 3000
+RUN apt-get update
+RUN apt-get install iputils-ping -y
+WORKDIR /usr/src/webserver
+COPY WVI_webserver ./
+RUN npm i
+RUN node ./src/SetupDatabase.ts
 CMD [ "npm", "start" ]

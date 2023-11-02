@@ -1,0 +1,15 @@
+version: '3.8'
+name: wviapp
+services:
+  wvi_ui:
+    mem_limit: 512m
+    network_mode: "host"
+    build:
+      context: .
+      target: WVI_UI
+  wvi_webserver:
+    mem_limit: 512m
+    network_mode: "host"
+    build:
+      context: .
+      target: WVI_Webserver

@@ -2,64 +2,55 @@ version: '2'
 services:
   gk.akm.03:
     mem_limit: 256m
+    network_mode: "host"
     build:
       context: .
       target: GK.AKM.03
-    ports:
-      - 10000:10000
   gk.go.01:
     mem_limit: 256m
+    network_mode: "host"
     build:
       context: .
       target: GK.GO.01
-    ports:
-      - 10001:10001
   gk.ktr.01:
     mem_limit: 256m
+    network_mode: "host"
     build:
       context: .
       target: GK.KTR.01
-    ports:
-      - 10002:10002
   gk.mrb.01:
     mem_limit: 256m
+    network_mode: "host"
     build:
       context: .
       target: GK.MRB.01
-    ports:
-      - 10003:10003
   gk.rv.01:
     mem_limit: 256m
+    network_mode: "host"
     build:
       context: .
       target: GK.RV.01
-    ports:
-      - 10004:10004
   gk.rv.02:
     mem_limit: 256m
+    network_mode: "host"
     build:
       context: .
       target: GK.RV.02
-    ports:
-      - 10005:10005
   gk.ww.01:
     mem_limit: 256m
+    network_mode: "host"
     build:
       context: .
       target: GK.WW.01
-    ports:
-      - 10006:10006
   gk.zlw.10:
     mem_limit: 256m
+    network_mode: "host"
     build:
       context: .
       target: GK.ZLW.10
-    ports:
-      - 10007:10007
   gk.zlw.11:
     mem_limit: 256m
+    network_mode: "host"
     build:
       context: .
       target: GK.ZLW.11
-    ports:
-      - 10008:10008
