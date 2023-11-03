@@ -3,13 +3,20 @@ name: wviapp
 services:
   wvi_ui:
     mem_limit: 512m
-    network_mode: "host"
     build:
       context: .
       target: WVI_UI
+    ports:
+      - 3001:3001
   wvi_webserver:
     mem_limit: 512m
-    network_mode: "host"
     build:
       context: .
       target: WVI_Webserver
+    ports:
+      - 3000:3000
+      
+networks:
+  default:
+    name: wviNetwork
+    external: true
