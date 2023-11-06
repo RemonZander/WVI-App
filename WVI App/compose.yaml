@@ -1,20 +1,26 @@
 version: '3.8'
-name: wviapp
+name: remonzander
 services:
-  wvi_ui:
+  wvifrontend:
     mem_limit: 512m
     build:
       context: .
-      target: WVI_UI
+      target: wvifrontend
     ports:
       - 3001:3001
-  wvi_webserver:
+    networks:
+      default:
+        ipv4_address: 10.0.10.100
+  wvibackend:
     mem_limit: 512m
     build:
       context: .
-      target: WVI_Webserver
+      target: wvibackend
     ports:
       - 3000:3000
+    networks:
+      default:
+        ipv4_address: 10.0.10.101
       
 networks:
   default:

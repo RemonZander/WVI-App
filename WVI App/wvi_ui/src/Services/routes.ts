@@ -1,7 +1,7 @@
 export default class routes {
 
     static GetStatus(nodeId: string, endpoint: string) {
-        return fetch('http://localhost:3000/OPCUA/status', {
+        return fetch(`http://${process.env.REACT_APP_SERVER}:3000/OPCUA/status`, {
             method: "POST",
             credentials: 'include',
             headers: {
@@ -14,7 +14,7 @@ export default class routes {
     }
 
     static async SetStatus(mode: number, nodeId: string, endpoint: string) {
-        await fetch('http://localhost:3000/OPCUA/write', {
+        await fetch(`http://${process.env.REACT_APP_SERVER}:3000/OPCUA/write`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
@@ -24,7 +24,7 @@ export default class routes {
     }
 
     static async GetWVIs() {
-        return await fetch('http://localhost:3000/getWVIs', {
+        return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/getWVIs`, {
             method: "GET",
             credentials: 'include',
         }).then((res) => {
@@ -33,7 +33,7 @@ export default class routes {
     }
 
     static async GetData(nodeId: string, endpoint: string) {
-        return await fetch('http://localhost:3000/OPCUA/data', {
+        return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/OPCUA/data`, {
             method: "POST",
             headers: {  
                 "Content-Type": "application/json"
@@ -46,7 +46,7 @@ export default class routes {
     }
 
     static async IsOnline(endpoint: string) {
-        return await fetch('http://localhost:3000/OPCUA/isonline', {
+        return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/OPCUA/isonline`, {
             method: "POST",
             credentials: 'include',
             headers: {
@@ -59,7 +59,7 @@ export default class routes {
     }
 
     static async SetHeatingCurve(SetPointHigh: number, SetPointLow: number, nodeId: string, endpoint: string) {
-        await fetch('http://localhost:3000/OPCUA/write', {
+        await fetch(`http://${process.env.REACT_APP_SERVER}:3000/OPCUA/write`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
@@ -69,7 +69,7 @@ export default class routes {
     }
 
     static async SetDefaultHeatingCurve(SetPointHigh: number, SetPointLow: number, nodeId: string, endpoint: string) {
-        await fetch('http://localhost:3000/OPCUA/write', {
+        await fetch(`http://${process.env.REACT_APP_SERVER}:3000/OPCUA/write`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
@@ -79,7 +79,7 @@ export default class routes {
     }
 
     static async Login(email: string, password: string) {
-        return await fetch('http://localhost:3000/login', {
+        return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/login`, {
             method: "POST",
             credentials: 'include',
             headers: {
@@ -92,7 +92,7 @@ export default class routes {
     }
 
     static async Logout() {
-        return await fetch('http://localhost:3000/logout', {
+        return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/logout`, {
             method: "GET",
             credentials: 'include'
         }).then((res) => {
@@ -101,7 +101,7 @@ export default class routes {
     }
 
     static async ValidateToken() {
-        return await fetch('http://localhost:3000/validatetoken', {
+        return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/validatetoken`, {
             method: "GET",
             credentials: 'include'
         }).then((res) => {
@@ -110,7 +110,7 @@ export default class routes {
     }
 
     static async GetRole() {
-        return await fetch('http://localhost:3000/role', {
+        return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/role`, {
             method: "GET",
             credentials: 'include'
         }).then((res) => {
@@ -119,7 +119,7 @@ export default class routes {
     }
 
     static async GetAllAccounts() {
-        return await fetch('http://localhost:3000/accounts', {
+        return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/accounts`, {
             method: "GET",
             credentials: 'include'
         }).then((res) => {
@@ -128,7 +128,7 @@ export default class routes {
     }
 
     static async DeleteAccount(email: string) {
-        return await fetch('http://localhost:3000/removeAccount', {
+        return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/removeAccount`, {
             method: "DELETE",
             credentials: 'include',
             headers: {
@@ -141,7 +141,7 @@ export default class routes {
     }
 
     static async UpdateOnderhoudsaannemer(email: string, onderhoudsaannemer: string) {
-        return await fetch('http://localhost:3000/removeOnderhoudsaannemer', {
+        return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/removeOnderhoudsaannemer`, {
             method: "POST",
             credentials: 'include',
             headers: {
@@ -154,7 +154,7 @@ export default class routes {
     }
 
     static async ListRoles() {
-        return await fetch('http://localhost:3000/listRoles', {
+        return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/listRoles`, {
             method: "GET",
             credentials: 'include'
         }).then((res) => {
@@ -163,7 +163,7 @@ export default class routes {
     }
 
     static async ListOnderhoudsaannemers() {
-        return await fetch('http://localhost:3000/listOnderhoudsaannemers', {
+        return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/listOnderhoudsaannemers`, {
             method: "GET",
             credentials: 'include'
         }).then((res) => {
@@ -172,7 +172,7 @@ export default class routes {
     }
 
     static async UpdateRole(email: string, role: string) {
-        return await fetch('http://localhost:3000/updateRole', {
+        return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/updateRole`, {
             method: "POST",
             credentials: 'include',
             headers: {

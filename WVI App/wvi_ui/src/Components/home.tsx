@@ -8,6 +8,7 @@ import Accounts from './Accounts';
 import Addaccount from './Addaccount';
 import Login from './Login';
 import routes from '../Services/routes';
+import { printDiffOrStringify } from 'jest-matcher-utils';
 
 const router = createBrowserRouter([
     {
@@ -43,7 +44,7 @@ function Home() {
     const [isBeheer, setIsBeheer] = useState(false);
 
     useEffect(() => {
-
+        console.log(process.env);
         routes.GetRole().then((res => {
             if (res.status === 404 || res.status === 401) {
                 setIsBeheer(false);

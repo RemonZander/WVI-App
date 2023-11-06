@@ -1,4 +1,4 @@
-import express, { Express } from 'express';
+import express, { Express, Request, Response } from 'express';
 import { AddressInfo } from "net";
 import cors from "cors";
 import Accountrouter from './modules/AccountrouterRouterModule';
@@ -9,19 +9,31 @@ import cookieParser from 'cookie-parser';
 import localStrategy from './passportStragegies';
 import authenticationRouter from './modules/authenticationRouterModule';
 import OPCUARouter from './modules/OPCUARouterModule';
+import 'dotenv/config'
 
 const bodyParser = require('body-parser');
 
 const app: Express = express();
 
-
 //https://www.npmjs.com/package/csrf-csrf
 //https://www.npmjs.com/package/react-helmet    ook X-XSS-Protection
+
+console.log(process.env.client);
+console.log("test");
 
 app.disable('x-powered-by');
 
 app.use(cors({
-    origin: "http://localhost:3001",
+    origin: function (origin, callback) {
+        const allowedOrigins = [`http://localhost:3001`, "*"];
+        if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+            console.log(`allowed connection from origin: ${origin}`);
+            callback(null, true);
+        } else {
+            console.log(`Blocked CORS request from origin: ${origin}`);
+            callback(null, false);
+        }
+    },
     withCredentials: true,
     credentials: true,
 }));
