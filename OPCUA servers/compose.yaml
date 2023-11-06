@@ -2,6 +2,7 @@ version: '2'
 services:
   gk.akm.03:
     mem_limit: 256m
+    image: remonzander/opcuaserver:GK.AKM.03
     build:
       context: .
       target: GK.AKM.03
@@ -9,6 +10,7 @@ services:
       - 10000:10000
   gk.go.01:
     mem_limit: 256m
+    image: remonzander/opcuaserver:GK.GO.01
     build:
       context: .
       target: GK.GO.01
@@ -16,6 +18,7 @@ services:
       - 10001:10001
   gk.ktr.01:
     mem_limit: 256m
+    image: remonzander/opcuaserver:GK.KTR.01
     build:
       context: .
       target: GK.KTR.01
@@ -23,6 +26,7 @@ services:
       - 10002:10002
   gk.mrb.01:
     mem_limit: 256m
+    image: remonzander/opcuaserver:GK.MRB.01
     build:
       context: .
       target: GK.MRB.01
@@ -30,6 +34,7 @@ services:
       - 10003:10003
   gk.rv.01:
     mem_limit: 256m
+    image: remonzander/opcuaserver:GK.RV.01
     build:
       context: .
       target: GK.RV.01
@@ -37,6 +42,7 @@ services:
       - 10004:10004
   gk.rv.02:
     mem_limit: 256m
+    image: remonzander/opcuaserver:GK.RV.02
     build:
       context: .
       target: GK.RV.02
@@ -44,6 +50,7 @@ services:
       - 10005:10005
   gk.ww.01:
     mem_limit: 256m
+    image: remonzander/opcuaserver:GK.WW.01
     build:
       context: .
       target: GK.WW.01
@@ -51,6 +58,7 @@ services:
       - 10006:10006
   gk.zlw.10:
     mem_limit: 256m
+    image: remonzander/opcuaserver:GK.ZLW.10
     build:
       context: .
       target: GK.ZLW.10
@@ -58,6 +66,7 @@ services:
       - 10007:10007
   gk.zlw.11:
     mem_limit: 256m
+    image: remonzander/opcuaserver:GK.ZLW.11
     build:
       context: .
       target: GK.ZLW.11

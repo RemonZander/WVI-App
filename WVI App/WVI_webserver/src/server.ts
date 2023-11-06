@@ -18,14 +18,11 @@ const app: Express = express();
 //https://www.npmjs.com/package/csrf-csrf
 //https://www.npmjs.com/package/react-helmet    ook X-XSS-Protection
 
-console.log(process.env.client);
-console.log("test");
-
 app.disable('x-powered-by');
 
 app.use(cors({
     origin: function (origin, callback) {
-        const allowedOrigins = [`http://localhost:3001`, "*"];
+        const allowedOrigins = [`http://${process.env.REACT_APP_CLIENT}`];
         if (!origin || allowedOrigins.indexOf(origin) !== -1) {
             console.log(`allowed connection from origin: ${origin}`);
             callback(null, true);

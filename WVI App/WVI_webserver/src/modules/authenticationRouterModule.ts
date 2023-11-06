@@ -39,6 +39,4 @@ authenticationRouter.get('/logout', (req: Request, res: Response) => {
     res.sendStatus(200);
 });
 
-
-
 export default authenticationRouter;

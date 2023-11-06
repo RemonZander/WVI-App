@@ -28,10 +28,10 @@
     "web-vitals": "^2.1.4"
   },
   "scripts": {
-    "start:local": "set PORT=3001 && env-cmd -f ./.env.local react-scripts start",
-    "start:prod": "set PORT=3001 && env-cmd -f ./.env.production react-scripts start",
-    "startlinux:local": "PORT=3001 env-cmd -f ./.env.local react-scripts start",
-    "startlinux:prod": "PORT=3001 env-cmd -f ./.env.production react-scripts start",
+    "start:local": "set PORT=3001 && env-cmd -f ../.env.local react-scripts start",
+    "start:prod": "set PORT=3001 && env-cmd -f ../.env.production react-scripts start",
+    "startlinux:local": "PORT=3001 env-cmd -f ../.env.local react-scripts start",
+    "startlinux:prod": "PORT=3001 env-cmd -f ../.env.production react-scripts start",
     "build": "react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"

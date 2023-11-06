@@ -1,17 +1,16 @@
 FROM node:18.18-bookworm as wvifrontend
 EXPOSE 3001
-EXPOSE 3000
 RUN apt-get update
 RUN apt-get install iputils-ping -y
 WORKDIR /usr/src/UI
 COPY wvi_ui ./
+COPY ./.env.production ../
 RUN npm i
 CMD npm run startlinux:prod
 
 
 
 FROM node:18.18-bookworm as wvibackend
-EXPOSE 3001
 EXPOSE 3000
 RUN apt-get update
 RUN apt-get install iputils-ping -y
@@ -19,5 +18,5 @@ WORKDIR /usr/src/webserver
 COPY WVI_webserver ./
 COPY ./.env.production ../
 RUN npm i
-RUN node ./src/SetupDatabase.ts
+RUN npm run initDB:prod
 CMD npm run start:prod
