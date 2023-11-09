@@ -25,6 +25,7 @@ function Dashboard() {
     const [status, setStatus] = useState<IWVIStatus[]>([]);
     const [WVIs, setWVIs] = useState<IWVI[]>([]);
     const [showWVIs, setShowWVIs] = useState(false);
+    const [role, setRole] = useState<string>();
         
     async function DoSetStatus(pos: number, node: string, eindpoint: string, newStatus: IWVIStatus[]) {
         await routes.GetStatus(node, eindpoint).then((result: number) => {
@@ -74,6 +75,12 @@ function Dashboard() {
     useEffect(() => {
         routes.ValidateToken().then((status) => {
             if (status === 401) window.location.replace('/');
+        });
+
+        routes.GetRole().then((res) => {
+            res.json().then((data) => {
+                setRole(data.role);
+            });
         });
 
         routes.GetWVIs().then((data: IWVI[]) => {
@@ -150,7 +157,7 @@ return (
                 </div>
             </div>
 
-            <div className="ml-[10%] flex flex-col gap-[120px]">
+            {role !== "beheerder" ? <div className="ml-[10%] flex flex-col gap-[120px]">
                 <div className="h-[10vh] flex flex-col items-start">
                     <span className="text-white text-[1.5rem]">Operate WVI:</span>
                     <button id="dropdownDefaultButton" onClick={() => { setDropDown(!dropDown) }} className="text-white bg-blue-700 hover:bg-blue-800 focus:ring-4 focus:outline-none focus:ring-blue-300 font-medium rounded-lg text-sm px-5 py-2.5 text-center inline-flex items-center dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800" type="button">Operation menu
@@ -159,7 +166,7 @@ return (
                         </svg></button>
                     {dropDown ? <div id="dropdown" className="z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
                         <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
-                            <li>                          
+                            <li>
                                 <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" onClick={async () => {
                                     setOperationChoice(operationChoice === "OperationMode" ? "" : "OperationMode");
                                     setDropDown(!dropDown);
@@ -170,7 +177,7 @@ return (
                                     setOperationChoice(operationChoice === "Heating curve" ? "" : "Heating curve");
                                     setDropDown(!dropDown);
                                     setHeatingCurve([nodeData.filter(node => node.Nodes.includes("HeatingCurve.SetPointHigh"))[0].Data, nodeData.filter(node => node.Nodes.includes("HeatingCurve.SetPointLow"))[0].Data]);
-                                }}>Heating curve</a>                              
+                                }}>Heating curve</a>
                             </li>
                             <li>
                                 <a href="#" className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white" onClick={async () => {
@@ -192,7 +199,7 @@ return (
                     {dropDownOperationChoice ? <div id="dropdown" className="z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
                         <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
                             <li>
-                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(0, "ns=2;s=" + currentNode.Node, currentNode.endpoint); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status); setOperationChoice("");  }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Uit</a>
+                                <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(0, "ns=2;s=" + currentNode.Node, currentNode.endpoint); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status); setOperationChoice(""); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Uit</a>
                             </li>
                             <li>
                                 <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(1, "ns=2;s=" + currentNode.Node, currentNode.endpoint); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status); setOperationChoice(""); }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Auto</a>
@@ -206,27 +213,27 @@ return (
                         </ul>
                     </div> : ''}
                 </div> : operationChoice === "Heating curve" ? <div className="flex flex-col gap-[20px]">
-                        <div className="flex justify-between">
-                            <span>SetPointHigh: </span>
-                            <input onChange={e => setHeatingCurve([e.target.value, heatingCurve[1]])} className="text-black max-w-[50px]" value={heatingCurve[0]}></input>
-                        </div>
-                        <div className="flex justify-between">
+                    <div className="flex justify-between">
+                        <span>SetPointHigh: </span>
+                        <input onChange={e => setHeatingCurve([e.target.value, heatingCurve[1]])} className="text-black max-w-[50px]" value={heatingCurve[0]}></input>
+                    </div>
+                    <div className="flex justify-between">
                         <span>SetPointLow: </span>
-                            <input onChange={e => setHeatingCurve([heatingCurve[0], e.target.value])} className="text-black max-w-[50px]" value={heatingCurve[1]}></input>
-                        </div>
-                        <button onClick={() => { routes.SetHeatingCurve(Number(heatingCurve[0]), Number(heatingCurve[1]), "ns=2;s=" + currentNode.Node, currentNode.endpoint); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status); setOperationChoice(""); } } className="font-medium text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-sm px-5 py-2.5 text-center items-center">toepassen</button>
-                    </div> : operationChoice === "Default heating curve" ? <div className="flex flex-col gap-[20px]">
-                        <div className="flex justify-between">
-                            <span>SetPointHigh: </span>
-                                <input onChange={e => setDefaultHeatingCurve([e.target.value, defaultHeatingCurve[1]])} className="text-black max-w-[50px]" value={defaultHeatingCurve[0]}></input>
-                        </div>
-                        <div className="flex justify-between">
-                            <span>SetPointLow: </span>
-                                <input onChange={e => setDefaultHeatingCurve([defaultHeatingCurve[0], e.target.value])} className="text-black max-w-[50px]" value={defaultHeatingCurve[1]}></input>
-                        </div>
-                            <button onClick={() => { routes.SetDefaultHeatingCurve(Number(defaultHeatingCurve[0]), Number(defaultHeatingCurve[1]), "ns=2;s=" + currentNode.Node, currentNode.endpoint); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status); setOperationChoice(""); }} className="font-medium text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-sm px-5 py-2.5 text-center items-center">toepassen</button>
-                    </div> : '' }
-            </div>
+                        <input onChange={e => setHeatingCurve([heatingCurve[0], e.target.value])} className="text-black max-w-[50px]" value={heatingCurve[1]}></input>
+                    </div>
+                    <button onClick={() => { routes.SetHeatingCurve(Number(heatingCurve[0]), Number(heatingCurve[1]), "ns=2;s=" + currentNode.Node, currentNode.endpoint); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status); setOperationChoice(""); }} className="font-medium text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-sm px-5 py-2.5 text-center items-center">toepassen</button>
+                </div> : operationChoice === "Default heating curve" ? <div className="flex flex-col gap-[20px]">
+                    <div className="flex justify-between">
+                        <span>SetPointHigh: </span>
+                        <input onChange={e => setDefaultHeatingCurve([e.target.value, defaultHeatingCurve[1]])} className="text-black max-w-[50px]" value={defaultHeatingCurve[0]}></input>
+                    </div>
+                    <div className="flex justify-between">
+                        <span>SetPointLow: </span>
+                        <input onChange={e => setDefaultHeatingCurve([defaultHeatingCurve[0], e.target.value])} className="text-black max-w-[50px]" value={defaultHeatingCurve[1]}></input>
+                    </div>
+                    <button onClick={() => { routes.SetDefaultHeatingCurve(Number(defaultHeatingCurve[0]), Number(defaultHeatingCurve[1]), "ns=2;s=" + currentNode.Node, currentNode.endpoint); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status); setOperationChoice(""); }} className="font-medium text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-sm px-5 py-2.5 text-center items-center">toepassen</button>
+                </div> : ''}
+            </div> : '' }
         </div> : ""}
     </div>
 );

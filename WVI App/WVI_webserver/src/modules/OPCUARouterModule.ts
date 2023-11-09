@@ -18,7 +18,12 @@ OPCUARouter.post('/OPCUA/status', (req: Request, res: Response) => {
 
 OPCUARouter.get('/getWVIs', (req: Request, res: Response) => {
     res.setHeader('Content-Type', 'application/json');
-    const contractgebiednummers = UserService.GetContractgebiednummers(UserService.GetOneByEmailAllColumns(TokenService.GetEmail(req.cookies["login"])[0].Email)[0].Onderhoudsaannemer);
+    const user = UserService.GetOneByEmailAllColumns(TokenService.GetEmail(req.cookies["login"])[0].Email)[0];
+    if (user.Role === "beheerder") {
+        res.send(JSON.stringify(WVIService.GetAll()));
+        return;
+    }
+    const contractgebiednummers = UserService.GetContractgebiednummers(user.Onderhoudsaannemer);
     const WVIs = [];
     for (var a = 0; a < contractgebiednummers.length; a++) {
         WVIs.push(...WVIService.GetWVIs(contractgebiednummers[a].Contractgebiednummer));

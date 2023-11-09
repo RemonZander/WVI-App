@@ -3,5 +3,5 @@ export interface IAccount {
     Email: string,
     Onderhoudsaannemer: string,
     Wachtwoord: string,
-    role: string
+    Role: string
 }

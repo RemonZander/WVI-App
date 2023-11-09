@@ -117,7 +117,7 @@ function Home() {
                     }
                 </div>
                 <div className="flex mt-[10px] text-[1.2rem]">
-                <div className={(showButtons && !isBeheer ? "" : "hidden ") + "rounded-t-[0.5vw] " + (WVIview ? "bg-[#2C2C39]" : "transition-all duration-300 ease-in-out hover:text-[1.4rem] hover:text-white")}>
+                <div className={(showButtons ? "" : "hidden ") + "rounded-t-[0.5vw] " + (WVIview ? "bg-[#2C2C39]" : "transition-all duration-300 ease-in-out hover:text-[1.4rem] hover:text-white")}>
                         <button className="px-[5px]" onClick={() => {
                             window.location.replace('/WVI');
                             setWVIview(true);

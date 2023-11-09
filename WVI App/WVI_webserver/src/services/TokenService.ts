@@ -58,7 +58,6 @@ export class TokenService {
     public static GetEmail(token: string): any[] {
         return All(`SELECT "Email" FROM "Tokens" WHERE Token = ?`,
             [token]);
-
     }
 }
 
