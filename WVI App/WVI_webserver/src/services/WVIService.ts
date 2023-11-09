@@ -10,7 +10,7 @@ export class WVIService {
         return All('SELECT * FROM WVIs WHERE "Contractgebiednummer" = ?', [Contractgebiednummer]);
     }
 
-    public static InsertOne(data) : string {
+    public static AddWVI(data) : string {
         return Run(`INSERT INTO "WVIs" ("PMP enkelvoudige objectnaam", "PPLG", "Objecttype", "Geocode", "Contractgebiednummer", "Equipmentnummer", "RD X-coordinaat", "RD Y-coordinaat", "Template", "Producent", "Endpoint") 
             VALUES (?,?,?,?,?,?,?,?,?,?,?)`, data);
     }

@@ -8,7 +8,6 @@ import Accounts from './Accounts';
 import Addaccount from './Addaccount';
 import Login from './Login';
 import routes from '../Services/routes';
-import { printDiffOrStringify } from 'jest-matcher-utils';
 
 const router = createBrowserRouter([
     {
@@ -42,18 +41,19 @@ function Home() {
     const [addRoleView, setAddRoleView] = useState(false);
     const [showButtons, setShowButtons] = useState(false);
     const [isBeheer, setIsBeheer] = useState(false);
+    const [account, setAccount] = useState<string>();
 
     useEffect(() => {
-        console.log(process.env);
         routes.GetRole().then((res => {
             if (res.status === 404 || res.status === 401) {
                 setIsBeheer(false);
             }
             res.json().then((data) => {
-                if (data === "aannemer") {
+                setAccount(data.email);
+                if (data.role === "aannemer") {
                     setIsBeheer(false);
                 }
-                else if (data === "beheerder") {
+                else if (data.role === "beheerder") {
                     setIsBeheer(true);
                 }
             });
@@ -100,19 +100,24 @@ function Home() {
 
 
     return (       
-            <div className="bg-[#2F2F31] w-screen h-screen flex flex-col text-gray-300">
+        <div className="bg-[#2F2F31] w-screen h-screen flex flex-col text-gray-300">
                 <div className="bg-[#2C2C39] w-screen h-[120px] flex justify-between rounded-b-[0.5vw]">
                     <img className="ml-[1vw]" src={logo} alt="" width="120" height="120" />
-                    {!WVIview && !AddWVIview && !AccountView && !Addaccountview && !roleView && !addRoleView ? '' : 
-                        <button className="mr-[8vw] text-lg self-center" onClick={() => {
-                            routes.Logout().then((status) => {
-                                window.location.replace('/');
-                            });
-                        }}>Loguit</button>
-                    }               
+                {!WVIview && !AddWVIview && !AccountView && !Addaccountview && !roleView && !addRoleView ? '' : 
+                    <>
+                        <div className="mr-[8vw] text-lg self-center flex gap-x-[50px]">
+                            <span>Ingelogd als: {account}</span>
+                            <button className="transition-all duration-300 ease-in-out hover:text-[1.4rem] hover:text-white" onClick={() => {
+                                routes.Logout().then((status) => {
+                                    window.location.replace('/');
+                                });
+                            }}>Uitloggen</button>
+                        </div>
+                    </>
+                    }
                 </div>
                 <div className="flex mt-[10px] text-[1.2rem]">
-                    <div className={(showButtons && !isBeheer ? "" : "hidden ") + "rounded-t-[0.5vw] " + (WVIview ? "bg-[#2C2C39]" : "")}>
+                <div className={(showButtons && !isBeheer ? "" : "hidden ") + "rounded-t-[0.5vw] " + (WVIview ? "bg-[#2C2C39]" : "transition-all duration-300 ease-in-out hover:text-[1.4rem] hover:text-white")}>
                         <button className="px-[5px]" onClick={() => {
                             window.location.replace('/WVI');
                             setWVIview(true);
@@ -124,7 +129,7 @@ function Home() {
                         }}>WVI's</button>
                     </div>
                     <div>
-                        <button className={(showButtons && isBeheer ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (AddWVIview ? "bg-[#2C2C39]" : "")} onClick={() => {
+                    <button className={(showButtons && isBeheer ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (AddWVIview ? "bg-[#2C2C39]" : "transition-all duration-300 ease-in-out hover:text-[1.4rem] hover:text-white")} onClick={() => {
                             window.location.replace('/AddWVI');
                             setWVIview(false);
                             setAddWVIview(true);
@@ -135,7 +140,7 @@ function Home() {
                         }}>WVI toevoegen</button>
                     </div>
                     <div>
-                        <button className={(showButtons && isBeheer ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (AccountView ? "bg-[#2C2C39]" : "")} onClick={() => {
+                    <button className={(showButtons && isBeheer ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (AccountView ? "bg-[#2C2C39]" : "transition-all duration-300 ease-in-out hover:text-[1.4rem] hover:text-white")} onClick={() => {
                             window.location.replace('/Accounts');
                             setWVIview(false);
                             setAddWVIview(false);
@@ -146,7 +151,7 @@ function Home() {
                         }}>Accounts beheren</button>
                     </div>
                     <div>
-                        <button className={(showButtons && isBeheer ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (Addaccountview ? "bg-[#2C2C39]" : "")} onClick={() => {
+                    <button className={(showButtons && isBeheer ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (Addaccountview ? "bg-[#2C2C39]" : "transition-all duration-300 ease-in-out hover:text-[1.4rem] hover:text-white")} onClick={() => {
                             window.location.replace('/Addaccount');
                             setWVIview(false);
                             setAddWVIview(false);
@@ -157,7 +162,7 @@ function Home() {
                         }}>Accounts toevoegen</button>
                     </div>
                     <div>
-                        <button className={(showButtons && isBeheer ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (roleView ? "bg-[#2C2C39]" : "")} onClick={() => {
+                    <button className={(showButtons && isBeheer ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (roleView ? "bg-[#2C2C39]" : "transition-all duration-300 ease-in-out hover:text-[1.4rem] hover:text-white")} onClick={() => {
                             window.location.replace('/Addaccount');
                             setWVIview(false);
                             setAddWVIview(false);
@@ -168,7 +173,7 @@ function Home() {
                         }}>Roles beheren</button>
                     </div>
                     <div>
-                        <button className={(showButtons && isBeheer ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (addRoleView ? "bg-[#2C2C39]" : "")} onClick={() => {
+                    <button className={(showButtons && isBeheer ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (addRoleView ? "bg-[#2C2C39]" : "transition-all duration-300 ease-in-out hover:text-[1.4rem] hover:text-white")} onClick={() => {
                             window.location.replace('/Addaccount');
                             setWVIview(false);
                             setAddWVIview(false);
@@ -179,10 +184,10 @@ function Home() {
                         }}>Roles toevoegen</button>
                     </div>
                 </div>
-                <div className="bg-[#2C2C39] w-screen flex flex-grow">
-                    <RouterProvider router={router} />
-                </div>
-            </div>        
+            <div className="bg-[#2C2C39] w-screen flex flex-grow">  
+                <RouterProvider router={router} />
+            </div>
+        </div>        
     )
 }
 

@@ -4,7 +4,7 @@ import { All, Run, QueryNoParams } from './DBService';
 export class UserService {
 
     public static GetAll(): IAccount[] {
-        return QueryNoParams(`SELECT "Email", "Onderhoudsaannemer", "Role" FROM Accounts`).all();
+        return QueryNoParams(`SELECT LOWER(Email), "Onderhoudsaannemer", "Role" FROM Accounts`).all();
     }
 
     public static GetOne(columns: string, filterColumn: string, value: string): string {
@@ -12,11 +12,11 @@ export class UserService {
     }
 
     public static GetOneByEmailSelectColumns(columns: string, value: string): any[] {
-        return All(`SELECT ${columns} FROM Accounts WHERE "Email" = ?`, [value]);
+        return All(`SELECT ${columns} FROM Accounts WHERE LOWER(Email) = ?`, [value]);
     }
 
     public static GetOneByEmailAllColumns(email: string): IAccount[] {
-        return All(`SELECT "Email", "Onderhoudsaannemer", "Role", "Wachtwoord" FROM Accounts WHERE "Email" = ?`, [email]);
+        return All(`SELECT LOWER(Email), "Onderhoudsaannemer", "Role", "Wachtwoord" FROM Accounts WHERE LOWER(Email) = ?`, [email]);
     }
 
     public static InsertOne(data): string {
@@ -25,11 +25,11 @@ export class UserService {
     }
 
     public static RemoveOne(value): string {
-        return Run(`DELETE FROM "Accounts" WHERE "Email" = ?`, value);
+        return Run(`DELETE FROM "Accounts" WHERE LOWER(Email) = ?`, value);
     }
 
     public static UpdateOnderhoudsaannemer(onderhoudsaannemer: string, email: string) {
-        return Run('UPDATE "Accounts" Set Onderhoudsaannemer = ? WHERE Email = ?', [onderhoudsaannemer, email]);
+        return Run('UPDATE "Accounts" Set Onderhoudsaannemer = ? WHERE LOWER(Email) = ?', [onderhoudsaannemer, email]);
     }
 
     public static ListOnderhoudsaannemers() {
@@ -41,7 +41,7 @@ export class UserService {
     }
 
     public static UpdateRole(role: string, email: string) {
-        return Run(`UPDATE "Accounts" Set Role = ? WHERE Email = ?`, [role, email]);
+        return Run(`UPDATE "Accounts" Set Role = ? WHERE LOWER(Email) = ?`, [role, email]);
     }
 
     public static GetContractgebiednummers(onderhoudsaannemer: string) {

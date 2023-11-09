@@ -183,4 +183,15 @@ export default class routes {
             return res.status;
         }));
     }
+
+    static async AddWVI(data: any) {
+        return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/addwvi`, {
+            method: "PUT",
+            credentials: 'include',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ data: data })
+        });
+    }
 }

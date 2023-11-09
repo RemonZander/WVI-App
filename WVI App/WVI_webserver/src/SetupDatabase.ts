@@ -3,8 +3,6 @@ const path = require('path');
 const fs = require('fs');
 require('dotenv').config();
 
-console.log(process.env);
-
 try {
 	fs.unlinkSync(path.resolve('./src/database.db'));
 } catch (e) {
@@ -84,8 +82,8 @@ db.prepare(`INSERT INTO "Roles" ("Role") VALUES(?)`).run(["aannemer"]);
 db.prepare(`INSERT INTO "Roles" ("Role") VALUES(?)`).run(["beheerder"]);
 
 //insert accounts
-db.prepare(`INSERT INTO "Accounts" ("Email", "Wachtwoord", "Onderhoudsaannemer", "Role") VALUES(?, ?, ?, ?)`).run(["Strukton@test.nl", "$2b$10$mn06oPdHs0f2euVp2adqo.hMq9BT9IXwXj7mkIZoNGyfnRVkgLpFy", "Strukton Rail", "aannemer"]);
-db.prepare(`INSERT INTO "Accounts" ("Email", "Wachtwoord", "Onderhoudsaannemer", "Role") VALUES(?, ?, ?, ?)`).run(["ASSETRail@test.nl", "$2b$10$BQ5nvVrm57ebFc8VykTsDe5nno32uXQOqdsZFdt3eovJWVaQwuwkq", "ASSET Rail", "aannemer"]);
+db.prepare(`INSERT INTO "Accounts" ("Email", "Wachtwoord", "Onderhoudsaannemer", "Role") VALUES(?, ?, ?, ?)`).run(["strukton@test.nl", "$2b$10$mn06oPdHs0f2euVp2adqo.hMq9BT9IXwXj7mkIZoNGyfnRVkgLpFy", "Strukton Rail", "aannemer"]);
+db.prepare(`INSERT INTO "Accounts" ("Email", "Wachtwoord", "Onderhoudsaannemer", "Role") VALUES(?, ?, ?, ?)`).run(["assetrail@test.nl", "$2b$10$BQ5nvVrm57ebFc8VykTsDe5nno32uXQOqdsZFdt3eovJWVaQwuwkq", "ASSET Rail", "aannemer"]);
 db.prepare(`INSERT INTO "Accounts" ("Email", "Wachtwoord", "Role") VALUES(?, ?, ?)`).run(["beheer@prorail.nl", "$2b$10$pPT4Ai0egvTwhoCJ4bw4CuknQkCkmp8QA3cY7/GHpoaighK/PeSN2", "beheerder"]);
 
 //insert WVI data

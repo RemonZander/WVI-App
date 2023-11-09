@@ -48,6 +48,7 @@
     <TypeScriptCompile Include="src\modules\authenticationRouterModule.ts" />
     <TypeScriptCompile Include="src\modules\OPCUARouterModule.ts" />
     <TypeScriptCompile Include="src\modules\AccountrouterRouterModule.ts" />
+    <TypeScriptCompile Include="src\modules\WVIRouterModule.ts" />
     <TypeScriptCompile Include="src\passportStragegies.ts" />
     <TypeScriptCompile Include="src\services\AuthenticationService.ts" />
     <TypeScriptCompile Include="src\services\DBService.ts" />

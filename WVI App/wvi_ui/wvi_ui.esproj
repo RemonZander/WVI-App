@@ -12,7 +12,6 @@
     <BuildOutputFolder>$(MSBuildProjectDirectory)\build</BuildOutputFolder>
   </PropertyGroup>
   <ItemGroup>
-    <Folder Include="src\Modules\" />
     <Folder Include="src\interfaces\" />
     <Folder Include="src\Services\" />
   </ItemGroup>

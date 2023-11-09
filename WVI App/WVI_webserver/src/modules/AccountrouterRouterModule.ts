@@ -16,7 +16,7 @@ Accountrouter.get('/role', (req: Request, res: Response) => {
         res.sendStatus(404);
         return;
     }
-    res.send(JSON.stringify(user[0].Role));
+    res.send(JSON.stringify({ role: user[0].Role, email: results[0].Email }));
 });
 
 Accountrouter.get('/accounts', (req: Request, res: Response) => {
