@@ -10,6 +10,9 @@ import localStrategy from './passportStragegies';
 import authenticationRouter from './modules/authenticationRouterModule';
 import OPCUARouter from './modules/OPCUARouterModule';
 import 'dotenv/config'
+import WVIRouter from './modules/WVIRouterModule';
+import Logger from './modules/loggerModule';
+import { LogLevel } from './enums/loglevelEnum';
 
 const bodyParser = require('body-parser');
 
@@ -24,10 +27,10 @@ app.use(cors({
     origin: function (origin, callback) {
         const allowedOrigins = [`http://${process.env.REACT_APP_CLIENT}`];
         if (!origin || allowedOrigins.indexOf(origin) !== -1) {
-            console.log(`allowed connection from origin: ${origin}`);
+            Logger(`allowed connection from origin: ${origin}`, "CORS", LogLevel.INFO);
             callback(null, true);
         } else {
-            console.log(`Blocked CORS request from origin: ${origin}`);
+            Logger(`Blocked CORS request from origin: ${origin}`, "CORS", LogLevel.WARNING);
             callback(null, false);
         }
     },
@@ -54,6 +57,7 @@ app.set('port', process.env.PORT || 3000);
 app.use(Accountrouter);
 app.use(authenticationRouter);
 app.use(OPCUARouter);
+app.use(WVIRouter);
 
 app.use(passport.initialize());
 app.use(passport.authenticate('session'));
@@ -73,5 +77,5 @@ passport.deserializeUser(function (user, cb) {
 });
     
 const server = app.listen(app.get('port'), function () {
-    console.log(`Express server listening on port ${(server.address() as AddressInfo).port}`);
+    Logger(`Express server listening on port ${(server.address() as AddressInfo).port}`, "SERVER.ts", LogLevel.INFO);
 });

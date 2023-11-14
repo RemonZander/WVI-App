@@ -13,12 +13,25 @@ authenticationRouter.post('/login',
 
         const token = tokgen.generate();
         if (TokenService.TokenExists(req.body.email, req.cookies.login)) {
-            TokenService.UpdateToken(req.body.email, req.cookies.login);
+            const result = TokenService.UpdateToken(req.body.email, req.cookies.login); {
+                if (result == false) {
+                    res.sendStatus(500);
+                    return;
+                }
+            }
             res.sendStatus(200);
             return;
         }
-        TokenService.RemoveTokenByEmail(req.body.email);
-        TokenService.InsertOne(req.body.email, token);
+        let result = TokenService.RemoveTokenByEmail(req.body.email);
+        if (result == false) {
+            res.sendStatus(500);
+            return;
+        }
+        result = TokenService.InsertOne(req.body.email, token);
+        if (result == false) {
+            res.sendStatus(500);
+            return;
+        }
         res.cookie('login', token, { path: '/', httpOnly: true, maxAge: 3600000, sameSite: "strict" });
         res.sendStatus(200);
     }
@@ -26,7 +39,11 @@ authenticationRouter.post('/login',
 
 authenticationRouter.get('/validatetoken', (req: Request, res: Response) => {
     if (TokenService.TokenExistsByToken(req.cookies["login"])) {
-        TokenService.UpdateTokenNoEmail(req.cookies.login);
+        const result = TokenService.UpdateTokenNoEmail(req.cookies.login);
+        if (result == false) {
+            res.sendStatus(500);
+            return;
+        }
         res.sendStatus(200);
         return;
     }
@@ -34,7 +51,11 @@ authenticationRouter.get('/validatetoken', (req: Request, res: Response) => {
 });
 
 authenticationRouter.get('/logout', (req: Request, res: Response) => {
-    TokenService.RemoveToken(req.cookies.login);
+    const result = TokenService.RemoveToken(req.cookies.login);
+    if (result == false) {
+        res.sendStatus(500);
+        return;
+    }
     res.clearCookie("login");
     res.sendStatus(200);
 });

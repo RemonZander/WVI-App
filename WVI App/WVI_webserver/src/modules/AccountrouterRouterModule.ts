@@ -6,12 +6,20 @@ import { UserService } from '../services/UserService';
 const Accountrouter: Router = express.Router();
 
 Accountrouter.get('/role', (req: Request, res: Response) => {
-    const results = TokenService.GetEmail(req.cookies.login);
-    if (results.length === 0) {
+    const results: any = TokenService.GetEmail(req.cookies.login);
+    if (results == false) {
+        res.sendStatus(500);
+        return;
+    }
+    else if (results.length === 0) {
         res.sendStatus(401);
         return;
     }
-    const user = UserService.GetOneByEmailSelectColumns(`"Role"`, results[0].Email);
+    const user: any = UserService.GetOneByEmailSelectColumns(`"Role"`, results[0].Email);
+    if (user == false) {
+        res.sendStatus(500);
+        return;
+    }
     if (user.length === 0) {
         res.sendStatus(404);
         return;
@@ -24,12 +32,20 @@ Accountrouter.get('/accounts', (req: Request, res: Response) => {
 });
 
 Accountrouter.delete('/removeAccount', (req: Request, res: Response) => {
-    UserService.RemoveOne(req.body.email);
+    const result = UserService.RemoveOne(req.body.email);
+    if (result == false) {
+        res.sendStatus(500);
+        return;
+    }
     res.sendStatus(200);
 });
 
 Accountrouter.post('/removeOnderhoudsaannemer', (req: Request, res: Response) => {
-    UserService.UpdateOnderhoudsaannemer(req.body.onderhoudsaannemer, req.body.email);
+    const result = UserService.UpdateOnderhoudsaannemer(req.body.onderhoudsaannemer, req.body.email);
+    if (result == false) {
+        res.sendStatus(500);
+        return;
+    }
     res.sendStatus(200);
 });
 
@@ -39,7 +55,11 @@ Accountrouter.get('/listRoles', (req: Request, res: Response) => {
 });
 
 Accountrouter.post('/updateRole', (req: Request, res: Response) => {
-    UserService.UpdateRole(req.body.role, req.body.email);
+    const result = UserService.UpdateRole(req.body.role, req.body.email);
+    if (result == false) {
+        res.sendStatus(500);
+        return;
+    }
     res.sendStatus(200);
 });
 

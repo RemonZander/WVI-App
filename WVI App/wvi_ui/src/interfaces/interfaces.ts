@@ -12,6 +12,7 @@ export interface IWVI {
     Geocode: number,
     Contractgebiednummer: number,
     Equipmenetnummer: number,
+    Objecttype: string,
     PUIC: string,
     "RD X-coordinaat": number,
     "RD Y-coordinaat": number,

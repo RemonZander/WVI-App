@@ -59,7 +59,7 @@ function Home() {
             });
         }));
 
-        switch (window.location.href.replace(window.location.host, '').replace(window.location.protocol + "//", '').replace("#", "")) {
+        switch (window.location.pathname) {
             case '/':
                 setShowButtons(false);
                 setWVIview(false);

@@ -15,7 +15,7 @@ const localStrategy = new LocalStrategy(
             if (account.length === 0) {
                 return done(null, false);
             }
-
+            
             bcrypt.compare(password, account[0].Wachtwoord).then(async hashResult => {
                 if (hashResult) return done(null, account[0]);
                 else return done(null, false);

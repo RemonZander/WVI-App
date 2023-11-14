@@ -1,6 +1,8 @@
 import { Request, Response } from "express";
 import { AttributeIds, BrowseResult, ClientSession, DataType, DataValue, OPCUAClient, ReferenceDescription, StatusCodes, TimestampsToReturn, UserTokenType, DataTypeIds, FilterContextOnAddressSpace } from "node-opcua-client";
 import { Datamodel } from '../enums/datamodel';
+import { LogLevel } from "../enums/loglevelEnum";
+import Logger from "./loggerModule";
 
 export default class OPCUAclient {
 
@@ -17,15 +19,15 @@ export default class OPCUAclient {
                     maxDelay: 10 * 1000
                 },
             });
-            client.on("backoff", () => console.log("retrying connection"));
+            client.on("backoff", () => Logger("retrying connection", OPCUAclient.name, LogLevel.WARNING));
             await client.connect(req.body.endpoint);
 
             session = await client.createSession({
                 type: UserTokenType.Anonymous
             });
 
-        } catch (e) {
-            console.log(e);
+        } catch (err) {
+            Logger(err.stack, OPCUAclient.name, LogLevel.SERVERE);
             res.sendStatus(404);
             return;
         }
@@ -50,7 +52,7 @@ export default class OPCUAclient {
                     maxDelay: 10 * 1000
                 },
             });
-            client.on("backoff", () => console.log("retrying connection"));
+            client.on("backoff", () => Logger("retrying connection", OPCUAclient.name, LogLevel.WARNING));
 
             await client.connect(req.body.endpoint);
 
@@ -68,8 +70,7 @@ export default class OPCUAclient {
         }
         catch (err)
         {
-            console.log("error in: GetStatus");
-            console.log(err);
+            Logger(err.stack, OPCUAclient.name, LogLevel.SERVERE);
             res.send(JSON.stringify(`Error: ${err}`));
         }
         client.disconnect();
@@ -89,7 +90,7 @@ export default class OPCUAclient {
                     maxDelay: 10 * 1000
                 },
             });
-            client.on("backoff", () => console.log("retrying connection"));
+            client.on("backoff", () => Logger("retrying connection", OPCUAclient.name, LogLevel.WARNING));
 
             await client.connect(req.body.endpoint);
 
@@ -116,8 +117,7 @@ export default class OPCUAclient {
             res.send(JSON.stringify(nodes));
         }
         catch (err) {
-            console.log("error in: GetData");
-            console.log(err);
+            Logger(err.stack, OPCUAclient.name, LogLevel.SERVERE);
             res.sendStatus(404);
         }
         res.end();
@@ -139,7 +139,7 @@ export default class OPCUAclient {
                     maxDelay: 10 * 1000
                 },
             });
-            client.on("backoff", () => console.log("retrying connection"));
+            client.on("backoff", () => Logger("retrying connection", OPCUAclient.name, LogLevel.WARNING));
 
 
             await client.connect(req.body.endpoint);
@@ -168,6 +168,7 @@ export default class OPCUAclient {
 
         }
         catch (err) {
+            Logger(err.stack, OPCUAclient.name, LogLevel.SERVERE);
             res.send(`Error: ${err}`);
         }
         client.disconnect();

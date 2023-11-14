@@ -192,6 +192,21 @@ export default class routes {
                 "Content-Type": "application/json"
             },
             body: JSON.stringify({ data: data })
+        }).then((res => {
+            return res.status;
+        }));
+    }
+
+    static async UpdateWVI(data: any) {
+        return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/updatewvi`, {
+            method: "POST",
+            credentials: 'include',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ data: data })
+        }).then(res => {
+            return res.status;
         });
     }
 }

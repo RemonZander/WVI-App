@@ -37,7 +37,6 @@ function Accounts() {
         });
 
         routes.ListOnderhoudsaannemers().then((data) => {
-            console.log(data);
             setOnderhoudsaannemers(data.map((a: { Onderhoudsaannemer: any; }) => a.Onderhoudsaannemer));
         });
     }, []);
