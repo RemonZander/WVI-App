@@ -19,9 +19,9 @@ export class UserService {
         return All(`SELECT LOWER(Email) AS Email, "Onderhoudsaannemer", "Role", "Wachtwoord" FROM Accounts WHERE Email = ?`, [email]);
     }
 
-    public static InsertOne(data): string | boolean {
-        return Run(`INSERT INTO "Accounts" ("Email", "Wachtwoord") 
-            VALUES (?,?)`, data);
+    public static AddAccount(data): string | boolean {
+        return Run(`INSERT INTO "Accounts" ("Email", "Wachtwoord", "Role", "Onderhoudsaannemer") 
+            VALUES (?,?,?,?)`, data);
     }
 
     public static RemoveOne(value): string | boolean {

@@ -2,6 +2,7 @@ import express, { Request, Response } from 'express';
 import { Router } from 'express-serve-static-core';
 import { TokenService } from '../services/TokenService';
 import { UserService } from '../services/UserService';
+import bcrypt from "bcrypt";
 
 const Accountrouter: Router = express.Router();
 
@@ -66,6 +67,22 @@ Accountrouter.post('/updateRole', (req: Request, res: Response) => {
 Accountrouter.get('/listOnderhoudsaannemers', (req: Request, res: Response) => {
     res.setHeader('Content-Type', 'application/json');
     res.send(JSON.stringify(UserService.ListOnderhoudsaannemers()));
+});
+
+Accountrouter.post('/getaannemer', (req: Request, res: Response) => {
+    res.setHeader('Content-Type', 'application/json');
+    res.send(JSON.stringify(UserService.GetAannemerOnContractgebiednummer(req.body.contractgebiednummer)));
+});
+
+Accountrouter.put('/addaccount', (req: Request, res: Response) => {
+    let data = req.body.data;
+    data[1] = bcrypt.hashSync(data[1], 10);
+    const result = UserService.AddAccount(req.body.data);
+    if (result == false) {
+        res.sendStatus(500);
+        return;
+    }
+    res.sendStatus(200);
 });
 
 export default Accountrouter;

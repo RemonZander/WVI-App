@@ -11,12 +11,16 @@ export class WVIService {
     }
 
     public static AddWVI(data) : string | boolean {
-        return Run(`INSERT INTO "WVIs" ("PMP_enkelvoudige_objectnaam", "PPLG", "Objecttype", "Geocode", "Contractgebiednummer", "Equipmentnummer", "RD X-coordinaat", "RD Y-coordinaat", "Template", "Producent", "Endpoint") 
+        return Run(`INSERT INTO "WVIs" ("PMP_enkelvoudige_objectnaam", "PPLG", "Objecttype", "Geocode", "Contractgebiednummer", "Equipmentnummer", "RD X-coordinaat", "RD Y-coordinaat", "Producent", "Endpoint", "Datamodel") 
             VALUES (?,?,?,?,?,?,?,?,?,?,?)`, data);
     }
 
     public static UpdateWVI(data): boolean {
-        return Run(`UPDATE "WVIs" SET PMP_enkelvoudige_objectnaam = ?, PPLG = ?, Objecttype = ?, Geocode = ?, Contractgebiednummer = ?, Equipmentnummer = ?, "RD X-coordinaat" = ?, "RD Y-coordinaat" = ?, Template = ?, Producent = ?, Endpoint = ? WHERE PMP_enkelvoudige_objectnaam = ?`, data);
+        return Run(`UPDATE "WVIs" SET PMP_enkelvoudige_objectnaam = ?, PPLG = ?, Objecttype = ?, Geocode = ?, Contractgebiednummer = ?, Equipmentnummer = ?, "RD X-coordinaat" = ?, "RD Y-coordinaat" = ?, Producent = ?, Endpoint = ?, Datamodel = ? WHERE PMP_enkelvoudige_objectnaam = ?`, data);
+    }
+
+    public static RemoveWVI(name): boolean {
+        return Run(`DELETE FROM "WVIs" WHERE PMP_enkelvoudige_objectnaam = ?`, [name]);
     }
 }
 

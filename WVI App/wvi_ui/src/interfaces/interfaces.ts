@@ -5,20 +5,26 @@ export interface IAccount {
     Role: string
 }
 
+export interface INewAccount {
+    Email: string,
+    Onderhoudsaannemer: string,
+    Role: string,
+    Wachtwoord: string
+}
+
 export interface IWVI {
-    ID: number,
     PMP_enkelvoudige_objectnaam: string,
     PPLG: string,
     Geocode: number,
     Contractgebiednummer: number,
-    Equipmenetnummer: number,
+    Equipmentnummer: number,
     Objecttype: string,
     PUIC: string,
     "RD X-coordinaat": number,
     "RD Y-coordinaat": number,
-    Template: string,
     Producent: string,
-    Endpoint: string
+    Endpoint: string,
+    Datamodel: string
 }
 
 export interface IWVIStatus {
@@ -26,18 +32,6 @@ export interface IWVIStatus {
     activityLed: any
 }
 
-export interface INewWVI {
-    datamodel: [],
-    PMP_enkelvoudige_objectnaam: string,
-    PPLG: string,
-    Geocode: number,
-    Contractgebiednummer: number,
-    Equipmentnummer: number,
-    PUIC: string,
-    "RD X-coordinaat": number,
-    "RD Y-coordinaat": number,
-    Template: string,
-    Producent: string,
-    Endpoint: string,
-    Objecttype: string
+export interface INewWVI extends IWVI {
+    Aannemer: string
 }

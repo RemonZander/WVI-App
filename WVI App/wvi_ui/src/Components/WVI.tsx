@@ -18,7 +18,7 @@ function Dashboard() {
     const [nodeData, setNodeData] = useState([{ DisplayName: "", Nodes: "", Data: "", dataType: "" }]);
     const [heatingCurve, setHeatingCurve] = useState([""]);
     const [defaultHeatingCurve, setDefaultHeatingCurve] = useState([""]);
-    const [currentNode, setCurrentNode] = useState({ Node: "", endpoint: "" });
+    const [currentNode, setCurrentNode] = useState({ Node: "", endpoint: "", datamodel: "" });
     const [status, setStatus] = useState<IWVIStatus[]>([]);
     const [WVIs, setWVIs] = useState<IWVI[]>([]);
     const [showWVIs, setShowWVIs] = useState(false);
@@ -28,8 +28,8 @@ function Dashboard() {
 
     let nodeDataVariable = [];
         
-    async function DoSetStatus(pos: number, node: string, eindpoint: string, newStatus: IWVIStatus[]) {
-        await routes.GetStatus(node, eindpoint).then((result: number) => {
+    async function DoSetStatus(pos: number, node: string, eindpoint: string, newStatus: IWVIStatus[], datamodel: string) {
+        await routes.GetStatus(node, eindpoint, datamodel).then((result: number) => {
             if (result == 0) {
                 newStatus[pos] = { status: "uit", activityLed: activityWhite };
             }
@@ -49,7 +49,7 @@ function Dashboard() {
         });
     }
 
-    async function GetData(nodeId: string, eindpoint: string, status: IWVIStatus[]) {
+    async function GetData(nodeId: string, eindpoint: string, status: IWVIStatus[], datamodel: string) {
         await routes.GetData(nodeId, eindpoint).then((data: [{ DisplayName: string, Nodes: string, Data: string, dataType: string }]) => {
             let newdata = [];
             let removeIndexes: string[] = [];
@@ -71,7 +71,7 @@ function Dashboard() {
             setNodeData([...newdata]);
         });
 
-        DoSetStatus(WVIs.findIndex(wvi => nodeId.includes(wvi.PMP_enkelvoudige_objectnaam)), nodeId, eindpoint, status);
+        DoSetStatus(WVIs.findIndex(wvi => nodeId.includes(wvi.PMP_enkelvoudige_objectnaam)), nodeId, eindpoint, status, datamodel);
     }
 
     useEffect(() => {
@@ -97,7 +97,7 @@ function Dashboard() {
                 for (var a = 0; a < data.length; a++) {
                     await routes.IsOnline(data[a].Endpoint).then((statuscode) => {
                         if (statuscode != 404) {  
-                            DoSetStatus(a, "ns=2;s=" + data[a].PMP_enkelvoudige_objectnaam, data[a].Endpoint, newStatus);
+                            DoSetStatus(a, "ns=2;s=" + data[a].PMP_enkelvoudige_objectnaam, data[a].Endpoint, newStatus, data[a].Datamodel);
                         }
                     });
                 }   
@@ -123,33 +123,39 @@ return (
                     <span className="text-white ml-[20px]">Alarm:</span>
                     <span className="text-white ml-[16px]"> Geen</span>
                 </div>
-                <button className="absolute self-end left[100%] top-[5px] mr-[5px] bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out" onClick={() => {
+                {status[index].status !== "Geen verbinding" ? <button className="absolute self-end left[100%] top-[5px] mr-[5px] bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out" onClick={() => {
                     if (currentNode.Node == null || currentNode.Node === "" || currentNode.Node === WVI.PMP_enkelvoudige_objectnaam) SetShowData(!showData);
-                    setCurrentNode({ Node: WVI.PMP_enkelvoudige_objectnaam, endpoint: WVI.Endpoint });
-                    GetData("ns=2;s=" + WVI.PMP_enkelvoudige_objectnaam, WVI.Endpoint, status);
+                    setCurrentNode({ Node: WVI.PMP_enkelvoudige_objectnaam, endpoint: WVI.Endpoint, datamodel: WVI.Datamodel });
+                    GetData("ns=2;s=" + WVI.PMP_enkelvoudige_objectnaam, WVI.Endpoint, status, WVI.Datamodel);
                     setShowOperateMenu(false);
-                }}>Toon info</button>
-                {role !== "beheerder" ? <button className="absolute self-end left[100%] bottom-0 mr-[5px] mb-[5px] bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out" onClick={async() => {
+                }}>Toon info</button> : ""}
+                {role !== "beheerder" && status[index].status !== "Geen verbinding" ? <button className="absolute self-end left[100%] bottom-0 mr-[5px] mb-[5px] bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out" onClick={async() => {
                     if (currentNode.Node == null || currentNode.Node === "" || currentNode.Node === WVI.PMP_enkelvoudige_objectnaam) setShowOperateMenu(!showOperateMenu);
-                    await GetData("ns=2;s=" + WVI.PMP_enkelvoudige_objectnaam, WVI.Endpoint, status);
-                    setCurrentNode({ Node: WVI.PMP_enkelvoudige_objectnaam, endpoint: WVI.Endpoint });
-                    setHeatingCurve([nodeDataVariable.filter(node => node.Nodes.includes("HeatingCurve.SetPointHigh"))[0].Data, nodeDataVariable.filter(node => node.Nodes.includes("HeatingCurve.SetPointLow"))[0].Data]);
-                    setDefaultHeatingCurve([nodeDataVariable.filter(node => node.Nodes.includes("DefaultHeatingCurve.SetPointHigh"))[0].Data, nodeDataVariable.filter(node => node.Nodes.includes("DefaultHeatingCurve.SetPointLow"))[0].Data]);
                     SetShowData(false);
+                    await GetData("ns=2;s=" + WVI.PMP_enkelvoudige_objectnaam, WVI.Endpoint, status, WVI.Datamodel);
+                    setCurrentNode({ Node: WVI.PMP_enkelvoudige_objectnaam, endpoint: WVI.Endpoint, datamodel: WVI.Datamodel });
+                    if (WVI.Datamodel === "2.0") {
+                        setHeatingCurve([nodeDataVariable.filter(node => node.Nodes.includes("HeatingCurve.SetPointHigh"))[0].Data, nodeDataVariable.filter(node => node.Nodes.includes("HeatingCurve.SetPointLow"))[0].Data]);
+                        setDefaultHeatingCurve([nodeDataVariable.filter(node => node.Nodes.includes("DefaultHeatingCurve.SetPointHigh"))[0].Data, nodeDataVariable.filter(node => node.Nodes.includes("DefaultHeatingCurve.SetPointLow"))[0].Data]);
+                    }
+                    else if (WVI.Datamodel === "1.7") {
+                        setHeatingCurve([nodeDataVariable.filter(node => node.Nodes.includes("CurrentHeatingcurveSetPoints.SetPointHigh"))[0].Data, nodeDataVariable.filter(node => node.Nodes.includes("CurrentHeatingcurveSetPoints.SetPointLow"))[0].Data]);
+                        setDefaultHeatingCurve([nodeDataVariable.filter(node => node.Nodes.includes("Params.DefaultHeatingcurveSetPointHigh"))[0].Data, nodeDataVariable.filter(node => node.Nodes.includes("Params.DefaultHeatingcurveSetPointLow"))[0].Data]);
+                    }
                 }}>
                     Bestuur WVI
-                </button> : <button className="absolute self-end left[100%] bottom-0 mr-[5px] mb-[5px] bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out" onClick={() => {
+                </button> : role === "beheerder" ? <button className="absolute self-end left[100%] bottom-0 mr-[5px] mb-[5px] bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out" onClick={() => {
                         window.location.replace(`/AddWVI?WVI=${WVI.PMP_enkelvoudige_objectnaam}`);
-                }}>WVI aanpassen</button>}
+                }}>WVI aanpassen</button> : ""}
             </div>) : <img className="relative translate-y-[-30%] translate-x-[-50%] top-[30%] left-[50%]" src={loadingGif} width="40" height="40" alt="loading..." /> }
         </div>
 
-        {currentNode?.Node !== "" && nodeData.length > 1 && showData ? <div className="mt-[5vh] hidden md:flex flex-grow">
-            <div className="w-[40%] h-[70vh] flex flex-col">
+        {currentNode?.Node !== "" && nodeData.length > 1 && showData ? <div className="mt-[5vh] ml-[8vw] hidden md:flex flex-grow">
+            <div className="w-[50%] h-[70vh] flex flex-col">
                 <div className="flex justify-between">
                     <span className="text-lg ml-[42%]">{ currentNode.Node }</span>
                     <button className="mr-[2vw] self-center" onClick={() => {
-                        GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status);
+                        GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status, currentNode.datamodel);
                     }}><img src={refreshArrow} alt="" width="30" height="30" /></button>
                 </div>
                 <div className="ml-[1%] overflow-y-scroll">
@@ -183,16 +189,16 @@ return (
                 {dropDownOperationChoice ? <div id="dropdown" className="z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
                     <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
                         <li>
-                            <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(0, "ns=2;s=" + currentNode.Node, currentNode.endpoint); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status); } } className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Uit</a>
+                            <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(0, "ns=2;s=" + currentNode.Node, currentNode.endpoint, currentNode.datamodel); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status, currentNode.datamodel); } } className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Uit</a>
                         </li>
                         <li>
-                            <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(1, "ns=2;s=" + currentNode.Node, currentNode.endpoint); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status); } } className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Auto</a>
+                            <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(1, "ns=2;s=" + currentNode.Node, currentNode.endpoint, currentNode.datamodel); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status, currentNode.datamodel); } } className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Auto</a>
                         </li>
                         <li>
-                            <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(2, "ns=2;s=" + currentNode.Node, currentNode.endpoint); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status); } } className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">handmatig</a>
+                            <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(2, "ns=2;s=" + currentNode.Node, currentNode.endpoint, currentNode.datamodel); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status, currentNode.datamodel); } } className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">handmatig</a>
                         </li>
                         <li>
-                            <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(3, "ns=2;s=" + currentNode.Node, currentNode.endpoint); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status); } } className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Burner test</a>
+                            <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(3, "ns=2;s=" + currentNode.Node, currentNode.endpoint, currentNode.datamodel); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status, currentNode.datamodel); } } className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Burner test</a>
                         </li>
                     </ul>
                 </div> : ''}
@@ -208,7 +214,7 @@ return (
                         <span>SetPointLow: </span>
                         <input onChange={e => setHeatingCurve([heatingCurve[0], e.target.value])} className="text-black max-w-[50px] ml-[5px]" value={heatingCurve[1]}></input>
                     </div>
-                    <button onClick={() => { routes.SetHeatingCurve(Number(heatingCurve[0]), Number(heatingCurve[1]), "ns=2;s=" + currentNode.Node, currentNode.endpoint); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status); } } className="font-medium text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-sm px-5 py-2.5 text-center items-center">toepassen</button>
+                    <button onClick={() => { routes.SetHeatingCurve(Number(heatingCurve[0]), Number(heatingCurve[1]), "ns=2;s=" + currentNode.Node, currentNode.endpoint, currentNode.datamodel); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status, currentNode.datamodel); } } className="font-medium text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-sm px-5 py-2.5 text-center items-center">toepassen</button>
                 </div>
                 <div className="flex flex-col gap-[20px]">
                     <span className="text-[1.1rem]">Default heating curve:</span>
@@ -220,7 +226,7 @@ return (
                         <span>SetPointLow: </span>
                         <input onChange={e => setDefaultHeatingCurve([defaultHeatingCurve[0], e.target.value])} className="text-black max-w-[50px] ml-[5px]" value={defaultHeatingCurve[1]}></input>
                     </div>
-                    <button onClick={() => { routes.SetDefaultHeatingCurve(Number(defaultHeatingCurve[0]), Number(defaultHeatingCurve[1]), "ns=2;s=" + currentNode.Node, currentNode.endpoint); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status); } } className="font-medium text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-sm px-5 py-2.5 text-center items-center">toepassen</button>
+                    <button onClick={() => { routes.SetDefaultHeatingCurve(Number(defaultHeatingCurve[0]), Number(defaultHeatingCurve[1]), "ns=2;s=" + currentNode.Node, currentNode.endpoint, currentNode.datamodel); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status, currentNode.datamodel); } } className="font-medium text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-sm px-5 py-2.5 text-center items-center">toepassen</button>
                 </div>
             </div>
         </div></div> : '' }     

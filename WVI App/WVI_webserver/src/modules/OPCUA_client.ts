@@ -39,9 +39,10 @@ export default class OPCUAclient {
     async GetStatus(req: Request, res: Response) {
         let client: OPCUAClient;
         let session: ClientSession;
-        const endpoint = "opc.tcp://game-pc:10000/OPCUA-Player";
-        const nodeId = `${req.body.nodeId}.cmdOperationMode`;
+        const nodeId = req.body.nodeId;
         res.setHeader('Content-Type', 'text/html');
+
+        Logger(nodeId, "OPC UA client", LogLevel.INFO);
 
         try {
             client = OPCUAClient.create({
@@ -113,7 +114,7 @@ export default class OPCUAclient {
                     nodes[a].Data = data[a].data;
                 }
             });
-            
+
             res.send(JSON.stringify(nodes));
         }
         catch (err) {

@@ -1,25 +1,25 @@
 export default class routes {
 
-    static GetStatus(nodeId: string, endpoint: string) {
+    static GetStatus(nodeId: string, endpoint: string, datamodel: string) {
         return fetch(`http://${process.env.REACT_APP_SERVER}:3000/OPCUA/status`, {
             method: "POST",
             credentials: 'include',
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ endpoint: endpoint, nodeId: nodeId })
+            body: JSON.stringify({ endpoint: endpoint, nodeId: datamodel === "2.0" ? `${nodeId}.cmdOperationMode` : `${nodeId}.CurrentOperationMode` })
         }).then((res) => {
            return res.json();
        }).then((data: number) => { return data });
     }
 
-    static async SetStatus(mode: number, nodeId: string, endpoint: string) {
+    static async SetStatus(mode: number, nodeId: string, endpoint: string, datamodel: string) {
         await fetch(`http://${process.env.REACT_APP_SERVER}:3000/OPCUA/write`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ endpoint: endpoint, data: [mode], nodes: [`${nodeId}.cmdOperationMode`], datatypes: [4] })
+            body: JSON.stringify({ endpoint: endpoint, data: [mode], nodes: [datamodel === "2.0" ? `${nodeId}.cmdOperationMode` : `${nodeId}.CurrentOperationMode`], datatypes: [4] })
         });
     }
 
@@ -58,23 +58,27 @@ export default class routes {
         });
     }
 
-    static async SetHeatingCurve(SetPointHigh: number, SetPointLow: number, nodeId: string, endpoint: string) {
+    static async SetHeatingCurve(SetPointHigh: number, SetPointLow: number, nodeId: string, endpoint: string, datamodel: string) {
+        console.log(SetPointHigh);
+        console.log(SetPointLow);
+        console.log(nodeId);
+        console.log(datamodel);
         await fetch(`http://${process.env.REACT_APP_SERVER}:3000/OPCUA/write`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ endpoint: endpoint, data: [SetPointHigh, SetPointLow], nodes: [`${nodeId}.HeatingCurve.SetPointHigh`, `${nodeId}.HeatingCurve.SetPointLow`], datatypes: [10, 10] })
+            body: JSON.stringify({ endpoint: endpoint, data: [SetPointHigh, SetPointLow], nodes: [datamodel === "2.0" ? `${nodeId}.HeatingCurve.SetPointHigh` : `${nodeId}.CurrentHeatingcurveSetPoints.SetPointHigh`, datamodel === "2.0" ? `${nodeId}.HeatingCurve.SetPointLow` : `${nodeId}.CurrentHeatingcurveSetPoints.SetPointLow`], datatypes: [10, 10] })
         });
     }
 
-    static async SetDefaultHeatingCurve(SetPointHigh: number, SetPointLow: number, nodeId: string, endpoint: string) {
+    static async SetDefaultHeatingCurve(SetPointHigh: number, SetPointLow: number, nodeId: string, endpoint: string, datamodel: string) {
         await fetch(`http://${process.env.REACT_APP_SERVER}:3000/OPCUA/write`, {
             method: "PUT",
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ endpoint: endpoint, data: [SetPointHigh, SetPointLow], nodes: [`${nodeId}.Params.DefaultHeatingCurve.SetPointHigh`, `${nodeId}.Params.DefaultHeatingCurve.SetPointLow`], datatypes: [6, 6] })
+            body: JSON.stringify({ endpoint: endpoint, data: [SetPointHigh, SetPointLow], nodes: [datamodel === "2.0" ? `${nodeId}.Params.DefaultHeatingCurve.SetPointHigh` : `${nodeId}.Params.DefaultHeatingcurveSetPointHigh`, datamodel === "2.0" ? `${nodeId}.Params.DefaultHeatingCurve.SetPointLow` : `${nodeId}.Params.DefaultHeatingcurveSetPointLow`], datatypes: [6, 6] })
         });
     }
 
@@ -208,5 +212,44 @@ export default class routes {
         }).then(res => {
             return res.status;
         });
+    }
+
+    static async DeleteWVI(name: string) {
+        return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/removewvi`, {
+            method: "DELETE",
+            credentials: 'include',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ name: name })
+        }).then((res => {
+            return res.status;
+        }));
+    }
+
+    static async GetAannemer(contractgebiednummer: number) {
+        return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/getaannemer`, {
+            method: "POST",
+            credentials: 'include',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ contractgebiednummer: contractgebiednummer })
+        }).then((res) => {
+            return res.json();
+        });
+    }
+
+    static async AddAccount(Email: string, Wachtwoord: string, Role: string, Onderhoudsaannemer: string) {
+        return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/addaccount`, {
+            method: "PUT",
+            credentials: 'include',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ data: [Email, Wachtwoord, Role, Onderhoudsaannemer] })
+        }).then((res => {
+            return res.status;
+        }));
     }
 }
