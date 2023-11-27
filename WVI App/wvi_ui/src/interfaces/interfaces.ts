@@ -35,3 +35,9 @@ export interface IWVIStatus {
 export interface INewWVI extends IWVI {
     Aannemer: string
 }
+
+export interface IRoles {
+    ID: number,
+    Role: string,
+    Permissions: string
+}

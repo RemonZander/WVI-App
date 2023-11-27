@@ -106,7 +106,8 @@ function Accounts() {
                                             {roles.map((role, index) =>
                                                 <li>
                                                     <a href="#" onClick={async () => {
-                                                        await routes.UpdateRole(account.Email, role);
+                                                        await routes.UpdateRoleInAccount(account.Email, role);
+                                                        await routes.RebuildEnforcerPolicies();
                                                         await routes.GetAllAccounts().then((data: IAccount[]) => {
                                                             setAccounts(data);
 
@@ -157,6 +158,7 @@ function Accounts() {
                                     <li>
                                         <a href="#" onClick={async () => {
                                             await routes.DeleteAccount(account.Email);
+                                            await routes.RebuildEnforcerPolicies();
                                             await routes.GetAllAccounts().then((data: IAccount[]) => {
                                                 setAccounts(data);
 

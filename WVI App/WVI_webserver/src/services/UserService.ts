@@ -1,9 +1,9 @@
-import { IAccount } from '../interfaces/interfaces';
+import { IAccount, IRoles } from '../interfaces/interfaces';
 import { All, Run, QueryNoParams } from './DBService';
 
 export class UserService {
 
-    public static GetAll(): IAccount[] | boolean {
+    public static GetAll(): IAccount[] {
         return QueryNoParams(`SELECT LOWER(Email) AS Email, "Onderhoudsaannemer", "Role" FROM Accounts`).all();
     }
 
@@ -40,12 +40,24 @@ export class UserService {
         return QueryNoParams('SELECT "Role" FROM Roles').all();
     }
 
-    public static UpdateRole(role: string, email: string): string | boolean {
+    public static GetRolesAndPermissions(): IRoles[] {
+        return QueryNoParams('SELECT * FROM Roles').all();
+    }
+
+    public static RemoveRole(role: string): boolean {
+        return Run(`DELETE FROM "Roles" WHERE Role = ?`, [role]);
+    }
+
+    public static UpdateRoleInAccount(role: string, email: string): string | boolean {
         return Run(`UPDATE "Accounts" Set Role = ? WHERE LOWER(Email) = ?`, [role, email]);
     }
 
     public static GetContractgebiednummers(onderhoudsaannemer: string): boolean | any[] {
         return All(`SELECT "Contractgebiednummer" FROM Aannemers WHERE "Onderhoudsaannemer" = ?`, [onderhoudsaannemer]);
+    }
+
+    public static AddRole(role: string, permissions: string): boolean {
+        return Run(`INSERT INTO "Roles" ("Role", "Permissions") VALUES(?,?)`, [role, permissions]);
     }
 
     public static GetAannemerOnContractgebiednummer(contractgebiednummer: string): any[] | boolean {

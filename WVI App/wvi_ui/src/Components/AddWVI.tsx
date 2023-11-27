@@ -99,7 +99,7 @@ function AddWVI() {
                                 }} value={WVIdata.PMP_enkelvoudige_objectnaam}></input>
                             </div>                           
                             <div className="flex justify-between">
-                                <span className="mr-[5px]">* Datamodel versie (1.7, 2.0, 2.1): </span>
+                                <span className="mr-[5px]">* Datamodel versie (1.7, 2.0): </span>
                                 <input className="text-black max-w-[200px]" onChange={e => {
                                     let tempdata = WVIdata;
                                     WVIdata.Datamodel = e.target.value;

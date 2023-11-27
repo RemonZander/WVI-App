@@ -119,7 +119,11 @@ function Addaccount() {
                             }
                             SetErrorText("");
                             routes.AddAccount(acccountGegevens.Email, acccountGegevens.Wachtwoord, acccountGegevens.Role, acccountGegevens.Onderhoudsaannemer).then((status) => {
-                                if (status === 200) window.location.replace("/Addaccount");
+                                if (status === 200)
+                                {
+                                    routes.RebuildEnforcerPolicies();
+                                    window.location.replace("/Addaccount");
+                                }
                             });
                         }}>Opslaan</button>
                     </div>

@@ -22,14 +22,15 @@ function Dashboard() {
     const [status, setStatus] = useState<IWVIStatus[]>([]);
     const [WVIs, setWVIs] = useState<IWVI[]>([]);
     const [showWVIs, setShowWVIs] = useState(false);
-    const [role, setRole] = useState<string>();
     const [showData, SetShowData] = useState<boolean>(false);
     const [showOperateMenu, setShowOperateMenu] = useState<boolean>(false);
+    const [canEditWVI, setCanEditWVI] = useState<boolean>(false);
+    const [canOperateWVI, setCanOperateWVI] = useState<boolean>(false);
 
     let nodeDataVariable = [];
         
-    async function DoSetStatus(pos: number, node: string, eindpoint: string, newStatus: IWVIStatus[], datamodel: string) {
-        await routes.GetStatus(node, eindpoint, datamodel).then((result: number) => {
+    async function DoSetStatus(pos: number, node: string, eindpoint: string, newStatus: IWVIStatus[], datamodel: string, wvi) {
+        await routes.GetStatus(node, eindpoint, datamodel, wvi).then((result: number) => {
             if (result == 0) {
                 newStatus[pos] = { status: "uit", activityLed: activityWhite };
             }
@@ -49,8 +50,8 @@ function Dashboard() {
         });
     }
 
-    async function GetData(nodeId: string, eindpoint: string, status: IWVIStatus[], datamodel: string) {
-        await routes.GetData(nodeId, eindpoint).then((data: [{ DisplayName: string, Nodes: string, Data: string, dataType: string }]) => {
+    async function GetData(nodeId: string, eindpoint: string, status: IWVIStatus[], datamodel: string, PMP_enkelvoudige_objectnaam: string) {
+        await routes.GetData(nodeId, eindpoint, PMP_enkelvoudige_objectnaam).then((data: [{ DisplayName: string, Nodes: string, Data: string, dataType: string }]) => {
             let newdata = [];
             let removeIndexes: string[] = [];
             for (var a = 0; a < data.length; a++) {
@@ -71,7 +72,7 @@ function Dashboard() {
             setNodeData([...newdata]);
         });
 
-        DoSetStatus(WVIs.findIndex(wvi => nodeId.includes(wvi.PMP_enkelvoudige_objectnaam)), nodeId, eindpoint, status, datamodel);
+        DoSetStatus(WVIs.findIndex(wvi => nodeId.includes(wvi.PMP_enkelvoudige_objectnaam)), nodeId, eindpoint, status, datamodel, WVIs[WVIs.findIndex(wvi => nodeId.includes(wvi.PMP_enkelvoudige_objectnaam))]);
     }
 
     useEffect(() => {
@@ -79,10 +80,18 @@ function Dashboard() {
             if (status === 401) window.location.replace('/');
         });
 
-        routes.GetRole().then((res) => {
-            res.json().then((data) => {
-                setRole(data.role);
-            });
+        routes.HasPermissions(["wvi.own.operate"]).then((status) => {
+            if (status === 200) {
+                setCanOperateWVI(true);
+            }
+            else setCanOperateWVI(false);
+        });
+
+        routes.HasPermissions(["wvi.update"]).then((status) => {
+            if (status === 200) {
+                setCanEditWVI(true);
+            }
+            else setCanEditWVI(false);
         });
 
         routes.GetWVIs().then((data: IWVI[]) => {
@@ -97,7 +106,7 @@ function Dashboard() {
                 for (var a = 0; a < data.length; a++) {
                     await routes.IsOnline(data[a].Endpoint).then((statuscode) => {
                         if (statuscode != 404) {  
-                            DoSetStatus(a, "ns=2;s=" + data[a].PMP_enkelvoudige_objectnaam, data[a].Endpoint, newStatus, data[a].Datamodel);
+                            DoSetStatus(a, "ns=2;s=" + data[a].PMP_enkelvoudige_objectnaam, data[a].Endpoint, newStatus, data[a].Datamodel, data[a]);
                         }
                     });
                 }   
@@ -126,13 +135,13 @@ return (
                 {status[index].status !== "Geen verbinding" ? <button className="absolute self-end left[100%] top-[5px] mr-[5px] bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out" onClick={() => {
                     if (currentNode.Node == null || currentNode.Node === "" || currentNode.Node === WVI.PMP_enkelvoudige_objectnaam) SetShowData(!showData);
                     setCurrentNode({ Node: WVI.PMP_enkelvoudige_objectnaam, endpoint: WVI.Endpoint, datamodel: WVI.Datamodel });
-                    GetData("ns=2;s=" + WVI.PMP_enkelvoudige_objectnaam, WVI.Endpoint, status, WVI.Datamodel);
+                    GetData("ns=2;s=" + WVI.PMP_enkelvoudige_objectnaam, WVI.Endpoint, status, WVI.Datamodel, WVI.PMP_enkelvoudige_objectnaam);
                     setShowOperateMenu(false);
                 }}>Toon info</button> : ""}
-                {role !== "beheerder" && status[index].status !== "Geen verbinding" ? <button className="absolute self-end left[100%] bottom-0 mr-[5px] mb-[5px] bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out" onClick={async() => {
+                {canOperateWVI && !canEditWVI && status[index].status !== "Geen verbinding" ? <button className="absolute self-end left[100%] bottom-0 mr-[5px] mb-[5px] bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out" onClick={async() => {
                     if (currentNode.Node == null || currentNode.Node === "" || currentNode.Node === WVI.PMP_enkelvoudige_objectnaam) setShowOperateMenu(!showOperateMenu);
                     SetShowData(false);
-                    await GetData("ns=2;s=" + WVI.PMP_enkelvoudige_objectnaam, WVI.Endpoint, status, WVI.Datamodel);
+                    await GetData("ns=2;s=" + WVI.PMP_enkelvoudige_objectnaam, WVI.Endpoint, status, WVI.Datamodel, WVI.PMP_enkelvoudige_objectnaam);
                     setCurrentNode({ Node: WVI.PMP_enkelvoudige_objectnaam, endpoint: WVI.Endpoint, datamodel: WVI.Datamodel });
                     if (WVI.Datamodel === "2.0") {
                         setHeatingCurve([nodeDataVariable.filter(node => node.Nodes.includes("HeatingCurve.SetPointHigh"))[0].Data, nodeDataVariable.filter(node => node.Nodes.includes("HeatingCurve.SetPointLow"))[0].Data]);
@@ -144,7 +153,7 @@ return (
                     }
                 }}>
                     Bestuur WVI
-                </button> : role === "beheerder" ? <button className="absolute self-end left[100%] bottom-0 mr-[5px] mb-[5px] bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out" onClick={() => {
+                </button> : canEditWVI ? <button className="absolute self-end left[100%] bottom-0 mr-[5px] mb-[5px] bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out" onClick={() => {
                         window.location.replace(`/AddWVI?WVI=${WVI.PMP_enkelvoudige_objectnaam}`);
                 }}>WVI aanpassen</button> : ""}
             </div>) : <img className="relative translate-y-[-30%] translate-x-[-50%] top-[30%] left-[50%]" src={loadingGif} width="40" height="40" alt="loading..." /> }
@@ -155,7 +164,7 @@ return (
                 <div className="flex justify-between">
                     <span className="text-lg ml-[42%]">{ currentNode.Node }</span>
                     <button className="mr-[2vw] self-center" onClick={() => {
-                        GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status, currentNode.datamodel);
+                        GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status, currentNode.datamodel, currentNode.Node);
                     }}><img src={refreshArrow} alt="" width="30" height="30" /></button>
                 </div>
                 <div className="ml-[1%] overflow-y-scroll">
@@ -178,7 +187,7 @@ return (
             </div>
         </div> : ""}
 
-        {role !== "beheerder" && showOperateMenu ? <div className="flex flex-col ml-[10%]"><span className="text-[1.5rem] self-center mb-[8vh] mt-[50px]">{currentNode.Node}</span><div className="flex gap-[50px] items-center">
+        {!canEditWVI && showOperateMenu ? <div className="flex flex-col ml-[10%]"><span className="text-[1.5rem] self-center mb-[8vh] mt-[50px]">{currentNode.Node}</span><div className="flex gap-[50px] items-center">
             <div className="flex flex-col items-start h-[10vh]">
                 <span className="text-white text-[1.2rem]">Set operation modes:</span>
 
@@ -189,16 +198,16 @@ return (
                 {dropDownOperationChoice ? <div id="dropdown" className="z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
                     <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
                         <li>
-                            <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(0, "ns=2;s=" + currentNode.Node, currentNode.endpoint, currentNode.datamodel); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status, currentNode.datamodel); } } className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Uit</a>
+                            <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(0, "ns=2;s=" + currentNode.Node, currentNode.endpoint, currentNode.datamodel, currentNode.Node); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status, currentNode.datamodel, currentNode.Node); } } className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Uit</a>
                         </li>
                         <li>
-                            <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(1, "ns=2;s=" + currentNode.Node, currentNode.endpoint, currentNode.datamodel); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status, currentNode.datamodel); } } className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Auto</a>
+                            <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(1, "ns=2;s=" + currentNode.Node, currentNode.endpoint, currentNode.datamodel, currentNode.Node); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status, currentNode.datamodel, currentNode.Node); } } className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Auto</a>
                         </li>
                         <li>
-                            <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(2, "ns=2;s=" + currentNode.Node, currentNode.endpoint, currentNode.datamodel); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status, currentNode.datamodel); } } className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">handmatig</a>
+                            <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(2, "ns=2;s=" + currentNode.Node, currentNode.endpoint, currentNode.datamodel, currentNode.Node); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status, currentNode.datamodel, currentNode.Node); } } className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">handmatig</a>
                         </li>
                         <li>
-                            <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(3, "ns=2;s=" + currentNode.Node, currentNode.endpoint, currentNode.datamodel); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status, currentNode.datamodel); } } className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Burner test</a>
+                            <a href="#" onClick={async () => { setDropDownOperationChoice(!dropDownOperationChoice); await routes.SetStatus(3, "ns=2;s=" + currentNode.Node, currentNode.endpoint, currentNode.datamodel, currentNode.Node); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status, currentNode.datamodel, currentNode.Node); } } className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Burner test</a>
                         </li>
                     </ul>
                 </div> : ''}
@@ -208,25 +217,25 @@ return (
                     <span className="text-[1.1rem]">Heating curve:</span>
                     <div className="flex justify-between">
                         <span>SetPointHigh: </span>
-                        <input onChange={e => setHeatingCurve([e.target.value, heatingCurve[1]])} className="text-black max-w-[50px] ml-[5px]" value={heatingCurve[0]}></input>
+                        <input onChange={e => setHeatingCurve([e.target.value, heatingCurve[1]])} className="text-black max-w-[50px] ml-[5px]" value={heatingCurve[0]} type="number" min="0"></input>
                     </div>
                     <div className="flex justify-between">
                         <span>SetPointLow: </span>
-                        <input onChange={e => setHeatingCurve([heatingCurve[0], e.target.value])} className="text-black max-w-[50px] ml-[5px]" value={heatingCurve[1]}></input>
+                        <input onChange={e => setHeatingCurve([heatingCurve[0], e.target.value])} className="text-black max-w-[50px] ml-[5px]" value={heatingCurve[1]} type="number" min="0"></input>
                     </div>
-                    <button onClick={() => { routes.SetHeatingCurve(Number(heatingCurve[0]), Number(heatingCurve[1]), "ns=2;s=" + currentNode.Node, currentNode.endpoint, currentNode.datamodel); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status, currentNode.datamodel); } } className="font-medium text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-sm px-5 py-2.5 text-center items-center">toepassen</button>
+                    <button onClick={() => { routes.SetHeatingCurve(Number(heatingCurve[0]), Number(heatingCurve[1]), "ns=2;s=" + currentNode.Node, currentNode.endpoint, currentNode.datamodel, currentNode.Node); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status, currentNode.datamodel, currentNode.Node); } } className="font-medium text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-sm px-5 py-2.5 text-center items-center">toepassen</button>
                 </div>
                 <div className="flex flex-col gap-[20px]">
                     <span className="text-[1.1rem]">Default heating curve:</span>
                     <div className="flex justify-between">
                         <span>SetPointHigh: </span>
-                        <input onChange={e => setDefaultHeatingCurve([e.target.value, defaultHeatingCurve[1]])} className="text-black max-w-[50px] ml-[5px]" value={defaultHeatingCurve[0]}></input>
+                        <input onChange={e => setDefaultHeatingCurve([e.target.value, defaultHeatingCurve[1]])} className="text-black max-w-[50px] ml-[5px]" value={defaultHeatingCurve[0]} type="number" min="0"></input>
                     </div>
                     <div className="flex justify-between">
                         <span>SetPointLow: </span>
-                        <input onChange={e => setDefaultHeatingCurve([defaultHeatingCurve[0], e.target.value])} className="text-black max-w-[50px] ml-[5px]" value={defaultHeatingCurve[1]}></input>
+                        <input onChange={e => setDefaultHeatingCurve([defaultHeatingCurve[0], e.target.value])} className="text-black max-w-[50px] ml-[5px]" value={defaultHeatingCurve[1]} type="number" min="0"></input>
                     </div>
-                    <button onClick={() => { routes.SetDefaultHeatingCurve(Number(defaultHeatingCurve[0]), Number(defaultHeatingCurve[1]), "ns=2;s=" + currentNode.Node, currentNode.endpoint, currentNode.datamodel); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status, currentNode.datamodel); } } className="font-medium text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-sm px-5 py-2.5 text-center items-center">toepassen</button>
+                    <button onClick={() => { routes.SetDefaultHeatingCurve(Number(defaultHeatingCurve[0]), Number(defaultHeatingCurve[1]), "ns=2;s=" + currentNode.Node, currentNode.endpoint, currentNode.datamodel, currentNode.Node); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status, currentNode.datamodel, currentNode.Node); } } className="font-medium text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-sm px-5 py-2.5 text-center items-center">toepassen</button>
                 </div>
             </div>
         </div></div> : '' }     

@@ -22,8 +22,8 @@ export default class OPCUAclient {
             client.on("backoff", () => Logger("retrying connection", OPCUAclient.name, LogLevel.WARNING));
             await client.connect(req.body.endpoint);
 
-            session = await client.createSession({
-                type: UserTokenType.Anonymous
+            session = await client.createSession({               
+                type: UserTokenType.Anonymous,
             });
 
         } catch (err) {

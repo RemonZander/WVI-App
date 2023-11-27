@@ -2,12 +2,16 @@ import { All, Run, QueryNoParams } from './DBService';
 
 export class WVIService {
 
-    public static GetAll() : string | boolean {
+    public static GetAll() : string[] | boolean {
         return QueryNoParams(`SELECT * FROM WVIs`).all();
     }
 
     public static GetWVIs(Contractgebiednummer: number): any[] {
         return All('SELECT * FROM WVIs WHERE "Contractgebiednummer" = ?', [Contractgebiednummer]);
+    }
+
+    public static GetWVIByName(name: string): any[] {
+        return All(`SELECT * FROM WVIs WHERE "PMP_enkelvoudige_objectnaam" = ?`, [name]);
     }
 
     public static AddWVI(data) : string | boolean {

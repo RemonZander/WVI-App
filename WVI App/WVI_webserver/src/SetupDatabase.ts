@@ -78,8 +78,8 @@ db.prepare(`INSERT INTO "Aannemers" ("Contractgebiednummer", Onderhoudsaannemer)
 db.prepare(`INSERT INTO "Aannemers" ("Contractgebiednummer", Onderhoudsaannemer) VALUES(?, ?)`).run(["19", "Strukton Rail"]);
 
 //inset roles
-db.prepare(`INSERT INTO "Roles" ("Role") VALUES(?)`).run(["aannemer"]);
-db.prepare(`INSERT INTO "Roles" ("Role") VALUES(?)`).run(["beheerder"]);
+db.prepare(`INSERT INTO "Roles" ("Role", "Permissions") VALUES(?, ?)`).run(["aannemer", "wvi.own.status;wvi.own.info;wvi.own.list;wvi.own.operate"]);
+db.prepare(`INSERT INTO "Roles" ("Role", "Permissions") VALUES(?, ?)`).run(["beheerder", "*"]);
 
 //insert accounts
 db.prepare(`INSERT INTO "Accounts" ("Email", "Wachtwoord", "Onderhoudsaannemer", "Role") VALUES(?, ?, ?, ?)`).run(["strukton@test.nl", "$2b$10$mn06oPdHs0f2euVp2adqo.hMq9BT9IXwXj7mkIZoNGyfnRVkgLpFy", "Strukton Rail", "aannemer"]);

@@ -5,3 +5,9 @@ export interface IAccount {
     Wachtwoord: string,
     Role: string
 }
+
+export interface IRoles {
+    ID: number,
+    Role: string,
+    Permissions: string
+}

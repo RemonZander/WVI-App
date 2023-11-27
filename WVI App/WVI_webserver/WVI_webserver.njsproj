@@ -30,6 +30,9 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="src\casbin\model.conf" />
+    <Content Include="src\casbin\permissions.txt" />
+    <Content Include="src\casbin\policy.csv" />
     <Content Include="src\modules\B64EncoderDecoder.ts" />
     <Content Include="tsconfig.json" />
     <Content Include="package.json" />
@@ -40,6 +43,7 @@
     <Folder Include="src\modules\" />
     <Folder Include="src\enums\" />
     <Folder Include="src\interfaces\" />
+    <Folder Include="src\casbin\" />
     <Folder Include="src\services\" />
   </ItemGroup>
   <ItemGroup>
@@ -53,6 +57,7 @@
     <TypeScriptCompile Include="src\modules\WVIRouterModule.ts" />
     <TypeScriptCompile Include="src\passportStragegies.ts" />
     <TypeScriptCompile Include="src\services\AuthenticationService.ts" />
+    <TypeScriptCompile Include="src\services\CasbinService.ts" />
     <TypeScriptCompile Include="src\services\DBService.ts" />
     <TypeScriptCompile Include="src\server.ts" />
     <TypeScriptCompile Include="src\modules\OPCUA_client.ts">

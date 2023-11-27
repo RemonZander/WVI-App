@@ -51,22 +51,42 @@ function Home() {
     const [roleView, setRoleView] = useState(false);
     const [addRoleView, setAddRoleView] = useState(false);
     const [showButtons, setShowButtons] = useState(false);
-    const [isBeheer, setIsBeheer] = useState(false);
     const [account, setAccount] = useState<string>();
+    const [canEditWVI, setCanEditWVI] = useState<boolean>(false);
+    const [canViewAccounts, setCanViewAccounts] = useState<boolean>(false);
+    const [canEditAccounts, setCanEditAccounts] = useState<boolean>(false);
+    const [canViewRoles, setCanViewRoles] = useState<boolean>(false);
+    const [canEditRoles, setCanEditRoles] = useState<boolean>(false);
 
     useEffect(() => {
         routes.GetRole().then((res => {
-            if (res.status === 404 || res.status === 401) {
-                setIsBeheer(false);
-            }
             res.json().then((data) => {
                 setAccount(data.email);
-                if (data.role === "aannemer") {
-                    setIsBeheer(false);
-                }
-                else if (data.role === "beheerder") {
-                    setIsBeheer(true);
-                }
+            });
+
+            routes.HasPermissions(["wvi.update", "wvi.add"]).then((status) => {
+                if (status === 200) setCanEditWVI(true);
+                else setCanEditWVI(false);
+            });
+
+            routes.HasPermissions(["account.list"]).then((status) => {
+                if (status === 200) setCanViewAccounts(true);
+                else setCanViewAccounts(false);
+            });
+
+            routes.HasPermissions(["account.update", "account.add"]).then((status) => {
+                if (status === 200) setCanEditAccounts(true);
+                else setCanEditAccounts(false);
+            });
+
+            routes.HasPermissions(["roles.list"]).then((status) => {
+                if (status === 200) setCanViewRoles(true);
+                else setCanViewRoles(false);
+            });
+
+            routes.HasPermissions(["roles.add"]).then((status) => {
+                if (status === 200) setCanEditRoles(true);
+                else setCanEditRoles(false);
             });
         }));
 
@@ -169,7 +189,7 @@ function Home() {
                             }}>WVI's</button>
                         </div>
                         <div>
-                        <button className={(showButtons && isBeheer ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (AddWVIview ? "bg-[#2C2C39]" : "transition-all duration-300 ease-in-out hover:text-[1.4rem] hover:text-white")} onClick={() => {
+                        <button className={(showButtons && canEditWVI ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (AddWVIview ? "bg-[#2C2C39]" : "transition-all duration-300 ease-in-out hover:text-[1.4rem] hover:text-white")} onClick={() => {
                                 window.location.replace('/AddWVI');
                                 setWVIview(false);
                                 setAddWVIview(true);
@@ -180,7 +200,7 @@ function Home() {
                             }}>WVI toevoegen</button>
                         </div>
                         <div>
-                        <button className={(showButtons && isBeheer ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (AccountView ? "bg-[#2C2C39]" : "transition-all duration-300 ease-in-out hover:text-[1.4rem] hover:text-white")} onClick={() => {
+                        <button className={(showButtons && canViewAccounts ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (AccountView ? "bg-[#2C2C39]" : "transition-all duration-300 ease-in-out hover:text-[1.4rem] hover:text-white")} onClick={() => {
                                 window.location.replace('/Accounts');
                                 setWVIview(false);
                                 setAddWVIview(false);
@@ -191,7 +211,7 @@ function Home() {
                             }}>Accounts beheren</button>
                         </div>
                         <div>
-                        <button className={(showButtons && isBeheer ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (Addaccountview ? "bg-[#2C2C39]" : "transition-all duration-300 ease-in-out hover:text-[1.4rem] hover:text-white")} onClick={() => {
+                        <button className={(showButtons && canEditAccounts ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (Addaccountview ? "bg-[#2C2C39]" : "transition-all duration-300 ease-in-out hover:text-[1.4rem] hover:text-white")} onClick={() => {
                                 window.location.replace('/Addaccount');
                                 setWVIview(false);
                                 setAddWVIview(false);
@@ -202,7 +222,7 @@ function Home() {
                             }}>Accounts toevoegen</button>
                         </div>
                         <div>
-                        <button className={(showButtons && isBeheer ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (roleView ? "bg-[#2C2C39]" : "transition-all duration-300 ease-in-out hover:text-[1.4rem] hover:text-white")} onClick={() => {
+                        <button className={(showButtons && canViewRoles ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (roleView ? "bg-[#2C2C39]" : "transition-all duration-300 ease-in-out hover:text-[1.4rem] hover:text-white")} onClick={() => {
                                 window.location.replace('/Roles');
                                 setWVIview(false);
                                 setAddWVIview(false);
@@ -213,7 +233,7 @@ function Home() {
                             }}>Roles beheren</button>
                         </div>
                         <div>
-                        <button className={(showButtons && isBeheer ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (addRoleView ? "bg-[#2C2C39]" : "transition-all duration-300 ease-in-out hover:text-[1.4rem] hover:text-white")} onClick={() => {
+                        <button className={(showButtons && canEditRoles ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (addRoleView ? "bg-[#2C2C39]" : "transition-all duration-300 ease-in-out hover:text-[1.4rem] hover:text-white")} onClick={() => {
                                 window.location.replace('/AddRoles');
                                 setWVIview(false);
                                 setAddWVIview(false);

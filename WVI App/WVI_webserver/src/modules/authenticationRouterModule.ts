@@ -2,6 +2,7 @@ import express, { Request, Response } from "express";
 import { Router } from 'express-serve-static-core';
 import passport from "passport";
 import { TokenGenerator } from "ts-token-generator";
+import { BuildEnforcerPolicies, createEnforcer } from "../services/CasbinService";
 import { TokenService } from "../services/TokenService";
 
 const tokgen = new TokenGenerator();
@@ -57,6 +58,33 @@ authenticationRouter.get('/logout', (req: Request, res: Response) => {
         return;
     }
     res.clearCookie("login");
+    res.sendStatus(200);
+});
+
+authenticationRouter.post('/haspermissions', async (req: Request, res: Response) => {
+    const enforcer = await createEnforcer();
+    const email = TokenService.GetEmail(req.cookies["login"])[0];
+    if (email == null) {
+        res.sendStatus(500);
+        return;
+    }
+
+    if (await enforcer.enforce(email.Email, "*")) {
+        res.sendStatus(200);
+        return;
+    }
+
+    for (var a = 0; a < req.body.permissions.length; a++) {
+        if (await enforcer.enforce(email.Email, req.body.permissions[a])) {
+            res.sendStatus(200);
+            return;
+        }
+    }
+    res.sendStatus(401);
+});
+
+authenticationRouter.get('/rebuildenforcerpolicies', (req: Request, res: Response) => {
+    BuildEnforcerPolicies();
     res.sendStatus(200);
 });
 
