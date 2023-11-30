@@ -26,7 +26,7 @@ OPCUARouter.post('/OPCUA/status',async (req: Request, res: Response) => {
         res.sendStatus(500);
         return;
     }     
-    else if (!user || user == undefined)
+    else if (!user)
     {
         res.sendStatus(500);
         return;
@@ -106,7 +106,6 @@ OPCUARouter.put('/OPCUA/write', async (req: Request, res: Response) => {
     const wvi = WVIService.GetWVIByName(req.body.PMP_enkelvoudige_objectnaam)[0];
     let contractgebiednummers: any = UserService.GetContractgebiednummers(user.Onderhoudsaannemer);
     contractgebiednummers = contractgebiednummers.map(a => a.Contractgebiednummer);
-
 
     if (!contractgebiednummers) {
         res.sendStatus(500);

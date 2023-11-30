@@ -33,11 +33,12 @@ export class UserService {
     }
 
     public static ListOnderhoudsaannemers(): string | boolean {
-        return QueryNoParams(`SELECT DISTINCT Onderhoudsaannemer FROM "Aannemers"`).all();
+        return QueryNoParams(`SELECT Onderhoudsaannemer FROM "Aannemers"  WHERE Onderhoudsaannemer IS NOT NULL AND TRIM(Onderhoudsaannemer) <> '' 
+        UNION SELECT Onderhoudsaannemer FROM "Accounts"  WHERE Onderhoudsaannemer IS NOT NULL AND TRIM(Onderhoudsaannemer) <> '';`).all();
     }
 
     public static ListRoles(): string | boolean {
-        return QueryNoParams('SELECT "Role" FROM Roles').all();
+        return QueryNoParams('SELECT * FROM Roles').all();
     }
 
     public static GetRolesAndPermissions(): IRoles[] {
@@ -46,6 +47,10 @@ export class UserService {
 
     public static RemoveRole(role: string): boolean {
         return Run(`DELETE FROM "Roles" WHERE Role = ?`, [role]);
+    }
+
+    public static UpdateRole(role: string, permissions: string): boolean {
+        return Run(`UPDATE "Roles" SET Permissions = ? WHERE Role = ?`, [permissions, role]);
     }
 
     public static UpdateRoleInAccount(role: string, email: string): string | boolean {

@@ -1,4 +1,6 @@
+/* eslint-disable react-hooks/exhaustive-deps */
 import React, { Component, useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
 import routes from '../Services/routes';
 import '../tailwind.css';
 
@@ -8,6 +10,72 @@ function AddRoles() {
     const [checkboxes, setCheckboxes] = useState<boolean[]>(new Array(17).fill(false));
     const [name, setName] = useState<string>();
     const [roles, setRoles] = useState<string[]>([]);
+    const [searchParams, setSearchParams] = useSearchParams();
+
+
+    const MakePermissionString = (): string => {
+        let permissions = "";
+        for (var a = 0; a < checkboxes.length; a++) {
+            if (!checkboxes[a]) continue;
+            switch (a) {
+                case 0:
+                    permissions += "wvi.own.list;"
+                    break;
+                case 1:
+                    permissions += "wvi.own.info;"
+                    break;
+                case 2:
+                    permissions += "wvi.own.status;"
+                    break;
+                case 3:
+                    permissions += "wvi.own.operate;"
+                    break;
+                case 4:
+                    permissions += "wvi.add;"
+                    break;
+                case 5:
+                    permissions += "wvi.update;"
+                    break;
+                case 6:
+                    permissions += "wvi.remove;"
+                    break;
+                case 7:
+                    permissions += "account.list;"
+                    break;
+                case 8:
+                    permissions += "account.add;"
+                    break;
+                case 9:
+                    permissions += "account.update;"
+                    break;
+                case 10:
+                    permissions += "account.remove;"
+                    break;
+                case 11:
+                    permissions += "roles.list;"
+                    break;
+                case 12:
+                    permissions += "roles.add;"
+                    break;
+                case 13:
+                    permissions += "roles.update;"
+                    break;
+                case 14:
+                    permissions += "roles.remove;"
+                    break;
+                case 15:
+                    permissions += "onderhoudsaannemers.list;"
+                    break;
+                case 16:
+                    permissions += "wvi.all.list;"
+                    break;
+                default:
+            }
+        }
+
+        permissions = permissions.slice(0, -1);
+        return permissions;
+    };
 
 
     useEffect(() => {
@@ -15,8 +83,70 @@ function AddRoles() {
             if (status === 401) window.location.replace('/');
         });
 
-        routes.ListRoles().then((data) => {
+        routes.ListRoles().then((data: any[]) => {
             setRoles(data.map((a: { Role: any; }) => a.Role));
+            const editRole = searchParams.get("Role");
+            if (editRole === null) return;
+            const permissions = data[data.findIndex(d => d.Role === editRole)].Permissions.split(";");
+            let checkoxesTemp = new Array(17).fill(false);
+            for (var a = 0; a < permissions.length; a++) {
+                switch (permissions[a]) {
+                    case "wvi.own.list":
+                        checkoxesTemp[0] = true;
+                        break;
+                    case "wvi.own.info":
+                        checkoxesTemp[1] = true;
+                        break;
+                    case "wvi.own.status":
+                        checkoxesTemp[2] = true;
+                        break;
+                    case "wvi.own.operate":
+                        checkoxesTemp[3] = true;
+                        break;
+                    case "wvi.add":
+                        checkoxesTemp[4] = true;
+                        break;
+                    case "wvi.update":
+                        checkoxesTemp[5] = true;
+                        break;
+                    case "wvi.remove":
+                        checkoxesTemp[6] = true;
+                        break;
+                    case "account.list":
+                        checkoxesTemp[7] = true;
+                        break;
+                    case "account.add":
+                        checkoxesTemp[8] = true;
+                        break;
+                    case "account.update":
+                        checkoxesTemp[9] = true;
+                        break;
+                    case "account.remove":
+                        checkoxesTemp[10] = true;
+                        break;
+                    case "roles.list":
+                        checkoxesTemp[11] = true;
+                        break;
+                    case "roles.add":
+                        checkoxesTemp[12] = true;
+                        break;
+                    case "roles.update":
+                        checkoxesTemp[13] = true;
+                        break;
+                    case "roles.remove":
+                        checkoxesTemp[14] = true;
+                        break;
+                    case "onderhoudsaannemers.list":
+                        checkoxesTemp[15] = true;
+                        break;
+                    case "wvi.all.list":
+                        checkoxesTemp[16] = true;
+                        break;
+                    default:
+                }
+            }
+            setName(editRole);
+            setCheckboxes([...checkoxesTemp]);
         });
     }, []);
 
@@ -30,9 +160,12 @@ function AddRoles() {
                     <div className="flex flex-col gap-y-[20px]">
                         <div className="flex justify-between">
                             <span className="mr-[5px]">* Naam: </span>
-                            <input className="ml-[10px] text-black" value={name} type="text" onChange={async (e) => {
+                            {searchParams.get("Role") === null ? <input className="ml-[10px] text-black" value={name} type="text" onChange={async (e) => {
                                 setName(e.target.value);
-                            }} />
+                            }} /> : 
+                            <input className="ml-[10px] text-black" value={name} disabled type="text" onChange={async (e) => {
+                                setName(e.target.value);
+                            }} />}
                         </div>
                         <div className="flex justify-between">
                             <span className="mr-[5px]">Toegang tot eigen WVI's: </span>
@@ -209,7 +342,7 @@ function AddRoles() {
                         }}>beheerder template toepassen</button>
                     </div>
                     <div className="flex flex-col gap-y-[20px]">
-                        <button onClick={() => {
+                        {searchParams.get("Role") === null ? <button onClick={() => {
                             if (name === "" || name == null) {
                                 SetErrorText("U moet wel een naam voor een rol invullen");
                                 return;
@@ -219,73 +352,24 @@ function AddRoles() {
                                 return;
                             }
                             SetErrorText("");
-                            let permissions = "";
-                            for (var a = 0; a < checkboxes.length; a++) {
-                                if (!checkboxes[a]) continue;
-                                switch (a) {
-                                    case 0:
-                                        permissions += "wvi.own.list;"
-                                        break;
-                                    case 1:
-                                        permissions += "wvi.own.info;"
-                                        break;
-                                    case 2:
-                                        permissions += "wvi.own.status;"
-                                        break;
-                                    case 3:
-                                        permissions += "wvi.own.operate;"
-                                        break;
-                                    case 4:
-                                        permissions += "wvi.add;"
-                                        break;
-                                    case 5:
-                                        permissions += "wvi.update;"
-                                        break;
-                                    case 6:
-                                        permissions += "wvi.remove;"
-                                        break;
-                                    case 7:
-                                        permissions += "account.list;"
-                                        break;
-                                    case 8:
-                                        permissions += "account.add;"
-                                        break;
-                                    case 9:
-                                        permissions += "account.update;"
-                                        break;
-                                    case 10:
-                                        permissions += "account.remove;"
-                                        break;
-                                    case 11:
-                                        permissions += "roles.list;"
-                                        break;
-                                    case 12:
-                                        permissions += "roles.add;"
-                                        break;
-                                    case 13:
-                                        permissions += "roles.update;"
-                                        break;
-                                    case 14:
-                                        permissions += "roles.remove;"
-                                        break;
-                                    case 15:
-                                        permissions += "onderhoudsaannemers.list;"
-                                        break;
-                                    case 16:
-                                        permissions += "wvi.all.list;"
-                                        break;
-                                    default:
-                                }
-                            }
 
-                            permissions = permissions.slice(0, -1);
+                            const permissions = MakePermissionString();                  
                             routes.AddRole(name, permissions).then((status) => {
                                 if (status === 200) {
                                     routes.RebuildEnforcerPolicies();
                                     window.location.replace("/AddRoles");
                                 }
                             });
-                        }}>Opslaan</button>
+                        }}>Opslaan</button> : 
+                            <button onClick={() => {
+                                const permissions = MakePermissionString();
+                                routes.UpdateRole(name, permissions).then((status) => {
+                                    if (status === 200) {
+                                        routes.RebuildEnforcerPolicies();
+                                        window.location.replace("/AddRoles");
+                                    }
+                                });
+                            }}>Bewerken</button>}
                     </div>
                 </div>
             </div>

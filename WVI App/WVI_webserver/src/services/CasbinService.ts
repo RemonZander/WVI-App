@@ -16,11 +16,11 @@ export async function createEnforcer(): Promise<Enforcer> {
 
 export async function BuildEnforcerPolicies() {
     enforcerInstance.clearPolicy();
-    const Roles = UserService.GetRolesAndPermissions();
-    for (var a = 0; a < Roles.length; a++) {
-        const permissions = Roles[a].Permissions.split(';');
+    const RolesAndPermissions = UserService.GetRolesAndPermissions();
+    for (var a = 0; a < RolesAndPermissions.length; a++) {
+        const permissions = RolesAndPermissions[a].Permissions.split(';');
         for (var b = 0; b < permissions.length; b++) {
-            await enforcerInstance.addPermissionForUser(Roles[a].Role, permissions[b]);
+            await enforcerInstance.addPermissionForUser(RolesAndPermissions[a].Role, permissions[b]);
         }
     }
     const users = UserService.GetAll();

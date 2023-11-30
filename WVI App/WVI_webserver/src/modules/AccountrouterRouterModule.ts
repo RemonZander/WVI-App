@@ -8,32 +8,18 @@ import { userInfo } from 'os';
 
 const Accountrouter: Router = express.Router();
 
-Accountrouter.get('/role', (req: Request, res: Response) => {
-    const results: any = TokenService.GetEmail(req.cookies.login);
-    if (!results) {
+Accountrouter.get('/email', async (req: Request, res: Response) => {
+    try {
+        res.send(JSON.stringify(TokenService.GetEmail(req.cookies["login"])[0].Email));
+    } catch (e) {
         res.sendStatus(500);
-        return;
-    }
-    else if (results.length === 0) {
-        res.sendStatus(401);
-        return;
-    }
-    const user: any = UserService.GetOneByEmailSelectColumns(`"Role"`, results[0].Email);
-    if (user == false) {
-        res.sendStatus(500);
-        return;
-    }
-    if (user.length === 0) {
-        res.sendStatus(404);
-        return;
-    }
-    res.send(JSON.stringify({ role: user[0].Role, email: results[0].Email }));
+    }   
 });
 
 Accountrouter.get('/accounts', async (req: Request, res: Response) => {
     const email = TokenService.GetEmail(req.cookies["login"])[0];
     const enforcer = await createEnforcer();
-    if (email == null)
+    if (!email)
     {
         res.sendStatus(500);
         return;
@@ -42,7 +28,7 @@ Accountrouter.get('/accounts', async (req: Request, res: Response) => {
         res.sendStatus(401);
         return;
     }
-    res.send(JSON.stringify(UserService.GetAll()));
+    res.json(UserService.GetAll());
 });
 
 Accountrouter.delete('/removeAccount', async (req: Request, res: Response) => {
@@ -175,6 +161,27 @@ Accountrouter.put('/addRole', async (req: Request, res: Response) => {
 
 
     const result = UserService.AddRole(req.body.role, req.body.permissions);
+    if (!result) {
+        res.sendStatus(500);
+        return;
+    }
+    res.sendStatus(200);
+});
+
+Accountrouter.put('/updateRole', async (req: Request, res: Response) => {
+    const email = TokenService.GetEmail(req.cookies["login"])[0];
+    const enforcer = await createEnforcer();
+    if (email == null) {
+        res.sendStatus(500);
+        return;
+    }
+    else if (!await enforcer.enforce(email.Email, "*") && !await enforcer.enforce(email.Email, "roles.update")) {
+        res.sendStatus(401);
+        return;
+    }
+
+
+    const result = UserService.UpdateRole(req.body.role, req.body.permissions);
     if (!result) {
         res.sendStatus(500);
         return;

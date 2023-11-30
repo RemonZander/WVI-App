@@ -58,7 +58,7 @@ function Roles() {
                                     Verwijderen
                                 </button> : ""}
                                 <button className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out" onClick={async () => {
-
+                                    window.location.replace(`/AddRoles?Role=${role.Role}`);
                                 }}>
                                     Bewerken
                                 </button>

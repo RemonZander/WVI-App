@@ -113,8 +113,8 @@ export default class routes {
         });
     }
 
-    static async GetRole() {
-        return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/role`, {
+    static async GetEmail() {
+        return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/email`, {
             method: "GET",
             credentials: 'include'
         }).then((res) => {
@@ -277,6 +277,19 @@ export default class routes {
 
     static async AddRole(role: string, permissions: string) {
         return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/addRole`, {
+            method: "PUT",
+            credentials: 'include',
+            headers: {
+                "Content-Type": "application/json"
+            },
+            body: JSON.stringify({ role: role, permissions: permissions })
+        }).then((res => {
+            return res.status;
+        }));
+    }
+
+    static async UpdateRole(role: string, permissions: string) {
+        return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/updateRole`, {
             method: "PUT",
             credentials: 'include',
             headers: {

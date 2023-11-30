@@ -132,25 +132,48 @@ return (
                     <span className="text-white ml-[20px]">Alarm:</span>
                     <span className="text-white ml-[16px]"> Geen</span>
                 </div>
-                {status[index].status !== "Geen verbinding" ? <button className="absolute self-end left[100%] top-[5px] mr-[5px] bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out" onClick={() => {
-                    if (currentNode.Node == null || currentNode.Node === "" || currentNode.Node === WVI.PMP_enkelvoudige_objectnaam) SetShowData(!showData);
-                    setCurrentNode({ Node: WVI.PMP_enkelvoudige_objectnaam, endpoint: WVI.Endpoint, datamodel: WVI.Datamodel });
-                    GetData("ns=2;s=" + WVI.PMP_enkelvoudige_objectnaam, WVI.Endpoint, status, WVI.Datamodel, WVI.PMP_enkelvoudige_objectnaam);
+                {status[index].status !== "Geen verbinding" ? <button className="absolute self-end left[100%] top-[5px] mr-[5px] bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out" onClick={async() => {
                     setShowOperateMenu(false);
+                    if (!showData)
+                    {
+                        SetShowData(!showData);
+                    }
+                    if ((showData && WVI.PMP_enkelvoudige_objectnaam !== currentNode.Node) || !showData)
+                    {
+                        setCurrentNode({ Node: WVI.PMP_enkelvoudige_objectnaam, endpoint: WVI.Endpoint, datamodel: WVI.Datamodel });
+                        await GetData("ns=2;s=" + WVI.PMP_enkelvoudige_objectnaam, WVI.Endpoint, status, WVI.Datamodel, WVI.PMP_enkelvoudige_objectnaam);
+                    }
+                    else
+                    {
+                        SetShowData(!showData);
+                        setCurrentNode({ Node: null, endpoint: null, datamodel: null });
+                    }
                 }}>Toon info</button> : ""}
                 {canOperateWVI && !canEditWVI && status[index].status !== "Geen verbinding" ? <button className="absolute self-end left[100%] bottom-0 mr-[5px] mb-[5px] bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out" onClick={async() => {
-                    if (currentNode.Node == null || currentNode.Node === "" || currentNode.Node === WVI.PMP_enkelvoudige_objectnaam) setShowOperateMenu(!showOperateMenu);
-                    SetShowData(false);
-                    await GetData("ns=2;s=" + WVI.PMP_enkelvoudige_objectnaam, WVI.Endpoint, status, WVI.Datamodel, WVI.PMP_enkelvoudige_objectnaam);
-                    setCurrentNode({ Node: WVI.PMP_enkelvoudige_objectnaam, endpoint: WVI.Endpoint, datamodel: WVI.Datamodel });
-                    if (WVI.Datamodel === "2.0") {
-                        setHeatingCurve([nodeDataVariable.filter(node => node.Nodes.includes("HeatingCurve.SetPointHigh"))[0].Data, nodeDataVariable.filter(node => node.Nodes.includes("HeatingCurve.SetPointLow"))[0].Data]);
-                        setDefaultHeatingCurve([nodeDataVariable.filter(node => node.Nodes.includes("DefaultHeatingCurve.SetPointHigh"))[0].Data, nodeDataVariable.filter(node => node.Nodes.includes("DefaultHeatingCurve.SetPointLow"))[0].Data]);
+                    SetShowData(false); 
+                    if (!showOperateMenu)
+                    {
+                        setShowOperateMenu(!showOperateMenu);
                     }
-                    else if (WVI.Datamodel === "1.7") {
-                        setHeatingCurve([nodeDataVariable.filter(node => node.Nodes.includes("CurrentHeatingcurveSetPoints.SetPointHigh"))[0].Data, nodeDataVariable.filter(node => node.Nodes.includes("CurrentHeatingcurveSetPoints.SetPointLow"))[0].Data]);
-                        setDefaultHeatingCurve([nodeDataVariable.filter(node => node.Nodes.includes("Params.DefaultHeatingcurveSetPointHigh"))[0].Data, nodeDataVariable.filter(node => node.Nodes.includes("Params.DefaultHeatingcurveSetPointLow"))[0].Data]);
+                    if ((showOperateMenu && WVI.PMP_enkelvoudige_objectnaam !== currentNode.Node) || !showOperateMenu) 
+                    {
+                        setCurrentNode({ Node: WVI.PMP_enkelvoudige_objectnaam, endpoint: WVI.Endpoint, datamodel: WVI.Datamodel });
+                        await GetData("ns=2;s=" + WVI.PMP_enkelvoudige_objectnaam, WVI.Endpoint, status, WVI.Datamodel, WVI.PMP_enkelvoudige_objectnaam);
+                        if (WVI.Datamodel === "2.0") {
+                            setHeatingCurve([nodeDataVariable.filter(node => node.Nodes.includes("HeatingCurve.SetPointHigh"))[0].Data, nodeDataVariable.filter(node => node.Nodes.includes("HeatingCurve.SetPointLow"))[0].Data]);
+                            setDefaultHeatingCurve([nodeDataVariable.filter(node => node.Nodes.includes("DefaultHeatingCurve.SetPointHigh"))[0].Data, nodeDataVariable.filter(node => node.Nodes.includes("DefaultHeatingCurve.SetPointLow"))[0].Data]);
+                        }
+                        else if (WVI.Datamodel === "1.7") {
+                            setHeatingCurve([nodeDataVariable.filter(node => node.Nodes.includes("CurrentHeatingcurveSetPoints.SetPointHigh"))[0].Data, nodeDataVariable.filter(node => node.Nodes.includes("CurrentHeatingcurveSetPoints.SetPointLow"))[0].Data]);
+                            setDefaultHeatingCurve([nodeDataVariable.filter(node => node.Nodes.includes("Params.DefaultHeatingcurveSetPointHigh"))[0].Data, nodeDataVariable.filter(node => node.Nodes.includes("Params.DefaultHeatingcurveSetPointLow"))[0].Data]);
+                        }
                     }
+                    else
+                    {
+                        setCurrentNode({ Node: null, endpoint: null, datamodel: null });
+                        setShowOperateMenu(!showOperateMenu);
+                        return;
+                    }                             
                 }}>
                     Bestuur WVI
                 </button> : canEditWVI ? <button className="absolute self-end left[100%] bottom-0 mr-[5px] mb-[5px] bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out" onClick={() => {

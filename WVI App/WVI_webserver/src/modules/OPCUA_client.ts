@@ -1,5 +1,6 @@
 import { Request, Response } from "express";
 import { AttributeIds, BrowseResult, ClientSession, DataType, DataValue, OPCUAClient, ReferenceDescription, StatusCodes, TimestampsToReturn, UserTokenType, DataTypeIds, FilterContextOnAddressSpace } from "node-opcua-client";
+import { performance } from "perf_hooks";
 import { Datamodel } from '../enums/datamodel';
 import { LogLevel } from "../enums/loglevelEnum";
 import Logger from "./loggerModule";
@@ -99,21 +100,30 @@ export default class OPCUAclient {
                 type: UserTokenType.Anonymous
             });
 
+            let startTime = performance.now();
+
             let nodes = [];
             await this.RecursiveBrowse(await session.browse(req.body.nodeId) as BrowseResult, session).then((results) => {
-                results.forEach((result) => {
-                    if (result.NodeId.includes("ns=2") && !result.NodeId.includes("/0:Id")) {
-                        nodes.push({ DisplayName: result.browseName, Nodes: result.NodeId, Data: "", dataType: result.dataType })
-                    }                 
-                });
-
+                for (var a = 0; a < results.length; a++) {
+                    if (results[a].NodeId.includes("ns=2") && !results[a].NodeId.includes("/0:Id")) {
+                        nodes.push({ DisplayName: results[a].browseName, Nodes: results[a].NodeId, Data: "", dataType: results[a].dataType })
+                    }  
+                }
             });
+
+            let endTime = performance.now();
+            console.log(`Call to RecursiveBrowse took ${endTime - startTime} milliseconds`);
+
+            startTime = performance.now();
 
             await this.ReadData(session, nodes).then((data) => {
                 for (var a = 0; a < data.length; a++) {
                     nodes[a].Data = data[a].data;
                 }
             });
+
+            endTime = performance.now();
+            console.log(`Call to ReadData took ${endTime - startTime} milliseconds`);
 
             res.send(JSON.stringify(nodes));
         }

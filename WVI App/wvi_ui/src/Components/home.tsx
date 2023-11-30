@@ -59,9 +59,10 @@ function Home() {
     const [canEditRoles, setCanEditRoles] = useState<boolean>(false);
 
     useEffect(() => {
-        routes.GetRole().then((res => {
+        routes.GetEmail().then((res => {
+            if (res.status === 401) return;
             res.json().then((data) => {
-                setAccount(data.email);
+                setAccount(data);
             });
 
             routes.HasPermissions(["wvi.update", "wvi.add"]).then((status) => {

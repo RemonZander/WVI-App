@@ -40,8 +40,8 @@ function Addaccount() {
                 _testitems = [...aannemers];
             }
             else {
-                _testitems = aannemers.filter((role) => {
-                    return role.toLowerCase().startsWith(event.query.toLowerCase());
+                _testitems = aannemers.filter((aannemer) => {
+                    return aannemer.toLowerCase().startsWith(event.query.toLowerCase());
                 });
             }
 
