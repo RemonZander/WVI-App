@@ -57,6 +57,7 @@ function Home() {
     const [canEditAccounts, setCanEditAccounts] = useState<boolean>(false);
     const [canViewRoles, setCanViewRoles] = useState<boolean>(false);
     const [canEditRoles, setCanEditRoles] = useState<boolean>(false);
+    const [hasLoaded, setHasLoaded] = useState<boolean>(false);
 
     useEffect(() => {
         routes.GetEmail().then((res => {
@@ -89,6 +90,8 @@ function Home() {
                 if (status === 200) setCanEditRoles(true);
                 else setCanEditRoles(false);
             });
+
+            setHasLoaded(true);
         }));
 
         switch (window.location.pathname) {
@@ -161,10 +164,10 @@ function Home() {
 
     return (       
         <PrimeReactProvider>
-            <div className="bg-[#2F2F31] w-screen h-screen flex flex-col text-gray-300">
-                    <div className="bg-[#2C2C39] w-screen h-[120px] flex justify-between rounded-b-[0.5vw]">
-                        <img className="ml-[1vw]" src={logo} alt="" width="120" height="120" />
-                    {!WVIview && !AddWVIview && !AccountView && !Addaccountview && !roleView && !addRoleView ? '' : 
+            {hasLoaded ? <div className="bg-[#2F2F31] w-screen h-screen flex flex-col text-gray-300">
+                <div className="bg-[#2C2C39] w-screen h-[120px] flex justify-between rounded-b-[0.5vw]">
+                    <img className="ml-[1vw]" src={logo} alt="" width="120" height="120" />
+                    {!WVIview && !AddWVIview && !AccountView && !Addaccountview && !roleView && !addRoleView ? '' :
                         <>
                             <div className="mr-[8vw] text-lg self-center flex gap-x-[50px]">
                                 <span>Ingelogd als: {account}</span>
@@ -175,80 +178,80 @@ function Home() {
                                 }}>Uitloggen</button>
                             </div>
                         </>
-                        }
-                    </div>
-                    <div className="flex mt-[10px] text-[1.2rem]">
+                    }
+                </div>
+                <div className="flex mt-[10px] text-[1.2rem]">
                     <div className={(showButtons ? "" : "hidden ") + "rounded-t-[0.5vw] " + (WVIview ? "bg-[#2C2C39]" : "transition-all duration-300 ease-in-out hover:text-[1.4rem] hover:text-white")}>
-                            <button className="px-[5px]" onClick={() => {
-                                window.location.replace('/WVI');
-                                setWVIview(true);
-                                setAddWVIview(false);
-                                setAccountView(false);
-                                setAddaccountview(false);
-                                setRoleView(false);
-                                setAddRoleView(false);
-                            }}>WVI's</button>
-                        </div>
-                        <div>
-                        <button className={(showButtons && canEditWVI ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (AddWVIview ? "bg-[#2C2C39]" : "transition-all duration-300 ease-in-out hover:text-[1.4rem] hover:text-white")} onClick={() => {
-                                window.location.replace('/AddWVI');
-                                setWVIview(false);
-                                setAddWVIview(true);
-                                setAccountView(false);
-                                setAddaccountview(false);
-                                setRoleView(false);
-                                setAddRoleView(false);
-                            }}>WVI toevoegen</button>
-                        </div>
-                        <div>
-                        <button className={(showButtons && canViewAccounts ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (AccountView ? "bg-[#2C2C39]" : "transition-all duration-300 ease-in-out hover:text-[1.4rem] hover:text-white")} onClick={() => {
-                                window.location.replace('/Accounts');
-                                setWVIview(false);
-                                setAddWVIview(false);
-                                setAccountView(true);
-                                setAddaccountview(false);
-                                setRoleView(false);
-                                setAddRoleView(false);
-                            }}>Accounts beheren</button>
-                        </div>
-                        <div>
-                        <button className={(showButtons && canEditAccounts ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (Addaccountview ? "bg-[#2C2C39]" : "transition-all duration-300 ease-in-out hover:text-[1.4rem] hover:text-white")} onClick={() => {
-                                window.location.replace('/Addaccount');
-                                setWVIview(false);
-                                setAddWVIview(false);
-                                setAccountView(false);
-                                setAddaccountview(true);
-                                setRoleView(false);
-                                setAddRoleView(false);
-                            }}>Accounts toevoegen</button>
-                        </div>
-                        <div>
-                        <button className={(showButtons && canViewRoles ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (roleView ? "bg-[#2C2C39]" : "transition-all duration-300 ease-in-out hover:text-[1.4rem] hover:text-white")} onClick={() => {
-                                window.location.replace('/Roles');
-                                setWVIview(false);
-                                setAddWVIview(false);
-                                setAccountView(false);
-                                setAddaccountview(false);
-                                setRoleView(true);
-                                setAddRoleView(false);
-                            }}>Roles beheren</button>
-                        </div>
-                        <div>
-                        <button className={(showButtons && canEditRoles ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (addRoleView ? "bg-[#2C2C39]" : "transition-all duration-300 ease-in-out hover:text-[1.4rem] hover:text-white")} onClick={() => {
-                                window.location.replace('/AddRoles');
-                                setWVIview(false);
-                                setAddWVIview(false);
-                                setAccountView(false);
-                                setAddaccountview(false);
-                                setRoleView(false);
-                                setAddRoleView(true);
-                            }}>Roles toevoegen</button>
-                        </div>
+                        <button className="px-[5px]" onClick={() => {
+                            window.location.replace('/WVI');
+                            setWVIview(true);
+                            setAddWVIview(false);
+                            setAccountView(false);
+                            setAddaccountview(false);
+                            setRoleView(false);
+                            setAddRoleView(false);
+                        }}>WVI's</button>
                     </div>
-                <div className="bg-[#2C2C39] w-screen flex flex-grow">  
+                    <div>
+                        <button className={(showButtons && canEditWVI ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (AddWVIview ? "bg-[#2C2C39]" : "transition-all duration-300 ease-in-out hover:text-[1.4rem] hover:text-white")} onClick={() => {
+                            window.location.replace('/AddWVI');
+                            setWVIview(false);
+                            setAddWVIview(true);
+                            setAccountView(false);
+                            setAddaccountview(false);
+                            setRoleView(false);
+                            setAddRoleView(false);
+                        }}>WVI toevoegen</button>
+                    </div>
+                    <div>
+                        <button className={(showButtons && canViewAccounts ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (AccountView ? "bg-[#2C2C39]" : "transition-all duration-300 ease-in-out hover:text-[1.4rem] hover:text-white")} onClick={() => {
+                            window.location.replace('/Accounts');
+                            setWVIview(false);
+                            setAddWVIview(false);
+                            setAccountView(true);
+                            setAddaccountview(false);
+                            setRoleView(false);
+                            setAddRoleView(false);
+                        }}>Accounts beheren</button>
+                    </div>
+                    <div>
+                        <button className={(showButtons && canEditAccounts ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (Addaccountview ? "bg-[#2C2C39]" : "transition-all duration-300 ease-in-out hover:text-[1.4rem] hover:text-white")} onClick={() => {
+                            window.location.replace('/Addaccount');
+                            setWVIview(false);
+                            setAddWVIview(false);
+                            setAccountView(false);
+                            setAddaccountview(true);
+                            setRoleView(false);
+                            setAddRoleView(false);
+                        }}>Accounts toevoegen</button>
+                    </div>
+                    <div>
+                        <button className={(showButtons && canViewRoles ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (roleView ? "bg-[#2C2C39]" : "transition-all duration-300 ease-in-out hover:text-[1.4rem] hover:text-white")} onClick={() => {
+                            window.location.replace('/Roles');
+                            setWVIview(false);
+                            setAddWVIview(false);
+                            setAccountView(false);
+                            setAddaccountview(false);
+                            setRoleView(true);
+                            setAddRoleView(false);
+                        }}>Roles beheren</button>
+                    </div>
+                    <div>
+                        <button className={(showButtons && canEditRoles ? "" : "hidden ") + "px-[5px] rounded-t-[0.5vw] " + (addRoleView ? "bg-[#2C2C39]" : "transition-all duration-300 ease-in-out hover:text-[1.4rem] hover:text-white")} onClick={() => {
+                            window.location.replace('/AddRoles');
+                            setWVIview(false);
+                            setAddWVIview(false);
+                            setAccountView(false);
+                            setAddaccountview(false);
+                            setRoleView(false);
+                            setAddRoleView(true);
+                        }}>Roles toevoegen</button>
+                    </div>
+                </div>
+                <div className="bg-[#2C2C39] w-screen flex flex-grow">
                     <RouterProvider router={router} />
                 </div>
-            </div>  
+            </div> : ""}
         </PrimeReactProvider>
     )
 }

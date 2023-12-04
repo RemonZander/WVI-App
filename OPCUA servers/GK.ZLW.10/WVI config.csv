@@ -8,4 +8,4 @@
 1070,Cabinet,GK.ZLW.10,7,HeatingCurve.SetPointLow,NoQuantity,NoUoM,NoPrefix,Both,Float
 1071,Cabinet,GK.ZLW.10,8,Params.DefaultHeatingCurve.SetPointHigh,NoQuantity,NoUoM,NoPrefix,Both,Int32
 1072,Cabinet,GK.ZLW.10,9,Params.DefaultHeatingCurve.SetPointLow,NoQuantity,NoUoM,NoPrefix,Both,Int32
-1019,Cabinet,GK.ZLW.10,9,statOperationMode,NoQuantity,NoUoM,NoPrefix,Both,Int32
+1019,Cabinet,GK.ZLW.10,10,statOperationMode,NoQuantity,NoUoM,NoPrefix,Both,Int16

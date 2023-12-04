@@ -40,10 +40,8 @@ export default class OPCUAclient {
     async GetStatus(req: Request, res: Response) {
         let client: OPCUAClient;
         let session: ClientSession;
-        const nodeId = req.body.nodeId;
         res.setHeader('Content-Type', 'text/html');
 
-        Logger(nodeId, "OPC UA client", LogLevel.INFO);
 
         try {
             client = OPCUAClient.create({
@@ -62,13 +60,23 @@ export default class OPCUAclient {
                 type: UserTokenType.Anonymous
             });
 
-            let dataValue = await session.read({ nodeId, attributeId: AttributeIds.Value });
+            let nodeId = req.body.nodeId[0];
+            Logger(nodeId, "OPC UA client", LogLevel.INFO);
+            let data = [await session.read({ nodeId, attributeId: AttributeIds.Value })];
 
-            if (dataValue.statusCode !== StatusCodes.Good) {
+            if (data[0].statusCode !== StatusCodes.Good) {
                 console.log("Could not read ", nodeId);
             }
 
-            res.send(JSON.stringify(dataValue.value.value.toString()));
+            nodeId = req.body.nodeId[1];
+            Logger(nodeId, "OPC UA client", LogLevel.INFO);
+            data.push(await session.read({ nodeId, attributeId: AttributeIds.Value }));
+
+            if (data[1].statusCode !== StatusCodes.Good) {
+                console.log("Could not read ", nodeId);
+            }
+
+            res.json([data[0].value.value, data[1].value.value]);
         }
         catch (err)
         {
@@ -140,7 +148,6 @@ export default class OPCUAclient {
         let client: OPCUAClient;
         let session: ClientSession;
         const nodes = req.body.nodes;
-
         try {
             client = OPCUAClient.create({
                 endpointMustExist: false,

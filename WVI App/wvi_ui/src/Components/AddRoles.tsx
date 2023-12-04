@@ -366,7 +366,7 @@ function AddRoles() {
                                 routes.UpdateRole(name, permissions).then((status) => {
                                     if (status === 200) {
                                         routes.RebuildEnforcerPolicies();
-                                        window.location.replace("/AddRoles");
+                                        window.location.replace("/Roles");
                                     }
                                 });
                             }}>Bewerken</button>}

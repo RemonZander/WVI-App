@@ -57,7 +57,7 @@ function Accounts() {
                     <td className="px-6 py-4">
                         Acties
                     </td>
-                    {accounts.map((account, index) => <tr className="bg-[#262739] border-b border-gray-700">
+                    {accounts.map((account, index) => <tr key={index} className="bg-[#262739] border-b border-gray-700">
                         <td className="p-6 py-4 text-white">
                             {account.Email}
                         </td>

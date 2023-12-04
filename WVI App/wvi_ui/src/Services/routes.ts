@@ -7,7 +7,10 @@ export default class routes {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ endpoint: endpoint, nodeId: datamodel === "2.0" ? `${nodeId}.statOperationMode` : `${nodeId}.CurrentOperationMode`, wvi: wvi })
+            body: JSON.stringify({
+                endpoint: endpoint, nodeId: [datamodel === "2.0" ? `${nodeId}.statOperationMode` : `${nodeId}.CurrentOperationMode`,
+                    datamodel === "2.0" ? `${nodeId}.cmdOperationMode` : `${nodeId}.CurrentOperationMode`], wvi: wvi
+            })
         }).then((res) => {
            return res.json();
        }).then((data: number) => { return data });
@@ -20,7 +23,7 @@ export default class routes {
             headers: {
                 "Content-Type": "application/json"
             },
-            body: JSON.stringify({ endpoint: endpoint, data: [mode], nodes: datamodel === "2.0" ? [`${nodeId}.cmdOperationMode`, `${nodeId}.statOperationMode`] : [`${nodeId}.CurrentOperationMode`], datatypes: [4], PMP_enkelvoudige_objectnaam: PMP_enkelvoudige_objectnaam })
+            body: JSON.stringify({ endpoint: endpoint, data: [mode], nodes: datamodel === "2.0" ? [`${nodeId}.cmdOperationMode`] : [`${nodeId}.CurrentOperationMode`], datatypes: [4], PMP_enkelvoudige_objectnaam: PMP_enkelvoudige_objectnaam })
         });
     }
 
