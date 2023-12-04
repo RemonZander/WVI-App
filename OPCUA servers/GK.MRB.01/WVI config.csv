@@ -8,3 +8,4 @@
 1007,Cabinet,GK.MRB.01,7,HeatingCurve.SetPointLow,NoQuantity,NoUoM,NoPrefix,Both,Float
 1008,Cabinet,GK.MRB.01,8,Params.DefaultHeatingCurve.SetPointHigh,NoQuantity,NoUoM,NoPrefix,Both,Int32
 1009,Cabinet,GK.MRB.01,9,Params.DefaultHeatingCurve.SetPointLow,NoQuantity,NoUoM,NoPrefix,Both,Int32
+1019,Cabinet,GK.MRB.01,9,statOperationMode,NoQuantity,NoUoM,NoPrefix,Both,Int32
