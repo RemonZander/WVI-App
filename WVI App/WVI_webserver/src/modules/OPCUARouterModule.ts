@@ -10,6 +10,12 @@ const OPCUARouter: Router = express.Router();
 
 const _OPCUAclient = new OPCUAclient();
 
+OPCUARouter.post('/OPCUA/statusCert', async (req: Request, res: Response) => {
+    res.setHeader('Content-Type', 'application/json');
+
+    _OPCUAclient.GetStatus(req, res);
+});
+
 OPCUARouter.post('/OPCUA/status',async (req: Request, res: Response) => {
     res.setHeader('Content-Type', 'application/json');
     const enforcer = await createEnforcer();

@@ -1,4 +1,4 @@
-import React, { Component, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import '../tailwind.css';
 import prorailLogo from '../media/proraillogo.png';
 import routes from '../Services/routes';
@@ -33,7 +33,7 @@ function Login() {
     return (
         <>
             {!autherised ?
-                <div className="flex flex-col items-center absolute top-[50%] left-[50%] translate-y-[-50%] translate-x-[-50%] w-[300px] h-[300px]">
+                <div className="flex flex-col items-center absolute top-[50%] left-[50%] translate-y-[-80%] translate-x-[-50%] w-[300px] h-[300px]">
                     <img className="ml-[1vw]" src={prorailLogo} alt="" width="120" height="120" />
                     <span className="text-lg">Login to WVI management</span>
                     <span className="text-lg mb-[2vh] text-red-600">{result}</span>
