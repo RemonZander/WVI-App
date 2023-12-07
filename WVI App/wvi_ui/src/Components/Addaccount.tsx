@@ -65,7 +65,7 @@ function Addaccount() {
 
 
     return (
-        <div className="flex flex-col gap-y-[20px] absolute translate-y-[-50%] translate-x-[-50%] top-[50%] left-[50%]">
+        <div className="flex flex-col gap-y-[20px] absolute translate-y-[-50%] translate-x-[-50%] top-[40%] left-[50%]">
             <div>
                 <div><span className="text-red-700">{errorText}</span></div>
                 <span className="text-lg">Account gegevens: </span>
@@ -112,7 +112,7 @@ function Addaccount() {
                 <span className="text-lg ml-[15px]">Acties: </span>
                 <div className="flex gap-x-[50px] ml-[15px] mt-[2vh] justify-between">
                     <div className="flex flex-col gap-y-[20px]">
-                        <button onClick={() => {
+                        <button className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out w-fit" onClick={() => {
                             if (acccountGegevens.Email === "" || acccountGegevens.Wachtwoord === "" || acccountGegevens.Role === "") {
                                 SetErrorText("De waarden met een * ervoor zijn verplicht.");
                                 return;

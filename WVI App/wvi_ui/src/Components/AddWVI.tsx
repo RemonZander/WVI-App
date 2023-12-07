@@ -4,7 +4,7 @@ import { INewWVI, IWVI } from '../interfaces/interfaces';
 import routes from '../Services/routes';
 import '../tailwind.css';
 import loadingGif from '../media/loading.gif';
-import { Route, useSearchParams } from 'react-router-dom';
+import { useSearchParams } from 'react-router-dom';
 import 'primereact/resources/themes/bootstrap4-light-blue/theme.css';
 import { AutoComplete } from 'primereact/autocomplete';
 
@@ -26,6 +26,7 @@ function AddWVI() {
     });
     const [errorText, setErrorText] = useState<string>();
     const [connectionStatus, setConnectionStatus] = useState<number>(-1);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [searchParams, setSearchParams] = useSearchParams();
     const [aannemers, setAannemers] = useState<string[]>();
     const [filteredAannemers, setFilteredAannemers] = useState(null);
@@ -99,7 +100,7 @@ function AddWVI() {
                                 }} value={WVIdata.PMP_enkelvoudige_objectnaam}></input>
                             </div>                           
                             <div className="flex justify-between">
-                                <span className="mr-[5px]">* Datamodel versie (1.7, 2.0): </span>
+                                <span className="mr-[5px]">* Datamodel versie (1.7, 2.0, 2.1): </span>
                                 <input className="text-black max-w-[200px]" onChange={e => {
                                     let tempdata = WVIdata;
                                     WVIdata.Datamodel = e.target.value;
@@ -143,6 +144,7 @@ function AddWVI() {
                             <div className="flex justify-between">
                                 <span className="mr-[5px]">* Contractgebiednummer: </span>
                                 {searchParams.get("WVI") == null ? <input className="text-black max-w-[200px]" type="number" min="0" step="1" onChange={e => {
+                                    if (!/[0-9a-zA-Z]/.test(e.target.value) && e.target.value !== "") return;
                                     let tempdata = WVIdata;
                                     WVIdata.Contractgebiednummer = Number.parseInt(e.target.value);
                                     setWVIdata({ ...tempdata });
@@ -196,12 +198,12 @@ function AddWVI() {
                     <span className="text-lg ml-[15px]">Acties: </span>
                     <div className="flex gap-x-[50px] ml-[15px] mt-[2vh] justify-between">
                         <div className="flex flex-col gap-y-[20px]">
-                            {searchParams.get("WVI") == null ? <button>Importeer WVI vanuit excel</button> :
-                                <button onClick={() => {
+                            {searchParams.get("WVI") == null ? <button className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out w-fit">Importeer WVI vanuit excel</button> :
+                                <button className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out w-fit" onClick={() => {
                                     routes.DeleteWVI(WVIdata.PMP_enkelvoudige_objectnaam);
                                     window.location.replace('/AddWVI');
                                 }}>Verwijderen</button>}
-                            <button onClick={() => {
+                            <button className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out w-fit" onClick={() => {
                                 setConnectionStatus(2);
                                 routes.IsOnline(WVIdata.Endpoint).then((statuscode) => {
                                     setErrorText("");                                 
@@ -219,8 +221,8 @@ function AddWVI() {
                             </div>
                         </div>
                         <div className="flex flex-col gap-y-[20px]">
-                            <button>Test datamodel van WVI</button>
-                            {searchParams.get("WVI") == null ? <button onClick={() => {
+                            <button className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out w-fit">Test datamodel van WVI</button>
+                            {searchParams.get("WVI") == null ? <button className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out w-fit" onClick={() => {
                                 setConnectionStatus(-1);
                                 if (WVIdata.PMP_enkelvoudige_objectnaam === "" || WVIdata.Endpoint === "" || WVIdata.Contractgebiednummer == null || WVIdata.Aannemer === "" || WVIdata.Datamodel === "") {
                                     console.log(WVIdata);
@@ -241,7 +243,7 @@ function AddWVI() {
                                     }
                                 }));
                                 window.location.replace('/AddWVI');
-                            }}>Opslaan</button> : <button onClick={() => {
+                            }}>Opslaan</button> : <button className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out w-fit" onClick={() => {
                                     setConnectionStatus(-1);
                                     if (WVIdata.PMP_enkelvoudige_objectnaam === "" || WVIdata.Endpoint === "" || WVIdata.Contractgebiednummer == null || WVIdata.Aannemer === "" || WVIdata.Datamodel === "") {
                                         console.log(WVIdata);
@@ -260,7 +262,7 @@ function AddWVI() {
                                             setErrorText("");
                                         }
                                     });
-                                    window.location.replace('/AddWVI');
+                                    window.location.replace('/WVI');
                             }}>Bewerken</button>}
                         </div>
                     </div>

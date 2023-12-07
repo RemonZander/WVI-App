@@ -248,7 +248,7 @@ function Home() {
                         }}>Roles toevoegen</button>
                     </div>
                 </div>
-                <div className="bg-[#2C2C39] w-screen flex flex-grow">
+                <div className="bg-[#2C2C39] w-screen flex flex-grow relative">
                     <RouterProvider router={router} />
                 </div>
             </div> : ""}

@@ -1,5 +1,4 @@
-import { stat } from 'fs/promises';
-import React, { Component, useEffect, useState } from 'react';
+import { useEffect, useState } from 'react';
 import { IRoles } from '../interfaces/interfaces';
 import routes from '../Services/routes';
 import '../tailwind.css';
@@ -33,7 +32,7 @@ function Roles() {
                         <td className="px-6 py-4">
                             Acties
                         </td>
-                        {roles.map((role, index) => <tr className="bg-[#262739] border-b border-gray-700">
+                        {roles.map((role, index) => <tr key={index} className="bg-[#262739] border-b border-gray-700">
                             <td className="p-6 py-4 text-white">
                                 {role.Role}
                             </td>

@@ -1,8 +1,10 @@
 /* eslint-disable react-hooks/exhaustive-deps */
-import React, { Component, useEffect, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { useSearchParams } from 'react-router-dom';
 import routes from '../Services/routes';
 import '../tailwind.css';
+import moreInfo from '../media/more_info.png';
+import { IWVIPermissions } from '../interfaces/interfaces';
 
 function AddRoles() {
 
@@ -10,7 +12,9 @@ function AddRoles() {
     const [checkboxes, setCheckboxes] = useState<boolean[]>(new Array(17).fill(false));
     const [name, setName] = useState<string>();
     const [roles, setRoles] = useState<string[]>([]);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [searchParams, setSearchParams] = useSearchParams();
+    const [uniqueWVIs, setUniqueWVIs] = useState<IWVIPermissions[]>(new Array(0));
 
 
     const MakePermissionString = (): string => {
@@ -73,6 +77,22 @@ function AddRoles() {
             }
         }
 
+        for (var b = 0; b < uniqueWVIs.length; b++) {
+            if (!uniqueWVIs[b].name) continue;
+            if (uniqueWVIs[b].list) {
+                permissions += `wvi.unique.${uniqueWVIs[b].name}.list;`;
+            }
+            if (uniqueWVIs[b].info) {
+                permissions += `wvi.unique.${uniqueWVIs[b].name}.info;`;
+            }
+            if (uniqueWVIs[b].status) {
+                permissions += `wvi.unique.${uniqueWVIs[b].name}.status;`;
+            }
+            if (uniqueWVIs[b].operate) {
+                permissions += `wvi.unique.${uniqueWVIs[b].name}.operate;`;
+            }
+        }
+
         permissions = permissions.slice(0, -1);
         return permissions;
     };
@@ -87,7 +107,7 @@ function AddRoles() {
             setRoles(data.map((a: { Role: any; }) => a.Role));
             const editRole = searchParams.get("Role");
             if (editRole === null) return;
-            const permissions = data[data.findIndex(d => d.Role === editRole)].Permissions.split(";");
+            let permissions: string[] = data[data.findIndex(d => d.Role === editRole)].Permissions.split(";");
             let checkoxesTemp = new Array(17).fill(false);
             for (var a = 0; a < permissions.length; a++) {
                 switch (permissions[a]) {
@@ -145,6 +165,50 @@ function AddRoles() {
                     default:
                 }
             }
+
+            console.log(permissions);
+            permissions = permissions.filter(item => item.includes("unique"));
+
+            const grouped: { [key: string]: string[] } = {};
+            for (var d = 0; d < permissions.length; d++) {
+                const wvi = permissions[d].slice(11, permissions[d].lastIndexOf("."));
+                if (!grouped[wvi]) {
+                    grouped[wvi] = [];
+                }
+                grouped[wvi].push(permissions[d]);
+            }
+            const jaggedArray = Object.values(grouped);
+
+            let tempArray: IWVIPermissions[] = [];
+            for (var c = 0; c < jaggedArray.length; c++) {
+                const wviName = jaggedArray[c][0].slice(11, jaggedArray[c][0].lastIndexOf("."));
+                tempArray.push({
+                    name: wviName,
+                    list: false,
+                    info: false,
+                    status: false,
+                    operate: false
+                });
+                for (var e = 0; e < jaggedArray[c].length; e++) {
+                    switch (jaggedArray[c][e]) {
+                        case `wvi.unique.${wviName}.list`:
+                            tempArray[c].list = true;
+                            break;
+                        case `wvi.unique.${wviName}.status`:
+                            tempArray[c].status = true;
+                            break;
+                        case `wvi.unique.${wviName}.info`:
+                            tempArray[c].info = true;
+                            break;
+                        case `wvi.unique.${wviName}.operate`:
+                            tempArray[c].operate = true;
+                            break;
+                        default:
+                    }
+                }
+            }
+
+            setUniqueWVIs([...tempArray]);
             setName(editRole);
             setCheckboxes([...checkoxesTemp]);
         });
@@ -152,14 +216,14 @@ function AddRoles() {
 
 
     return (
-        <div className="flex flex-col gap-y-[20px] absolute translate-y-[-50%] translate-x-[-50%] top-[50%] left-[50%]">
+        <div className="flex flex-col gap-y-[20px] absolute translate-x-[-50%] left-[50%] mt-[40px]">
             <div>
                 <div><span className="text-red-700">{errorText}</span></div>
                 <span className="text-lg">Role toevoegen: </span>
                 <div className="flex gap-x-[50px] mt-[2vh] ml-[15px] justify-between">
                     <div className="flex flex-col gap-y-[20px]">
                         <div className="flex justify-between">
-                            <span className="mr-[5px]">* Naam: </span>
+                            <span className="mr-[5px]">* Rol naam: </span>
                             {searchParams.get("Role") === null ? <input className="ml-[10px] text-black" value={name} type="text" onChange={async (e) => {
                                 setName(e.target.value);
                             }} /> : 
@@ -168,7 +232,10 @@ function AddRoles() {
                             }} />}
                         </div>
                         <div className="flex justify-between">
-                            <span className="mr-[5px]">Toegang tot eigen WVI's: </span>
+                            <div className="flex">
+                                <img title="Dit is nodig om de WVI's die zien die bij de aannemer horen" className="w-[20px] h-[20px] self-center" src={moreInfo} alt="" />
+                                <span className="ml-[10px]">Toegang tot eigen WVI's: </span>
+                            </div>
                             <input className="ml-[10px]" type="checkbox" checked={checkboxes[0]} onChange={async (e) => {
                                 let checkboxesTemp = checkboxes;
                                 checkboxesTemp[0] = !checkboxes[0];
@@ -176,7 +243,10 @@ function AddRoles() {
                             }} />
                         </div>
                         <div className="flex justify-between">
-                            <span className="mr-[5px]">Eigen WVI's uitlezen: </span>
+                            <div className="flex">
+                                <img title="Dit is nodig om de WVI's van de aannemer uit te kunnen lezen" className="w-[20px] h-[20px] self-center" src={moreInfo} alt="" />
+                                <span className="ml-[10px]">Eigen WVI's uitlezen: </span>
+                            </div>
                             <input className="ml-[10px]" type="checkbox" checked={checkboxes[1]} onChange={async (e) => {
                                 let checkboxesTemp = checkboxes;
                                 checkboxesTemp[1] = !checkboxes[1];
@@ -184,7 +254,10 @@ function AddRoles() {
                             }} />
                         </div>
                         <div className="flex justify-between">
-                            <span className="mr-[5px]">Eigen WVI's status uitlezen: </span>
+                            <div className="flex">
+                                <img title="Dit is nodig om de status van de WVI's van de aannemer uit te kunnen lezen" className="w-[20px] h-[20px] self-center" src={moreInfo} alt="" />
+                                <span className="ml-[10px]">Eigen WVI's status uitlezen: </span>
+                            </div>
                             <input className="ml-[10px]" type="checkbox" checked={checkboxes[2]} onChange={async (e) => {
                                 let checkboxesTemp = checkboxes;
                                 checkboxesTemp[2] = !checkboxes[2];
@@ -192,7 +265,10 @@ function AddRoles() {
                             }} />
                         </div>
                         <div className="flex justify-between">
-                            <span className="mr-[5px]">Eigen WVI's besturen: </span>
+                            <div className="flex">
+                                <img title="Dit is nodig om de WVI's van de aannemer te kunnen besturen" className="w-[20px] h-[20px] self-center" src={moreInfo} alt="" />
+                                <span className="ml-[10px]">Eigen WVI's besturen: </span>
+                            </div>
                             <input className="ml-[10px]" type="checkbox" checked={checkboxes[3]} onChange={async (e) => {
                                 let checkboxesTemp = checkboxes;
                                 checkboxesTemp[3] = !checkboxes[3];
@@ -200,7 +276,10 @@ function AddRoles() {
                             }} />
                         </div>
                         <div className="flex justify-between">
-                            <span className="mr-[5px]">Toegang tot alle WVI's: </span>
+                            <div className="flex">
+                                <img title="Dit is nodig om toegang te hebben tot alle WVi's. Dit is een optie voor een beheerders rol" className="w-[20px] h-[20px] self-center" src={moreInfo} alt="" />
+                                <span className="ml-[10px]">Toegang tot alle WVI's: </span>
+                            </div>
                             <input className="ml-[10px]" type="checkbox" checked={checkboxes[16]} onChange={async (e) => {
                                 let checkboxesTemp = checkboxes;
                                 checkboxesTemp[16] = !checkboxes[16];
@@ -210,7 +289,10 @@ function AddRoles() {
                     </div>
                     <div className="flex flex-col gap-y-[20px]">
                         <div className="flex justify-between">
-                            <span className="mr-[5px]">WVI's toevoegen: </span>
+                            <div className="flex">
+                                <img title="Dit is nodig om een WVI te kunnen toevoegen. Als je ook een WVI mag besturen wordt die optie uitgezet en heeft deze optie voorrang" className="w-[20px] h-[20px] self-center" src={moreInfo} alt="" />
+                                <span className="ml-[10px]">WVI's toevoegen: </span>
+                            </div>
                             <input className="ml-[10px]" type="checkbox" checked={checkboxes[4]} onChange={async (e) => {
                                 let checkboxesTemp = checkboxes;
                                 checkboxesTemp[4] = !checkboxes[4];
@@ -218,7 +300,10 @@ function AddRoles() {
                             }} />
                         </div>
                         <div className="flex justify-between">
-                            <span className="mr-[5px]">WVI's bewerken: </span>
+                            <div className="flex">
+                                <img title="Dit is nodig om de informatie van een WVI te kunnen bewerken. Dit is een optie voor een beheerders rol" className="w-[20px] h-[20px] self-center" src={moreInfo} alt="" />
+                                <span className="ml-[10px]">WVI's bewerken: </span>
+                            </div>
                             <input className="ml-[10px]" type="checkbox" checked={checkboxes[5]} onChange={async (e) => {
                                 let checkboxesTemp = checkboxes;
                                 checkboxesTemp[5] = !checkboxes[5];
@@ -226,7 +311,10 @@ function AddRoles() {
                             }} />
                         </div>
                         <div className="flex justify-between">
-                            <span className="mr-[5px]">WVI's verwijderen: </span>
+                            <div className="flex">
+                                <img title="Dit is nodig om een WVI te kunnen verwijderen. Dit is een optie voor een beheerders rol" className="w-[20px] h-[20px] self-center" src={moreInfo} alt="" />
+                                <span className="ml-[10px]">WVI's verwijderen: </span>
+                            </div>
                             <input className="ml-[10px]" type="checkbox" checked={checkboxes[6]} onChange={async (e) => {
                                 let checkboxesTemp = checkboxes;
                                 checkboxesTemp[6] = !checkboxes[6];
@@ -234,7 +322,10 @@ function AddRoles() {
                             }} />
                         </div>
                         <div className="flex justify-between">
-                            <span className="mr-[5px]">Accounts uitlezen: </span>
+                            <div className="flex">
+                                <img title="Dit is nodig om alle accounts te kunnen zien en uitlezen. Dit is een optie voor een beheerders rol" className="w-[20px] h-[20px] self-center" src={moreInfo} alt="" />
+                                <span className="ml-[10px]">Accounts uitlezen: </span>
+                            </div>
                             <input className="ml-[10px]" type="checkbox" checked={checkboxes[7]} onChange={async (e) => {
                                 let checkboxesTemp = checkboxes;
                                 checkboxesTemp[7] = !checkboxes[7];
@@ -242,7 +333,10 @@ function AddRoles() {
                             }} />
                         </div>
                         <div className="flex justify-between">
-                            <span className="mr-[5px]">Accounts toevoegen: </span>
+                            <div className="flex">
+                                <img title="Dit is nodig om een account te kunnen toevoegen. Dit is een optie voor een beheerders rol" className="w-[20px] h-[20px] self-center" src={moreInfo} alt="" />
+                                <span className="ml-[10px]">Accounts toevoegen: </span>
+                            </div>
                             <input className="ml-[10px]" type="checkbox" checked={checkboxes[8]} onChange={async (e) => {
                                 let checkboxesTemp = checkboxes;
                                 checkboxesTemp[8] = !checkboxes[8];
@@ -250,7 +344,10 @@ function AddRoles() {
                             }} />
                         </div>
                         <div className="flex justify-between">
-                            <span className="mr-[5px]">Accounts bewerken: </span>
+                            <div className="flex">
+                                <img title="Dit is nodig om een account te kunnen bewerken. Dit is een optie voor een beheerders rol" className="w-[20px] h-[20px] self-center" src={moreInfo} alt="" />
+                                <span className="ml-[10px]">Accounts bewerken: </span>
+                            </div>
                             <input className="ml-[10px]" type="checkbox" checked={checkboxes[9]} onChange={async (e) => {
                                 let checkboxesTemp = checkboxes;
                                 checkboxesTemp[9] = !checkboxes[9];
@@ -261,7 +358,10 @@ function AddRoles() {
                     </div>
                     <div className="flex flex-col gap-y-[20px]">
                         <div className="flex justify-between">
-                            <span className="mr-[5px]">Accounts verwijderen: </span>
+                            <div className="flex">
+                                <img title="Dit is nodig om een account te kunnen verwijderen. Dit is een optie voor een beheerders rol" className="w-[20px] h-[20px] self-center" src={moreInfo} alt="" />
+                                <span className="ml-[10px]">Accounts verwijderen: </span>
+                            </div>
                             <input className="ml-[10px]" type="checkbox" checked={checkboxes[10]} onChange={async (e) => {
                                 let checkboxesTemp = checkboxes;
                                 checkboxesTemp[10] = !checkboxes[10];
@@ -269,7 +369,10 @@ function AddRoles() {
                             }} />
                         </div>
                         <div className="flex justify-between">
-                            <span className="mr-[5px]">Rollen uitlezen: </span>
+                            <div className="flex">
+                                <img title="Dit is nodig om alle rollen te kunnen zien en uitlezen. Dit is een optie voor een beheerders rol" className="w-[20px] h-[20px] self-center" src={moreInfo} alt="" />
+                                <span className="ml-[10px]">Rollen uitlezen: </span>
+                            </div>
                             <input className="ml-[10px]" type="checkbox" checked={checkboxes[11]} onChange={async (e) => {
                                 let checkboxesTemp = checkboxes;
                                 checkboxesTemp[11] = !checkboxes[11];
@@ -277,7 +380,10 @@ function AddRoles() {
                             }} />
                         </div>
                         <div className="flex justify-between">
-                            <span className="mr-[5px]">Rollen toevoegen: </span>
+                            <div className="flex">
+                                <img title="Dit is nodig om een rol te kunnen toevoegen. Dit is een optie voor een beheerders rol" className="w-[20px] h-[20px] self-center" src={moreInfo} alt="" />
+                                <span className="ml-[10px]">Rollen toevoegen: </span>
+                            </div>
                             <input className="ml-[10px]" type="checkbox" checked={checkboxes[12]} onChange={async (e) => {
                                 let checkboxesTemp = checkboxes;
                                 checkboxesTemp[12] = !checkboxes[12];
@@ -285,7 +391,10 @@ function AddRoles() {
                             }} />
                         </div>
                         <div className="flex justify-between">
-                            <span className="mr-[5px]">Rollen bewerken: </span>
+                            <div className="flex">
+                                <img title="Dit is nodig om een rol te kunnen bewerken. Dit is een optie voor een beheerders rol" className="w-[20px] h-[20px] self-center" src={moreInfo} alt="" />
+                                <span className="ml-[10px]">Rollen bewerken: </span>
+                            </div>
                             <input className="ml-[10px]" type="checkbox" checked={checkboxes[13]} onChange={async (e) => {
                                 let checkboxesTemp = checkboxes;
                                 checkboxesTemp[13] = !checkboxes[13];
@@ -293,7 +402,10 @@ function AddRoles() {
                             }} />
                         </div>
                         <div className="flex justify-between">
-                            <span className="mr-[5px]">Rollen verwijderen: </span>
+                            <div className="flex">
+                                <img title="Dit is nodig om een rol te kunnen verwijderen. Dit is een optie voor een beheerders rol" className="w-[20px] h-[20px] self-center" src={moreInfo} alt="" />
+                                <span className="ml-[10px]">Rollen verwijderen: </span>
+                            </div>
                             <input className="ml-[10px]" type="checkbox" checked={checkboxes[14]} onChange={async (e) => {
                                 let checkboxesTemp = checkboxes;
                                 checkboxesTemp[14] = !checkboxes[14];
@@ -301,7 +413,10 @@ function AddRoles() {
                             }} />
                         </div>
                         <div className="flex justify-between">
-                            <span className="mr-[5px]">Aannemers uitlezen: </span>
+                            <div className="flex">
+                                <img title="Dit is nodig om aannemers te kunnen uitlezen. Deze optie is ook nodig als de rol ook accounts kan bewerken / aanmaken. Dit is een optie voor een beheerders rol" className="w-[20px] h-[20px] self-center" src={moreInfo} alt="" />
+                                <span className="ml-[10px]">Aannemers uitlezen: </span>
+                            </div>
                             <input className="ml-[10px]" type="checkbox" checked={checkboxes[15]} onChange={async (e) => {
                                 let checkboxesTemp = checkboxes;
                                 checkboxesTemp[15] = !checkboxes[15];
@@ -312,10 +427,72 @@ function AddRoles() {
                 </div>
             </div>
             <div className="border-t-4 border-dashed pt-[10px]">
+                <span className="text-lg ml-[15px]">Aparte WVI toegang: </span>
+                <div className="grid grid-cols-4 gap-[10px] p-[10px] w-full border-2 overflow-y-scroll max-h-[260px]">
+                    {uniqueWVIs.map((wviPermissions, index) =>
+                        <div className="border-2 h-fit flex flex-col p-[5px]">
+                            <div className="flex">
+                                <span>naam: </span>
+                                <input onChange={(e) => {
+                                    let tempArray = uniqueWVIs;
+                                    tempArray[index].name = e.target.value;
+                                    setUniqueWVIs([...tempArray]);
+                                }} value={uniqueWVIs[index].name} className="w-[110px] ml-[10px] text-black"></input>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>Toegang: </span>
+                                <input onChange={(e) => {
+                                    let tempArray = uniqueWVIs;
+                                    tempArray[index].list = e.target.checked;
+                                    setUniqueWVIs([...tempArray]);
+                                }} checked={uniqueWVIs[index].list} type="checkbox"></input>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>status: </span>
+                                <input onChange={(e) => {
+                                    let tempArray = uniqueWVIs;
+                                    tempArray[index].status = e.target.checked;
+                                    setUniqueWVIs([...tempArray]);
+                                }} checked={uniqueWVIs[index].status} type="checkbox"></input>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>Uitlezen: </span>
+                                <input onChange={(e) => {
+                                    let tempArray = uniqueWVIs;
+                                    tempArray[index].info = e.target.checked;
+                                    setUniqueWVIs([...tempArray]);
+                                }} checked={uniqueWVIs[index].info} type="checkbox"></input>
+                            </div>
+                            <div className="flex justify-between">
+                                <span>Besturen: </span>
+                                <input onChange={(e) => {
+                                    let tempArray = uniqueWVIs;
+                                    tempArray[index].operate = e.target.checked;
+                                    setUniqueWVIs([...tempArray]);
+                                }} checked={uniqueWVIs[index].operate} type="checkbox"></input>
+                            </div>
+                        </div>)
+                    }
+                    <div className="border-2 h-[134px] relative">
+                        <button onClick={() => {
+                            let tempArray = uniqueWVIs;
+                            tempArray.push({
+                                name: "",
+                                list: true,
+                                info: true,
+                                status: true,
+                                operate: false
+                            });
+                            setUniqueWVIs([...tempArray]);
+                        }} className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out w-fit absolute translate-y-[-50%] translate-x-[-50%] top-[50%] left-[50%]">Toevoegen</button>
+                    </div>
+                </div>
+            </div>
+            <div className="border-t-4 border-dashed pt-[10px]">
                 <span className="text-lg ml-[15px]">Acties: </span>
                 <div className="flex gap-x-[50px] ml-[15px] mt-[2vh] justify-between">
                     <div className="flex flex-col gap-y-[20px]">
-                        <button onClick={() => {
+                        <button className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out w-fit" onClick={() => {
                             let checkboxesTemp = checkboxes;
                             checkboxesTemp[0] = true;
                             checkboxesTemp[1] = true;
@@ -323,7 +500,7 @@ function AddRoles() {
                             checkboxesTemp[3] = true;
                             setCheckboxes([...checkboxesTemp]);
                         }}>Aannemer template toepassen</button>
-                        <button onClick={() => {
+                        <button className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out w-fit" onClick={() => {
                             let checkboxesTemp = checkboxes;
                             checkboxesTemp[4] = true;
                             checkboxesTemp[5] = true;
@@ -342,7 +519,7 @@ function AddRoles() {
                         }}>beheerder template toepassen</button>
                     </div>
                     <div className="flex flex-col gap-y-[20px]">
-                        {searchParams.get("Role") === null ? <button onClick={() => {
+                        {searchParams.get("Role") === null ? <button className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out w-fit" onClick={() => {
                             if (name === "" || name == null) {
                                 SetErrorText("U moet wel een naam voor een rol invullen");
                                 return;

@@ -87,7 +87,7 @@ Accountrouter.get('/listRoles', async (req: Request, res: Response) => {
     }
 
     res.setHeader('Content-Type', 'application/json');
-    res.send(JSON.stringify(UserService.ListRoles()));
+    res.json(UserService.ListRoles());
 });
 
 Accountrouter.get('/getRolesAndPermissions', async (req: Request, res: Response) => {
@@ -103,7 +103,7 @@ Accountrouter.get('/getRolesAndPermissions', async (req: Request, res: Response)
     }
 
     res.setHeader('Content-Type', 'application/json');
-    res.send(JSON.stringify(UserService.GetRolesAndPermissions()));
+    res.json(UserService.GetRolesAndPermissions());
 });
 
 Accountrouter.post('/UpdateRoleInAccount', async (req: Request, res: Response) => {
@@ -202,7 +202,7 @@ Accountrouter.get('/listOnderhoudsaannemers', async (req: Request, res: Response
     }
 
     res.setHeader('Content-Type', 'application/json');
-    res.send(JSON.stringify(UserService.ListOnderhoudsaannemers()));
+    res.json(UserService.ListOnderhoudsaannemers());
 });
 
 Accountrouter.post('/getaannemer', async (req: Request, res: Response) => {
@@ -218,7 +218,7 @@ Accountrouter.post('/getaannemer', async (req: Request, res: Response) => {
     }
 
     res.setHeader('Content-Type', 'application/json');
-    res.send(JSON.stringify(UserService.GetAannemerOnContractgebiednummer(req.body.contractgebiednummer)));
+    res.json(UserService.GetAannemerOnContractgebiednummer(req.body.contractgebiednummer));
 });
 
 Accountrouter.put('/addaccount', async (req: Request, res: Response) => {

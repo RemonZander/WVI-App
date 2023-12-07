@@ -1,6 +1,5 @@
 import { Request, Response } from "express";
 import { AttributeIds, BrowseResult, ClientSession, DataType, DataValue, OPCUAClient, ReferenceDescription, StatusCodes, TimestampsToReturn, UserTokenType, DataTypeIds, FilterContextOnAddressSpace } from "node-opcua-client";
-import { performance } from "perf_hooks";
 import { Datamodel } from '../enums/datamodel';
 import { LogLevel } from "../enums/loglevelEnum";
 import Logger from "./loggerModule";
@@ -81,7 +80,7 @@ export default class OPCUAclient {
         catch (err)
         {
             Logger(err.stack, OPCUAclient.name, LogLevel.SERVERE);
-            res.send(JSON.stringify(`Error: ${err}`));
+            res.json(`Error: ${err}`);
         }
         client.disconnect();
     }
@@ -108,8 +107,6 @@ export default class OPCUAclient {
                 type: UserTokenType.Anonymous
             });
 
-            let startTime = performance.now();
-
             let nodes = [];
             await this.RecursiveBrowse(await session.browse(req.body.nodeId) as BrowseResult, session).then((results) => {
                 for (var a = 0; a < results.length; a++) {
@@ -119,21 +116,13 @@ export default class OPCUAclient {
                 }
             });
 
-            let endTime = performance.now();
-            console.log(`Call to RecursiveBrowse took ${endTime - startTime} milliseconds`);
-
-            startTime = performance.now();
-
             await this.ReadData(session, nodes).then((data) => {
                 for (var a = 0; a < data.length; a++) {
                     nodes[a].Data = data[a].data;
                 }
             });
 
-            endTime = performance.now();
-            console.log(`Call to ReadData took ${endTime - startTime} milliseconds`);
-
-            res.send(JSON.stringify(nodes));
+            res.json(nodes);
         }
         catch (err) {
             Logger(err.stack, OPCUAclient.name, LogLevel.SERVERE);
@@ -208,6 +197,7 @@ export default class OPCUAclient {
         let result = [];
 
         for (var a = 0; a < browseResult.references.length; a++) {
+            if (browseResult.references[a].browseName.name === "Alarms") continue;
             if (browseResult.references[a].nodeClass != 1) {
                 result.push({ browseName: browseResult.references[a].browseName.name, NodeId: browseResult.references[a].nodeId.toString(), dataType: Datamodel[browseResult.references[a].browseName.name] });
             }

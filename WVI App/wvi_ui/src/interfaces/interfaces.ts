@@ -41,3 +41,11 @@ export interface IRoles {
     Role: string,
     Permissions: string
 }
+
+export interface IWVIPermissions {
+    name: string,
+    list: boolean,
+    info: boolean,
+    status: boolean,
+    operate: boolean
+}

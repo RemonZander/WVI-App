@@ -121,7 +121,7 @@ WVIRouter.get('/getWVIs', async (req: Request, res: Response) => {
         }
     }
 
-    res.send(JSON.stringify(WVIs));
+    res.json(WVIs);
 });
 
 

@@ -32,10 +32,10 @@ function Dashboard() {
         
     async function DoSetStatus(pos: number, node: string, eindpoint: string, newStatus: IWVIStatus[], datamodel: string, wvi, canEditWVI: boolean): Promise<IWVIStatus> {
         await routes.GetStatus(node, eindpoint, datamodel, wvi).then((result: number) => {
-            if (result[0] === result[1] && !canEditWVI) {
+            if (result[0] === result[1] && !canEditWVI && datamodel === "2.1") {
                 routes.SetStatus(-1, node, eindpoint, datamodel, wvi.PMP_enkelvoudige_objectnaam);
             }
-            else if (result[1] !== -1 && !canEditWVI) return newStatus[pos];
+            else if (result[1] !== -1 && !canEditWVI && datamodel === "2.1") return newStatus[pos];
             if (result[0] === 0) {
                 newStatus[pos] = { status: "Uit", activityLed: activityWhite };
             }
@@ -62,7 +62,8 @@ function Dashboard() {
             let removeIndexes: string[] = [];
             for (var a = 0; a < data.length; a++) {
                 if (data[a].DisplayName === "cmdOperationMode" || data[a].DisplayName === "HeatingCurve.SetPointHigh" || data[a].DisplayName === "HeatingCurve.SetPointLow" ||
-                    data[a].DisplayName === "Params.DefaultHeatingCurve.SetPointHigh" || data[a].DisplayName === "Params.DefaultHeatingCurve.SetPointLow") {
+                    data[a].DisplayName === "Params.DefaultHeatingCurve.SetPointHigh" || data[a].DisplayName === "Params.DefaultHeatingCurve.SetPointLow" ||
+                    data[a].DisplayName === "CurrentOperationMode" || data[a].DisplayName === "SetPointLow" || data[a].DisplayName === "SetPointHigh") {
 
                     newdata.push(data[a]);
                     removeIndexes.push(data[a].DisplayName);
@@ -115,7 +116,7 @@ function Dashboard() {
             (async () => {
                 for (var a = 0; a < data.length; a++) {
                     await routes.IsOnline(data[a].Endpoint).then(async (statuscode) => {
-                        if (statuscode != 404) {  
+                        if (statuscode !== 404) {  
                             newStatus[a] = await DoSetStatus(a, "ns=2;s=" + data[a].PMP_enkelvoudige_objectnaam, data[a].Endpoint, newStatus, data[a].Datamodel, data[a], canEditWVI);
                         }
                     });
@@ -171,7 +172,7 @@ return (
                     {
                         setCurrentNode({ Node: WVI.PMP_enkelvoudige_objectnaam, endpoint: WVI.Endpoint, datamodel: WVI.Datamodel });
                         await GetData("ns=2;s=" + WVI.PMP_enkelvoudige_objectnaam, WVI.Endpoint, status, WVI.Datamodel, WVI.PMP_enkelvoudige_objectnaam);
-                        if (WVI.Datamodel === "2.0") {
+                        if (WVI.Datamodel === "2.0" || WVI.Datamodel === "2.1") {
                             setHeatingCurve([nodeDataVariable.filter(node => node.Nodes.includes("HeatingCurve.SetPointHigh"))[0].Data, nodeDataVariable.filter(node => node.Nodes.includes("HeatingCurve.SetPointLow"))[0].Data]);
                             setDefaultHeatingCurve([nodeDataVariable.filter(node => node.Nodes.includes("DefaultHeatingCurve.SetPointHigh"))[0].Data, nodeDataVariable.filter(node => node.Nodes.includes("DefaultHeatingCurve.SetPointLow"))[0].Data]);
                         }
