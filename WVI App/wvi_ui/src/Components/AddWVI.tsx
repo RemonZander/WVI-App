@@ -53,7 +53,7 @@ function AddWVI() {
             if (status === 401) window.location.replace('/');
         });
 
-        routes.ListOnderhoudsaannemers().then((data) => {
+        routes.ListOnderhoudsaannemersUnique().then((data) => {
             setAannemers(data.map((a: { Onderhoudsaannemer: string; }) => a.Onderhoudsaannemer));
         });
 
@@ -85,7 +85,7 @@ function AddWVI() {
 
     return (
         <>
-            <div className="flex flex-col gap-y-[20px] absolute translate-y-[-50%] translate-x-[-50%] top-[50%] left-[50%]">
+            <div className="flex flex-col gap-y-[20px] absolute translate-y-[-50%] translate-x-[-50%] top-[40vh] left-[50%]">
                 <div>
                     <div><span className="text-red-700">{errorText}</span></div>
                     <span className="text-lg ml-[15px]">Gegevens: </span>

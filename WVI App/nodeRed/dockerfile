@@ -1,0 +1,4 @@
+FROM nodered/node-red:latest as nodered
+EXPOSE 1880
+COPY flows ./
+RUN npm install node-red-contrib-opcua

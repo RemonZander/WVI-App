@@ -61,9 +61,7 @@ function Dashboard() {
             let newdata = [];
             let removeIndexes: string[] = [];
             for (var a = 0; a < data.length; a++) {
-                if (data[a].DisplayName === "cmdOperationMode" || data[a].DisplayName === "HeatingCurve.SetPointHigh" || data[a].DisplayName === "HeatingCurve.SetPointLow" ||
-                    data[a].DisplayName === "Params.DefaultHeatingCurve.SetPointHigh" || data[a].DisplayName === "Params.DefaultHeatingCurve.SetPointLow" ||
-                    data[a].DisplayName === "CurrentOperationMode" || data[a].DisplayName === "SetPointLow" || data[a].DisplayName === "SetPointHigh") {
+                if (data[a].DisplayName.includes("OperationMode") || data[a].DisplayName.includes("SetPoint")) {
 
                     newdata.push(data[a]);
                     removeIndexes.push(data[a].DisplayName);

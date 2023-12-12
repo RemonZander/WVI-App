@@ -32,9 +32,13 @@ export class UserService {
         return Run('UPDATE "Accounts" Set Onderhoudsaannemer = ? WHERE LOWER(Email) = ?', [onderhoudsaannemer, email]);
     }
 
-    public static ListOnderhoudsaannemers(): string | boolean {
+    public static ListOnderhoudsaannemersUnique(): string | boolean {
         return QueryNoParams(`SELECT Onderhoudsaannemer FROM "Aannemers"  WHERE Onderhoudsaannemer IS NOT NULL AND TRIM(Onderhoudsaannemer) <> '' 
         UNION SELECT Onderhoudsaannemer FROM "Accounts"  WHERE Onderhoudsaannemer IS NOT NULL AND TRIM(Onderhoudsaannemer) <> '';`).all();
+    }
+
+    public static ListOnderhoudsaannemers(): string | boolean {
+        return QueryNoParams(`SELECT Contractgebiednummer, Onderhoudsaannemer FROM "Aannemers" WHERE Onderhoudsaannemer IS NOT NULL AND TRIM(Onderhoudsaannemer) <> '' ORDER BY Onderhoudsaannemer`).all();
     }
 
     public static ListRoles(): string | boolean {

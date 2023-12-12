@@ -189,6 +189,22 @@ Accountrouter.put('/updateRole', async (req: Request, res: Response) => {
     res.sendStatus(200);
 });
 
+Accountrouter.get('/listOnderhoudsaannemersunique', async (req: Request, res: Response) => {
+    const email = TokenService.GetEmail(req.cookies["login"])[0];
+    const enforcer = await createEnforcer();
+    if (email == null) {
+        res.sendStatus(500);
+        return;
+    }
+    else if (!await enforcer.enforce(email.Email, "*") && !await enforcer.enforce(email.Email, "onderhoudsaannemers.list")) {
+        res.sendStatus(401);
+        return;
+    }
+
+    res.setHeader('Content-Type', 'application/json');
+    res.json(UserService.ListOnderhoudsaannemersUnique());
+});
+
 Accountrouter.get('/listOnderhoudsaannemers', async (req: Request, res: Response) => {
     const email = TokenService.GetEmail(req.cookies["login"])[0];
     const enforcer = await createEnforcer();

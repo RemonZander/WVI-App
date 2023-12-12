@@ -20,7 +20,7 @@ function Roles() {
 
     return (
         <>
-            {show ? <div className="h-[50vh] overflow-y-scroll absolute translate-y-[-50%] translate-x-[-50%] top-[50%] left-[50%]">
+            {show ? <div className="h-[50vh] overflow-y-scroll absolute translate-y-[-50%] translate-x-[-50%] top-[40vh] left-[50%]">
                 <table className="w-full text-sm text-left text-white mt-[1vh]">
                     <tbody>
                         <td className="p-6 py-4 text-white">
@@ -56,11 +56,11 @@ function Roles() {
                                 }}>
                                     Verwijderen
                                 </button> : ""}
-                                <button className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out" onClick={async () => {
+                                {role.Role !== "beheerder" ? <button className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out" onClick={async () => {
                                     window.location.replace(`/AddRoles?Role=${role.Role}`);
                                 }}>
                                     Bewerken
-                                </button>
+                                </button> : ""}
                             </td>
                         </tr>)}
                     </tbody>

@@ -7,6 +7,8 @@ export enum Datamodel {
     "Params.DefaultHeatingCurve.SetPointLow" = "Celsius",
     "HeatingCurve.SetPointHigh" = "Celsius",
     "HeatingCurve.SetPointLow" = "Celsius",
+    "DefaultHeatingcurveSetPointLow" = "Celsius",
+    "DefaultHeatingcurveSetPointHigh" = "Celsius",
     Inlet1Voltage = "Volts",
     Inlet2Voltage = "Volts",
     Inlet3Voltage = "Volts",

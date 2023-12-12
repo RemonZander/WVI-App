@@ -58,7 +58,7 @@ function Addaccount() {
             setRoles(data.map((a: { Role: string; }) => a.Role));
         });
 
-        routes.ListOnderhoudsaannemers().then((data) => {
+        routes.ListOnderhoudsaannemersUnique().then((data) => {
             setAannemers(data.map((a: { Onderhoudsaannemer: string; }) => a.Onderhoudsaannemer));
         });
     }, []);
@@ -115,6 +115,10 @@ function Addaccount() {
                         <button className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out w-fit" onClick={() => {
                             if (acccountGegevens.Email === "" || acccountGegevens.Wachtwoord === "" || acccountGegevens.Role === "") {
                                 SetErrorText("De waarden met een * ervoor zijn verplicht.");
+                                return;
+                            }
+                            else if (!roles.includes(acccountGegevens.Role)) {
+                                SetErrorText("Deze rol bestaat niet. U moet een bestaande rol uitkiezen of een nieuwe rol aanmaken.");
                                 return;
                             }
                             SetErrorText("");

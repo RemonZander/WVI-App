@@ -18,4 +18,7 @@ roles.list						<- list all roles
 roles.remove					<- remove a role
 roles.add						<- add a role
 onderhoudsaannemers.list		<- list all onderhoudsaannemers
+onderhoudsaannemers.add			<- add new onderhoudsaannemers
+onderhoudsaannemers.update		<- update any onderhoudsaannemers
+onderhoudsaannemers.remove		<- remove any onderhoudsaannemers
 wvi.all.list					<- toegang tot alle wvi's

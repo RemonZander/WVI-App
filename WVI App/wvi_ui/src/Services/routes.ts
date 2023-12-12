@@ -242,6 +242,19 @@ export default class routes {
         }
     }
 
+    static async ListOnderhoudsaannemersUnique() {
+        try {
+            return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/listOnderhoudsaannemersunique`, {
+                method: "GET",
+                credentials: 'include'
+            }).then((res) => {
+                return res.json();
+            });
+        } catch (e) {
+
+        }
+    }
+
     static async ListOnderhoudsaannemers() {
         try {
             return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/listOnderhoudsaannemers`, {

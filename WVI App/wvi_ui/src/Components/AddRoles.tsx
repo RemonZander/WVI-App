@@ -427,7 +427,7 @@ function AddRoles() {
                 </div>
             </div>
             <div className="border-t-4 border-dashed pt-[10px]">
-                <span className="text-lg ml-[15px]">Aparte WVI toegang: </span>
+                <span className="text-lg ml-[15px]">Andere WVI toegang: </span>
                 <div className="grid grid-cols-4 gap-[10px] p-[10px] w-full border-2 overflow-y-scroll max-h-[260px]">
                     {uniqueWVIs.map((wviPermissions, index) =>
                         <div className="border-2 h-fit flex flex-col p-[5px]">

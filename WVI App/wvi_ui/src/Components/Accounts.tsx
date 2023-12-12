@@ -36,13 +36,13 @@ function Accounts() {
             setRoles(data.map((a: { Role: any; }) => a.Role));
         });
 
-        routes.ListOnderhoudsaannemers().then((data) => {
+        routes.ListOnderhoudsaannemersUnique().then((data) => {
             setOnderhoudsaannemers(data.map((a: { Onderhoudsaannemer: any; }) => a.Onderhoudsaannemer));
         });
     }, []);
 
     return (
-        <div className="h-[50vh] overflow-y-scroll absolute translate-y-[-50%] translate-x-[-50%] top-[50%] left-[50%]">
+        <div className="h-[50vh] overflow-y-scroll absolute translate-y-[-50%] translate-x-[-50%] top-[40vh] left-[50%]">
             <table className="w-full text-sm text-left text-white mt-[1vh]">
                 <tbody>
                     <td className="p-6 py-4 text-white">
