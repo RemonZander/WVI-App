@@ -1,9 +1,10 @@
 import { Request, Response } from "express";
-import { AttributeIds, BrowseResult, ClientSession, DataType, DataValue, OPCUAClient, ReferenceDescription, StatusCodes, TimestampsToReturn, UserTokenType, DataTypeIds, FilterContextOnAddressSpace } from "node-opcua-client";
+import { AttributeIds, BrowseResult, ClientSession, DataType, DataValue, OPCUAClient, ReferenceDescription, StatusCodes, TimestampsToReturn, UserTokenType, DataTypeIds, FilterContextOnAddressSpace, MessageSecurityMode, SecurityPolicy, OPCUACertificateManager } from "node-opcua";
 import { Datamodel } from '../enums/datamodel';
 import { LogLevel } from "../enums/loglevelEnum";
 import Logger from "./loggerModule";
 import * as fs from 'fs';
+const path = require('path');
 
 export default class OPCUAclient {
 
@@ -19,48 +20,33 @@ export default class OPCUAclient {
                     initialDelay: 2000,
                     maxDelay: 10 * 1000
                 },
+/*                securityMode: MessageSecurityMode.SignAndEncrypt,
+                securityPolicy: SecurityPolicy.Basic256Sha256,
+                certificateFile: path.resolve("./src/certs/OPCUA_client.der"),
+                privateKeyFile: path.resolve("./src/certs/OPCUA_client.pem"),
+                applicationUri: "urn:WVIAPP:OPCUA:client",
+                clientCertificateManager: new OPCUACertificateManager({
+                    automaticallyAcceptUnknownCertificate: true,
+                    rootFolder: path.resolve("./src/OPCUAPKI")
+                }),*/
             });
             client.on("backoff", () => Logger("retrying connection", OPCUAclient.name, LogLevel.WARNING));
             await client.connect(req.body.endpoint);
 
-            if (req.body.cert) {
-                session = await client.createSession({
-                type: UserTokenType.Certificate,
-                certificateData: fs.readFileSync("../certs/uaexpert.der"),
-                privateKey: `MIIEogIBAAKCAQEAzgi1GMLbAHiDGuBiRlSlQxC+OCKls1MKGwXJEjRcJqQYSpf3
-                            1rwN8+X7kjBnNA333vQepyBQUK2h+kI+q6DuqmdH6vTI4IgTZo0CpIy21khk+4lb
-                            UWeBQfjQWlRECIXr2UqivmcAW5tmYhfmejerRtyqreLRdo/NHkiKH1yl3EAHqU+7
-                            mwoacn9btlL6V2ApC8NPjlJ8evacGUj4i/fw1Kn54nHMzK0oGtc7iy7Q64RcW4/Z
-                            kehXqhfDfGSnwzBhXsRb5Fw53T2bm7aVKSVYzFRyoAuOXgsMtyEbrmrz/Mq9x2Ig
-                            H+BI0g41jsp8TWugwT8ly5j5XXMtvvnEv4ystQIDAQABAoIBABI5ePNgwQhwoIAv
-                            GuJHuHqPL5Q9lFShYsJzJ48BrKkKWM+4U4beCYnqbO9IcsiK98Lz6wYzeIc6ZJqD
-                            Y5HA4XuXOShSULZzsuueS36Mp9uaebw6MSapNijEvoFO9NmgJvWIgY7AA6sWut6w
-                            aIWlCPRyrnJFHuwS2jz0g6s0gcNSifnDHd6E0qW88LByqYejc1NaqBhrilTeECdd
-                            z87TASHqZKEtcw/CZYp/R8FmRot8v1h2NzMfi1xuCEH6qD7ZQgfbNH81FRIsx2c1
-                            AvIwrPvCcJiTN6pJaSxw4qzLMHhM9ctliC4usMpSe+NGmtTcjRJ97ntAzh68a62W
-                            wXB28z0CgYEA5dduZBRbYSSZHmEcSlOujK+YI9/yu10AanrnsfNB7scqRk8ZRo46
-                            BuP3kaiFEYOabozkL9ZTycNZSPmmjgEdXsW8mhr6j9gSEi5lyfIx0uu8XDTtcDHE
-                            eYBfwaGKuBPPV0SA1NFTPOP7K5h8ckBx0hUaXONUzioLnG69CEyi+5MCgYEA5Xuh
-                            UzblyPTjtBuzZggnp3P42gZFIupGsq6ADFIEkmr2x2w3QsHOy1OKuzXnno+Op++L
-                            qVIA0KxvOUjlTjLh/zyMF1odbGeRIA9eCQfkgClO5cCqUVVA5vMCknUwjQMElOiR
-                            YcDM8s1LguKLEJDd/Sv9LHtPGqkoT6VcLWcEM5cCgYBze9AypuvXHo107zRIwE0m
-                            0R+vftm2fJ814TVDe0d4k0fRdfLsOZA8YBTHchYSW76fp1kMFDObX/UfrpiaJ0M7
-                            mD0QbVfSKK3Dxt5MHs4b/WhyKAHZapgeuHrkjqdloEaAwaG9zMN3B9Hu8LouqeTG
-                            uuW5IFw/Dm8xFY8TeXY20wKBgBYJEgugiN4MDdVcl5RjkhM1Qp8E3RymLFW6Bdep
-                            BIFevgWWMZQ6cfX6NqcVXQFPvZ4IlXuTwTpIZIG2qzYgEq1kjfssDwk6xKe0cg4h
-                            8OIRlV7gajpXGl1S1ltj316a/JSj5FnjnopuBiMyR7I2huppj+z2hjkEJzfGpBxD
-                            +RZPAoGAez+pkRE8t9ZerUIBLKY7L9e3cH73B59RlZV2f5Cx35LpZ/efJhL7Fof7
-                            qWuuaEhHp58gMuDtNHOs2KXovvo0/x9h7HeOB+FOVobxiM1tyUUz8zT4wFUwjGWo
-                            GDdxirN2OBJSsFwVuw6udFfLe5nHViQ0KdfrvPIN+hw9QKirTsM=`
+
+            session = await client.createSession({
+                type: UserTokenType.Anonymous
             });
-            }
-            else {
-                session = await client.createSession({
-                    type: UserTokenType.Anonymous
-                });
-            }
+
+/*            session = await client.createSession({
+                type: UserTokenType.UserName,
+                userName: "admin",
+                password: "admin"
+            });*/
+
 
         } catch (err) {
+            console.log(err);
             Logger(err.stack, OPCUAclient.name, LogLevel.SERVERE);
             res.sendStatus(404);
             return;

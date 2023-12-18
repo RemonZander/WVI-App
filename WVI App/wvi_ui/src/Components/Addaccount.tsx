@@ -65,7 +65,7 @@ function Addaccount() {
 
 
     return (
-        <div className="flex flex-col gap-y-[20px] absolute translate-y-[-50%] translate-x-[-50%] top-[40%] left-[50%]">
+        <div className="flex flex-col gap-y-[20px] mt-[100px]">
             <div>
                 <div><span className="text-red-700">{errorText}</span></div>
                 <span className="text-lg">Account gegevens: </span>

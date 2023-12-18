@@ -3,8 +3,9 @@ import './tailwind.css'
 import './index.css'
 import Home from './Components/home';
 
-const root = ReactDOM.createRoot(
-  document.getElementById('root') as HTMLElement
-);
+const rootElement = document.getElementById('root') as HTMLElement;
+//rootElement.classList.add('h-[100%]');
+
+const root = ReactDOM.createRoot(rootElement);
 
 root.render(<Home />);

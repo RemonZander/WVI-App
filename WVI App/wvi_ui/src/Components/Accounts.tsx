@@ -42,7 +42,7 @@ function Accounts() {
     }, []);
 
     return (
-        <div className="h-[50vh] overflow-y-scroll absolute translate-y-[-50%] translate-x-[-50%] top-[40vh] left-[50%]">
+        <div className="h-[50vh] overflow-y-scroll mt-[100px]">
             <table className="w-full text-sm text-left text-white mt-[1vh]">
                 <tbody>
                     <td className="p-6 py-4 text-white">

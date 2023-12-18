@@ -9,7 +9,7 @@ import { IWVIPermissions } from '../interfaces/interfaces';
 function AddRoles() {
 
     const [errorText, SetErrorText] = useState<string>();
-    const [checkboxes, setCheckboxes] = useState<boolean[]>(new Array(17).fill(false));
+    const [checkboxes, setCheckboxes] = useState<boolean[]>(new Array(20).fill(false));
     const [name, setName] = useState<string>();
     const [roles, setRoles] = useState<string[]>([]);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -72,6 +72,15 @@ function AddRoles() {
                     break;
                 case 16:
                     permissions += "wvi.all.list;"
+                    break;
+                case 17:
+                    permissions += "onderhoudsaannemers.add;"
+                    break;
+                case 18:
+                    permissions += "onderhoudsaannemers.update;"
+                    break;
+                case 19:
+                    permissions += "onderhoudsaannemers.remove;"
                     break;
                 default:
             }
@@ -162,6 +171,15 @@ function AddRoles() {
                     case "wvi.all.list":
                         checkoxesTemp[16] = true;
                         break;
+                    case "onderhoudsaannemers.add":
+                        checkoxesTemp[17] = true;
+                        break;
+                    case "onderhoudsaannemers.update":
+                        checkoxesTemp[18] = true;
+                        break;
+                    case "onderhoudsaannemers.remove":
+                        checkoxesTemp[19] = true;
+                        break;
                     default:
                 }
             }
@@ -216,7 +234,7 @@ function AddRoles() {
 
 
     return (
-        <div className="flex flex-col gap-y-[20px] absolute translate-x-[-50%] left-[50%] mt-[40px]">
+        <div className="flex flex-col gap-y-[20px]">
             <div>
                 <div><span className="text-red-700">{errorText}</span></div>
                 <span className="text-lg">Role toevoegen: </span>
@@ -354,9 +372,6 @@ function AddRoles() {
                                 setCheckboxes([...checkboxesTemp]);
                             }} />
                         </div>
-                       
-                    </div>
-                    <div className="flex flex-col gap-y-[20px]">
                         <div className="flex justify-between">
                             <div className="flex">
                                 <img title="Dit is nodig om een account te kunnen verwijderen. Dit is een optie voor een beheerders rol" className="w-[20px] h-[20px] self-center" src={moreInfo} alt="" />
@@ -368,6 +383,8 @@ function AddRoles() {
                                 setCheckboxes([...checkboxesTemp]);
                             }} />
                         </div>
+                    </div>
+                    <div className="flex flex-col gap-y-[20px]">
                         <div className="flex justify-between">
                             <div className="flex">
                                 <img title="Dit is nodig om alle rollen te kunnen zien en uitlezen. Dit is een optie voor een beheerders rol" className="w-[20px] h-[20px] self-center" src={moreInfo} alt="" />
@@ -420,6 +437,39 @@ function AddRoles() {
                             <input className="ml-[10px]" type="checkbox" checked={checkboxes[15]} onChange={async (e) => {
                                 let checkboxesTemp = checkboxes;
                                 checkboxesTemp[15] = !checkboxes[15];
+                                setCheckboxes([...checkboxesTemp]);
+                            }} />
+                        </div>
+                        <div className="flex justify-between">
+                            <div className="flex">
+                                <img title="Dit is nodig om een nieuwe aannemer te kunnen toevoegen. Dit is een optie voor een beheerders rol" className="w-[20px] h-[20px] self-center" src={moreInfo} alt="" />
+                                <span className="ml-[10px]">Aannemers toevoegen: </span>
+                            </div>
+                            <input className="ml-[10px]" type="checkbox" checked={checkboxes[17]} onChange={async (e) => {
+                                let checkboxesTemp = checkboxes;
+                                checkboxesTemp[17] = !checkboxes[17];
+                                setCheckboxes([...checkboxesTemp]);
+                            }} />
+                        </div>
+                        <div className="flex justify-between">
+                            <div className="flex">
+                                <img title="Dit is nodig om een aannemer te kunnen bewerken. Dit is een optie voor een beheerders rol" className="w-[20px] h-[20px] self-center" src={moreInfo} alt="" />
+                                <span className="ml-[10px]">Aannemers bewerken: </span>
+                            </div>
+                            <input className="ml-[10px]" type="checkbox" checked={checkboxes[18]} onChange={async (e) => {
+                                let checkboxesTemp = checkboxes;
+                                checkboxesTemp[18] = !checkboxes[18];
+                                setCheckboxes([...checkboxesTemp]);
+                            }} />
+                        </div>
+                        <div className="flex justify-between">
+                            <div className="flex">
+                                <img title="Dit is nodig om een aannemer te kunnen verwijderen. Dit is een optie voor een beheerders rol" className="w-[20px] h-[20px] self-center" src={moreInfo} alt="" />
+                                <span className="ml-[10px]">Aannemers verwijderen: </span>
+                            </div>
+                            <input className="ml-[10px]" type="checkbox" checked={checkboxes[19]} onChange={async (e) => {
+                                let checkboxesTemp = checkboxes;
+                                checkboxesTemp[19] = !checkboxes[19];
                                 setCheckboxes([...checkboxesTemp]);
                             }} />
                         </div>
@@ -515,6 +565,9 @@ function AddRoles() {
                             checkboxesTemp[14] = true;
                             checkboxesTemp[15] = true;
                             checkboxesTemp[16] = true;
+                            checkboxesTemp[17] = true;
+                            checkboxesTemp[18] = true;
+                            checkboxesTemp[19] = true;
                             setCheckboxes([...checkboxesTemp]);
                         }}>beheerder template toepassen</button>
                     </div>

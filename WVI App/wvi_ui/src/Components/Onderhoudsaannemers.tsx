@@ -1,9 +1,30 @@
 import React, { useEffect, useState } from 'react';
 import '../tailwind.css';
 import routes from '../Services/routes';
+import { AutoComplete } from 'primereact/autocomplete';
 
 function Onderhoudsaannemers() {
     const [onderhoudsaannemers, setOnderhoudsaannemers] = useState([{ Contractgebiednummer: 0, Onderhoudsaannemer: "" }]);
+    const [aannemers, setAannemers] = useState<string[]>();
+    const [showOnderhoudsaannemers, setShowOnderhoudsaannemers] = useState<boolean[]>([]);
+    const [filteredAannemers, setFilteredAannemers] = useState(null);
+    const [showScreen, setShowScreen] = useState<boolean>(false);
+
+    const search = (event) => {
+        setTimeout(() => {
+            let _testitems;
+            if (!event.query.trim().length) {
+                _testitems = [...aannemers];
+            }
+            else {
+                _testitems = aannemers.filter((aannemer) => {
+                    return aannemer.toLowerCase().startsWith(event.query.toLowerCase());
+                });
+            }
+
+            setFilteredAannemers(_testitems);
+        }, 250);
+    }
 
     useEffect(() => {
         routes.ValidateToken().then((status) => {
@@ -13,13 +34,21 @@ function Onderhoudsaannemers() {
             }
         });
 
+        routes.ListOnderhoudsaannemersUnique().then((data) => {
+            setAannemers(data.map((a: { Onderhoudsaannemer: string; }) => a.Onderhoudsaannemer));
+            setShowOnderhoudsaannemers([...new Array(data.length).fill(false)]);
+        });
+
         routes.ListOnderhoudsaannemers().then((data) => {
             setOnderhoudsaannemers(data);
         });
+
+        setShowScreen(true);
     }, []);
 
     return (
-        <div className="absolute translate-y-[-50%] translate-x-[-50%] top-[40vh] left-[50%]">
+        <>
+            {showScreen ? <div className="mt-[100px]">
             <div className="h-[50vh] overflow-y-scroll">
                 <table>
                     <tbody>
@@ -37,16 +66,33 @@ function Onderhoudsaannemers() {
                                 {aannemer.Contractgebiednummer}
                             </th>
                             <td className="px-6 py-4">
-                                {aannemer.Onderhoudsaannemer}
+                                {showOnderhoudsaannemers[index] ?
+                                    <AutoComplete className="text-black max-w-[182px]" virtualScrollerOptions={{ itemSize: 35 }} value={aannemer.Onderhoudsaannemer} suggestions={filteredAannemers} completeMethod={search} onChange={e => {
+                                        let tempdata = onderhoudsaannemers;
+                                        tempdata[index].Onderhoudsaannemer = e.target.value;
+                                        setOnderhoudsaannemers([...tempdata]);
+                                    }} dropdown />
+                                    : aannemer.Onderhoudsaannemer}
                             </td>
                             <td className="px-6 py-4 flex flex-col gap-y-[5px]">
                                 <button className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out" onClick={async () => {
-
+                                    routes.RemoveContractgebied(aannemer.Contractgebiednummer).then((status) => {
+                                        if (status === 500) {
+                                            alert("Er zijn nog WVI's geregistreerd met dit contractgebiednummer. Verwijder deze eerst.");
+                                            return;
+                                        }
+                                        window.location.reload();
+                                    });
                                 }}>
                                     Verwijderen
                                 </button>
                                 <button className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out" onClick={async () => {
-                                
+                                    if (showOnderhoudsaannemers[index]) {
+                                        routes.UpdateContractgebied(aannemer.Onderhoudsaannemer, aannemer.Contractgebiednummer);
+                                    }
+                                    let tempData = showOnderhoudsaannemers;
+                                    tempData[index] = !tempData[index];
+                                    setShowOnderhoudsaannemers([...tempData]);
                                 }}>
                                     Bewerken
                                 </button>
@@ -60,7 +106,8 @@ function Onderhoudsaannemers() {
                     entry toevoegen
                 </button>
             </div>
-        </div>
+        </div> : ""}
+        </>
     );
 }
 

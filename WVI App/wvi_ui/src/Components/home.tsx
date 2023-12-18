@@ -103,7 +103,14 @@ function Home() {
                 else setCanViewOnderhoudsaannemers(false);
             });
 
+            let timer = setInterval(async () => {
+                routes.ValidateToken().then((status) => {
+                    if (status === 401 && window.location.pathname !== "/") window.location.replace('/');
+                });
+            }, 120000);
+
             setHasLoaded(true);
+            return () => clearInterval(timer);
         }));
 
         switch (window.location.pathname) {
@@ -186,8 +193,8 @@ function Home() {
 
     return (       
         <PrimeReactProvider>
-            {hasLoaded ? <div className="bg-[#2F2F31] w-screen h-screen flex flex-col text-gray-300">
-                <div className="bg-[#2C2C39] w-screen h-[120px] flex justify-between rounded-b-[0.5vw]">
+            {hasLoaded ? <div className="bg-[#2F2F31] w-full h-screen flex flex-col text-gray-300">
+                <div className="bg-[#2C2C39] w-full h-[120px] flex justify-between rounded-b-[0.5vw]">
                     <img className="ml-[1vw]" src={logo} alt="" width="120" height="120" />
                     {!WVIview && !AddWVIview && !AccountView && !Addaccountview && !roleView && !addRoleView ? '' :
                         <>
@@ -288,7 +295,7 @@ function Home() {
                         }}>Onderhoudsaannemers beheren</button>
                     </div>
                 </div>
-                <div className="bg-[#2C2C39] w-screen flex flex-grow relative">
+                <div className="bg-[#2C2C39] w-full flex grow justify-center items-start pt-[40px]">
                     <RouterProvider router={router} />
                 </div>
             </div> : ""}

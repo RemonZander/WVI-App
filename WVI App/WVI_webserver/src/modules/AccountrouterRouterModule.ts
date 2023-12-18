@@ -4,259 +4,172 @@ import { TokenService } from '../services/TokenService';
 import { UserService } from '../services/UserService';
 import bcrypt from "bcrypt";
 import { createEnforcer } from '../services/CasbinService';
-import { userInfo } from 'os';
+import AuthenticationDecorator from '../decorators/authenticationDecorator';
 
-const Accountrouter: Router = express.Router();
-
-Accountrouter.get('/email', async (req: Request, res: Response) => {
-    try {
-        res.send(JSON.stringify(TokenService.GetEmail(req.cookies["login"])[0].Email));
-    } catch (e) {
-        res.sendStatus(500);
-    }   
-});
-
-Accountrouter.get('/accounts', async (req: Request, res: Response) => {
-    const email = TokenService.GetEmail(req.cookies["login"])[0];
-    const enforcer = await createEnforcer();
-    if (!email)
-    {
-        res.sendStatus(500);
-        return;
-    }
-    else if (!await enforcer.enforce(email.Email, "*") && !await enforcer.enforce(email.Email, "account.list")) {
-        res.sendStatus(401);
-        return;
-    }
-    res.json(UserService.GetAll());
-});
-
-Accountrouter.delete('/removeAccount', async (req: Request, res: Response) => {
-    const email = TokenService.GetEmail(req.cookies["login"])[0];
-    const enforcer = await createEnforcer();
-    if (email == null)
-    {
-        res.sendStatus(500);
-        return;
-    }
-    else if (!await enforcer.enforce(email.Email, "*") && !await enforcer.enforce(email.Email, "account.remove")) {
-        res.sendStatus(401);
-        return;
+class AccountRouter {
+    router: Router;
+    constructor() {
+        this.router = express.Router();
+        this.initializeRoutes();
     }
 
-    const result = UserService.RemoveOne(req.body.email);
-    if (!result) {
-        res.sendStatus(500);
-        return;
-    }
-    res.sendStatus(200);
-});
-
-Accountrouter.post('/removeOnderhoudsaannemer', async (req: Request, res: Response) => {
-    const email = TokenService.GetEmail(req.cookies["login"])[0];
-    const enforcer = await createEnforcer();
-    if (email == null)
-    {
-        res.sendStatus(500);
-        return;
-    }
-    else if (!await enforcer.enforce(email.Email, "*") && !await enforcer.enforce(email.Email, "account.update")) {
-        res.sendStatus(401);
-        return;
+    initializeRoutes() {
+        this.router.get('/email', this.GetEmail);
+        this.router.get('/accounts', this.GetAccounts);
+        this.router.delete('/removeAccount', this.RemoveAccount);
+        this.router.post('/removeOnderhoudsaannemer', this.RemoveOnderhoudsaannemer);
+        this.router.get('/listRoles', this.ListRoles);
+        this.router.get('/getRolesAndPermissions', this.GetRolesAndPermissions);
+        this.router.post('/UpdateRoleInAccount', this.UpdateRoleInAccount);
+        this.router.delete('/removeRole', this.RemoveRole);
+        this.router.put('/addRole', this.AddRole);
+        this.router.put('/updateRole', this.UpdateRole);
+        this.router.get('/listOnderhoudsaannemersunique', this.ListOnderhoudsaannemersUnique);
+        this.router.get('/listOnderhoudsaannemers', this.ListOnderhoudsaannemers);
+        this.router.post('getaannemer', this.GetAannemer);
+        this.router.put('/addaccount', this.AddAccount);
+        this.router.delete('/removecontractgebied', this.RemoveContractgebied);
+        this.router.put('/updatecontractgebied', this.UpdateContractgebied);
     }
 
-    const result = UserService.UpdateOnderhoudsaannemer(req.body.onderhoudsaannemer, req.body.email);
-    if (!result) {
-        res.sendStatus(500);
-        return;
-    }
-    res.sendStatus(200);
-});
-
-Accountrouter.get('/listRoles', async (req: Request, res: Response) => {
-    const email = TokenService.GetEmail(req.cookies["login"])[0];
-    const enforcer = await createEnforcer();
-    if (email == null)
-    {
-        res.sendStatus(500);
-        return;
-    }
-    else if (!await enforcer.enforce(email.Email, "*") && !await enforcer.enforce(email.Email, "roles.list")) {
-        res.sendStatus(401);
-        return;
+    getRouter() {
+        return this.router;
     }
 
-    res.setHeader('Content-Type', 'application/json');
-    res.json(UserService.ListRoles());
-});
-
-Accountrouter.get('/getRolesAndPermissions', async (req: Request, res: Response) => {
-    const email = TokenService.GetEmail(req.cookies["login"])[0];
-    const enforcer = await createEnforcer();
-    if (email == null) {
-        res.sendStatus(500);
-        return;
-    }
-    else if (!await enforcer.enforce(email.Email, "*") && !await enforcer.enforce(email.Email, "roles.list")) {
-        res.sendStatus(401);
-        return;
+    async GetEmail(req: Request, res: Response) {
+        try {
+            res.send(JSON.stringify(TokenService.GetEmail(req.cookies["login"])[0].Email));
+        } catch (e) {
+            res.sendStatus(500);
+        }   
     }
 
-    res.setHeader('Content-Type', 'application/json');
-    res.json(UserService.GetRolesAndPermissions());
-});
-
-Accountrouter.post('/UpdateRoleInAccount', async (req: Request, res: Response) => {
-    const email = TokenService.GetEmail(req.cookies["login"])[0];
-    const enforcer = await createEnforcer();
-    if (email == null)
-    {
-        res.sendStatus(500);
-        return;
-    }
-    else if (!await enforcer.enforce(email.Email, "*") && !await enforcer.enforce(email.Email, "account.update")) {
-        res.sendStatus(401);
-        return;
+    @AuthenticationDecorator("account.list")
+    async GetAccounts(req: Request, res: Response) {
+        res.json(UserService.GetAll());
     }
 
-    const result = UserService.UpdateRoleInAccount(req.body.role, req.body.email);
-    if (!result) {
-        res.sendStatus(500);
-        return;
-    }
-    res.sendStatus(200);
-});
-
-Accountrouter.delete('/removeRole', async (req: Request, res: Response) => {
-    const email = TokenService.GetEmail(req.cookies["login"])[0];
-    const enforcer = await createEnforcer();
-    if (email == null) {
-        res.sendStatus(500);
-        return;
-    }
-    else if (!await enforcer.enforce(email.Email, "*") && !await enforcer.enforce(email.Email, "roles.remove")) {
-        res.sendStatus(401);
-        return;
+    @AuthenticationDecorator("account.remove")
+    async RemoveAccount(req: Request, res: Response) {
+        const result = UserService.RemoveOne(req.body.email);
+        if (!result) {
+            res.sendStatus(500);
+            return;
+        }
+        res.sendStatus(200);
     }
 
-    const result = UserService.RemoveRole(req.body.role);
-    if (!result) {
-        res.sendStatus(403);
-        return;
-    }
-    res.sendStatus(200);
-});
-
-Accountrouter.put('/addRole', async (req: Request, res: Response) => {
-    const email = TokenService.GetEmail(req.cookies["login"])[0];
-    const enforcer = await createEnforcer();
-    if (email == null) {
-        res.sendStatus(500);
-        return;
-    }
-    else if (!await enforcer.enforce(email.Email, "*") && !await enforcer.enforce(email.Email, "roles.add")) {
-        res.sendStatus(401);
-        return;
+    @AuthenticationDecorator("account.update")
+    async RemoveOnderhoudsaannemer(req: Request, res: Response) {
+        const result = UserService.UpdateOnderhoudsaannemer(req.body.onderhoudsaannemer, req.body.email);
+        if (!result) {
+            res.sendStatus(500);
+            return;
+        }
+        res.sendStatus(200);
     }
 
-
-    const result = UserService.AddRole(req.body.role, req.body.permissions);
-    if (!result) {
-        res.sendStatus(500);
-        return;
-    }
-    res.sendStatus(200);
-});
-
-Accountrouter.put('/updateRole', async (req: Request, res: Response) => {
-    const email = TokenService.GetEmail(req.cookies["login"])[0];
-    const enforcer = await createEnforcer();
-    if (email == null) {
-        res.sendStatus(500);
-        return;
-    }
-    else if (!await enforcer.enforce(email.Email, "*") && !await enforcer.enforce(email.Email, "roles.update")) {
-        res.sendStatus(401);
-        return;
+    @AuthenticationDecorator("roles.list")
+    async ListRoles(req: Request, res: Response) {
+        res.setHeader('Content-Type', 'application/json');
+        res.json(UserService.ListRoles());
     }
 
-
-    const result = UserService.UpdateRole(req.body.role, req.body.permissions);
-    if (!result) {
-        res.sendStatus(500);
-        return;
-    }
-    res.sendStatus(200);
-});
-
-Accountrouter.get('/listOnderhoudsaannemersunique', async (req: Request, res: Response) => {
-    const email = TokenService.GetEmail(req.cookies["login"])[0];
-    const enforcer = await createEnforcer();
-    if (email == null) {
-        res.sendStatus(500);
-        return;
-    }
-    else if (!await enforcer.enforce(email.Email, "*") && !await enforcer.enforce(email.Email, "onderhoudsaannemers.list")) {
-        res.sendStatus(401);
-        return;
+    @AuthenticationDecorator("roles.list")
+    async GetRolesAndPermissions(req: Request, res: Response) {
+        res.setHeader('Content-Type', 'application/json');
+        res.json(UserService.GetRolesAndPermissions());
     }
 
-    res.setHeader('Content-Type', 'application/json');
-    res.json(UserService.ListOnderhoudsaannemersUnique());
-});
-
-Accountrouter.get('/listOnderhoudsaannemers', async (req: Request, res: Response) => {
-    const email = TokenService.GetEmail(req.cookies["login"])[0];
-    const enforcer = await createEnforcer();
-    if (email == null) {
-        res.sendStatus(500);
-        return;
-    }
-    else if (!await enforcer.enforce(email.Email, "*") && !await enforcer.enforce(email.Email, "onderhoudsaannemers.list")) {
-        res.sendStatus(401);
-        return;
+    @AuthenticationDecorator("account.update")
+    async UpdateRoleInAccount(req: Request, res: Response) {
+        const result = UserService.UpdateRoleInAccount(req.body.role, req.body.email);
+        if (!result) {
+            res.sendStatus(500);
+            return;
+        }
+        res.sendStatus(200);
     }
 
-    res.setHeader('Content-Type', 'application/json');
-    res.json(UserService.ListOnderhoudsaannemers());
-});
-
-Accountrouter.post('/getaannemer', async (req: Request, res: Response) => {
-    const email = TokenService.GetEmail(req.cookies["login"])[0];
-    const enforcer = await createEnforcer();
-    if (email == null) {
-        res.sendStatus(500);
-        return;
-    }
-    else if (!await enforcer.enforce(email.Email, "*") && !await enforcer.enforce(email.Email, "account.list")) {
-        res.sendStatus(401);
-        return;
+    @AuthenticationDecorator("roles.remove")
+    async RemoveRole(req: Request, res: Response) {
+        const result = UserService.RemoveRole(req.body.role);
+        if (!result) {
+            res.sendStatus(403);
+            return;
+        }
+        res.sendStatus(200);
     }
 
-    res.setHeader('Content-Type', 'application/json');
-    res.json(UserService.GetAannemerOnContractgebiednummer(req.body.contractgebiednummer));
-});
-
-Accountrouter.put('/addaccount', async (req: Request, res: Response) => {
-    const email = TokenService.GetEmail(req.cookies["login"])[0];
-    const enforcer = await createEnforcer();
-    if (email == null) {
-        res.sendStatus(500);
-        return;
-    }
-    else if (!await enforcer.enforce(email.Email, "*") && !await enforcer.enforce(email.Email, "account.add")) {
-        res.sendStatus(401);
-        return;
+    @AuthenticationDecorator("roles.add")
+    async AddRole(req: Request, res: Response) {
+        const result = UserService.AddRole(req.body.role, req.body.permissions);
+        if (!result) {
+            res.sendStatus(500);
+            return;
+        }
+        res.sendStatus(200);
     }
 
-    let data = req.body.data;
-    data[1] = bcrypt.hashSync(data[1], 10);
-    const result = UserService.AddAccount(req.body.data);
-    if (!result) {
-        res.sendStatus(500);
-        return;
+    @AuthenticationDecorator("roles.update")
+    async UpdateRole(req: Request, res: Response) {
+        const result = UserService.UpdateRole(req.body.role, req.body.permissions);
+        if (!result) {
+            res.sendStatus(500);
+            return;
+        }
+        res.sendStatus(200);
     }
-    res.sendStatus(200);
-});
 
-export default Accountrouter;
+    @AuthenticationDecorator("onderhoudsaannemers.list")
+    async ListOnderhoudsaannemersUnique(req: Request, res: Response) {
+        res.setHeader('Content-Type', 'application/json');
+        res.json(UserService.ListOnderhoudsaannemersUnique());
+    }
+
+    @AuthenticationDecorator("onderhoudsaannemers.list")
+    async ListOnderhoudsaannemers(req: Request, res: Response) {
+        res.setHeader('Content-Type', 'application/json');
+        res.json(UserService.ListOnderhoudsaannemers());
+    }
+
+    @AuthenticationDecorator("account.list")
+    async GetAannemer(req: Request, res: Response) {
+        res.setHeader('Content-Type', 'application/json');
+        res.json(UserService.GetAannemerOnContractgebiednummer(req.body.contractgebiednummer));
+    }
+
+    @AuthenticationDecorator("accound.add")
+    async AddAccount(req: Request, res: Response) {
+        let data = req.body.data;
+        data[1] = bcrypt.hashSync(data[1], 10);
+        const result = UserService.AddAccount(req.body.data);
+        if (!result) {
+            res.sendStatus(500);
+            return;
+        }
+        res.sendStatus(200);
+    }
+
+    @AuthenticationDecorator("onderhoudsaannemers.remove")
+    async RemoveContractgebied(req: Request, res: Response) {
+        const result = UserService.RemoveContractgebied(req.body.contractgebiednummer);
+        if (!result) {
+            res.sendStatus(500);
+            return;
+        }
+        res.sendStatus(200);
+    }
+
+    @AuthenticationDecorator("onderhoudsaannemers.update")
+    async UpdateContractgebied(req: Request, res: Response) {
+        const result = UserService.UpdateContractgebied(req.body.onderhoudsaannemer, req.body.contractgebiednummer);
+        if (!result) {
+            res.sendStatus(500);
+            return;
+        }
+        res.sendStatus(200);
+    }
+}
+
+export default new AccountRouter().getRouter();

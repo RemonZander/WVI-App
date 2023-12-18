@@ -129,7 +129,7 @@ function Dashboard() {
 
 
 return (
-    <div className="bg-[#2C2C39] w-screen flex flex-grow">
+    <div className="bg-[#2C2C39] w-screen flex flex-grow min-h-full">
         <div className="ml-[8vw] mt-[5vh] flex-col items-center gap-y-1 max-h-[60vh] w-[340px] overflow-y-scroll">
             <span className="text-white text-[2rem]">WVI's</span>
             {showWVIs ? WVIs.map((WVI, index) => <div className="flex flex-col relative bg-[#262739] mb-[1vh] h-[85px]">

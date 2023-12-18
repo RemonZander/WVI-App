@@ -76,6 +76,14 @@ export class UserService {
     public static AddAannemer(contractgebeidnummer: number, aannemer: string): string | boolean {
         return Run(`INSERT INTO "Aannemers" ("Contractgebiednummer", Onderhoudsaannemer) VALUES(?, ?)`, [contractgebeidnummer, aannemer]);
     }
+
+    public static RemoveContractgebied(contractgebeidnummer: number) {
+        return Run(`DELETE FROM "Aannemers" WHERE Contractgebiednummer = ?`, [contractgebeidnummer]);
+    }
+
+    public static UpdateContractgebied(onderhoudsaannemer: string, contractgebeidnummer: number) {
+        return Run(`UPDATE "Aannemers" Set Onderhoudsaannemer = ? WHERE Contractgebiednummer = ?`, [onderhoudsaannemer, contractgebeidnummer]);
+    }
 }
 
 module.exports = {

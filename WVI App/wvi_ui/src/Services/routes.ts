@@ -255,6 +255,40 @@ export default class routes {
         }
     }
 
+    static async RemoveContractgebied(contractgebiednummer: number) {
+        try {
+            return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/removecontractgebied`, {
+                method: "DELETE",
+                credentials: 'include',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ contractgebiednummer: contractgebiednummer })
+            }).then((res) => {
+                return res.status;
+            });
+        } catch (e) {
+
+        }
+    }
+
+    static async UpdateContractgebied(onderhoudsaannemer: string, contractgebiednummer: number) {
+        try {
+            return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/updatecontractgebied`, {
+                method: "PUT",
+                credentials: 'include',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ onderhoudsaannemer: onderhoudsaannemer, contractgebiednummer: contractgebiednummer })
+            }).then((res) => {
+                return res.status;
+            });
+        } catch (e) {
+
+        }
+    }
+
     static async ListOnderhoudsaannemers() {
         try {
             return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/listOnderhoudsaannemers`, {
