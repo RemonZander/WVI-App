@@ -289,6 +289,23 @@ export default class routes {
         }
     }
 
+    static async AddContractgebied(onderhoudsaannemer: string, contractgebiednummer: number) {
+        try {
+            return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/addcontractgebied`, {
+                method: "PUT",
+                credentials: 'include',
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify({ onderhoudsaannemer: onderhoudsaannemer, contractgebiednummer: contractgebiednummer })
+            }).then((res) => {
+                return res.status;
+            });
+        } catch (e) {
+
+        }
+    }
+
     static async ListOnderhoudsaannemers() {
         try {
             return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/listOnderhoudsaannemers`, {
@@ -382,23 +399,6 @@ export default class routes {
             }).then((res => {
                 return res.status;
             }));
-        } catch (e) {
-
-        }
-    }
-
-    static async GetAannemer(contractgebiednummer: number) {
-        try {
-            return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/getaannemer`, {
-                method: "POST",
-                credentials: 'include',
-                headers: {
-                    "Content-Type": "application/json"
-                },
-                body: JSON.stringify({ contractgebiednummer: contractgebiednummer })
-            }).then((res) => {
-                return res.json();
-            });
         } catch (e) {
 
         }

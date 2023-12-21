@@ -84,6 +84,10 @@ export class UserService {
     public static UpdateContractgebied(onderhoudsaannemer: string, contractgebeidnummer: number) {
         return Run(`UPDATE "Aannemers" Set Onderhoudsaannemer = ? WHERE Contractgebiednummer = ?`, [onderhoudsaannemer, contractgebeidnummer]);
     }
+
+    public static AddContractgebied(onderhoudsaannemer: string, contractgebeidnummer: number) {
+        return Run(`INSERT INTO "Aannemers" ("Contractgebiednummer", Onderhoudsaannemer) VALUES (?,?)`, [contractgebeidnummer, onderhoudsaannemer])
+    }
 }
 
 module.exports = {

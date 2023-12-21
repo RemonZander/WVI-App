@@ -28,23 +28,24 @@ function AddWVI() {
     const [connectionStatus, setConnectionStatus] = useState<number>(-1);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [searchParams, setSearchParams] = useSearchParams();
-    const [aannemers, setAannemers] = useState<string[]>();
-    const [filteredAannemers, setFilteredAannemers] = useState(null);
+    const [filteredContractgebiednummers, setFilteredContractgebiednummers] = useState(null);
     const [oldname, setOldname] = useState<string>();
+    const [onderhoudsaannemers, setOnderhoudsaannemers] = useState([{ Contractgebiednummer: 0, Onderhoudsaannemer: "" }]);
+    const [contractgebiednummers, setContractgebiednummers] = useState<string[]>([]);
 
     const search = (event) => {
         setTimeout(() => {
             let _testitems;
             if (!event.query.trim().length) {
-                _testitems = [...aannemers];
+                _testitems = [...contractgebiednummers];
             }
             else {
-                _testitems = aannemers.filter((aannemer) => {
-                    return aannemer.toLowerCase().startsWith(event.query.toLowerCase());
+                _testitems = contractgebiednummers.filter((contractgebiednummer) => {
+                    return contractgebiednummer.toLowerCase().startsWith(event.query.toLowerCase());
                 });
             }
 
-            setFilteredAannemers(_testitems);
+            setFilteredContractgebiednummers(_testitems);
         }, 250);
     }
 
@@ -53,34 +54,35 @@ function AddWVI() {
             if (status === 401) window.location.replace('/');
         });
 
-        routes.ListOnderhoudsaannemersUnique().then((data) => {
-            setAannemers(data.map((a: { Onderhoudsaannemer: string; }) => a.Onderhoudsaannemer));
+        routes.ListOnderhoudsaannemers().then((aannemerData) => {
+            setOnderhoudsaannemers(aannemerData);
+            setContractgebiednummers(aannemerData.map((a: { Contractgebiednummer: string; }) => a.Contractgebiednummer.toString()));
+        
+            const editWVI = searchParams.get("WVI");
+            if (editWVI != null) {
+                routes.GetWVIs().then((wviData: IWVI[]) => {
+                    const currentWVI = wviData.find(d => d.PMP_enkelvoudige_objectnaam === editWVI);
+                    const tempdata: INewWVI = WVIdata;
+                    tempdata.Contractgebiednummer = currentWVI.Contractgebiednummer;
+                    tempdata.Endpoint = currentWVI.Endpoint;
+                    tempdata.Equipmentnummer = currentWVI.Equipmentnummer;
+                    tempdata.Geocode = currentWVI.Geocode;
+                    tempdata.Objecttype = currentWVI.Objecttype;
+                    tempdata.PMP_enkelvoudige_objectnaam = currentWVI.PMP_enkelvoudige_objectnaam;
+                    tempdata.PPLG = currentWVI.PPLG;
+                    tempdata.Producent = currentWVI.Producent;
+                    tempdata['RD X-coordinaat'] = currentWVI['RD X-coordinaat'];
+                    tempdata['RD Y-coordinaat'] = currentWVI['RD Y-coordinaat'];
+                    tempdata.Datamodel = currentWVI.Datamodel;
+                    setOldname(tempdata.PMP_enkelvoudige_objectnaam);
+
+                    const result = aannemerData[aannemerData.findIndex(o => o.Contractgebiednummer === currentWVI.Contractgebiednummer)];
+                    if (!result) tempdata.Aannemer = "";
+                    else tempdata.Aannemer = result.Onderhoudsaannemer;
+                    setWVIdata({ ...tempdata });            
+                });
+            }
         });
-
-        const editWVI = searchParams.get("WVI");
-        if (editWVI != null) {
-            routes.GetWVIs().then((data: IWVI[]) => {
-                const currentWVI = data.find(d => d.PMP_enkelvoudige_objectnaam === editWVI);
-                const tempdata: INewWVI = WVIdata;
-                tempdata.Contractgebiednummer = currentWVI.Contractgebiednummer;
-                tempdata.Endpoint = currentWVI.Endpoint;
-                tempdata.Equipmentnummer = currentWVI.Equipmentnummer;
-                tempdata.Geocode = currentWVI.Geocode;
-                tempdata.Objecttype = currentWVI.Objecttype;
-                tempdata.PMP_enkelvoudige_objectnaam = currentWVI.PMP_enkelvoudige_objectnaam;
-                tempdata.PPLG = currentWVI.PPLG;
-                tempdata.Producent = currentWVI.Producent;
-                tempdata['RD X-coordinaat'] = currentWVI['RD X-coordinaat'];
-                tempdata['RD Y-coordinaat'] = currentWVI['RD Y-coordinaat'];
-                tempdata.Datamodel = currentWVI.Datamodel;
-                setOldname(tempdata.PMP_enkelvoudige_objectnaam);
-
-                routes.GetAannemer(currentWVI.Contractgebiednummer).then((data) => {
-                    tempdata.Aannemer = data[0].Onderhoudsaannemer;
-                    setWVIdata({ ...tempdata });
-                });               
-            });
-        }
     }, []);
 
     return (
@@ -143,21 +145,26 @@ function AddWVI() {
                         <div className="flex flex-col gap-y-[20px]">
                             <div className="flex justify-between">
                                 <span className="mr-[5px]">* Contractgebiednummer: </span>
-                                {searchParams.get("WVI") == null ? <input className="text-black max-w-[200px]" type="number" min="0" step="1" onChange={e => {
-                                    if (!/[0-9a-zA-Z]/.test(e.target.value) && e.target.value !== "") return;
+                                {searchParams.get("WVI") == null ? <AutoComplete dropdown className="text-black max-w-[150px]" onChange={e => {
+                                    if (e.target.value.toString().includes("-")) {
+                                        let tempdata = WVIdata;
+                                        tempdata.Contractgebiednummer = NaN;
+                                        tempdata.Aannemer = "";
+                                        setWVIdata({ ...tempdata });
+                                        return;
+                                    }
                                     let tempdata = WVIdata;
-                                    WVIdata.Contractgebiednummer = Number.parseInt(e.target.value);
+                                    tempdata.Contractgebiednummer = Number.parseInt(e.target.value);
+                                    const result = onderhoudsaannemers[onderhoudsaannemers.findIndex(o => o.Contractgebiednummer === Number.parseInt(e.target.value))];
+                                    if (!result) tempdata.Aannemer = "";
+                                    else tempdata.Aannemer = result.Onderhoudsaannemer;
                                     setWVIdata({ ...tempdata });
-                                }} value={WVIdata.Contractgebiednummer}></input> :
-                                    <input disabled className="text-black max-w-[200px]" type="number" min="0" step="1" value={WVIdata.Contractgebiednummer}></input>}
+                                }} value={WVIdata.Contractgebiednummer} suggestions={filteredContractgebiednummers} completeMethod={search} virtualScrollerOptions={{ itemSize: 35 }}></AutoComplete> :
+                                    <input disabled className="text-black max-w-[150px]" type="number" min="0" step="1" value={WVIdata.Contractgebiednummer}></input>}
                             </div>
                             <div className="flex justify-between">
                                 <span className="mr-[5px]">* Aannemer: </span>
-                                <AutoComplete className="text-black max-w-[182px]" virtualScrollerOptions={{ itemSize: 35 }} value={WVIdata.Aannemer} suggestions={filteredAannemers} completeMethod={search} onChange={e => {
-                                    let tempdata = WVIdata;
-                                    tempdata.Aannemer = e.target.value;
-                                    setWVIdata({ ...tempdata });
-                                }} dropdown />
+                                <input disabled className="text-black max-w-[150px]" type="text" value={WVIdata.Aannemer}></input>
                             </div>
                             <div className="flex justify-between">
                                 <span className="mr-[5px]">Leverancier: </span>

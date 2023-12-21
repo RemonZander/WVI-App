@@ -26,10 +26,10 @@ class AccountRouter {
         this.router.put('/updateRole', this.UpdateRole);
         this.router.get('/listOnderhoudsaannemersunique', this.ListOnderhoudsaannemersUnique);
         this.router.get('/listOnderhoudsaannemers', this.ListOnderhoudsaannemers);
-        this.router.post('getaannemer', this.GetAannemer);
         this.router.put('/addaccount', this.AddAccount);
         this.router.delete('/removecontractgebied', this.RemoveContractgebied);
         this.router.put('/updatecontractgebied', this.UpdateContractgebied);
+        this.router.put('/addcontractgebied', this.AddContractgebied);
     }
 
     getRouter() {
@@ -133,12 +133,6 @@ class AccountRouter {
         res.json(UserService.ListOnderhoudsaannemers());
     }
 
-    @AuthenticationDecorator("account.list")
-    async GetAannemer(req: Request, res: Response) {
-        res.setHeader('Content-Type', 'application/json');
-        res.json(UserService.GetAannemerOnContractgebiednummer(req.body.contractgebiednummer));
-    }
-
     @AuthenticationDecorator("accound.add")
     async AddAccount(req: Request, res: Response) {
         let data = req.body.data;
@@ -164,6 +158,16 @@ class AccountRouter {
     @AuthenticationDecorator("onderhoudsaannemers.update")
     async UpdateContractgebied(req: Request, res: Response) {
         const result = UserService.UpdateContractgebied(req.body.onderhoudsaannemer, req.body.contractgebiednummer);
+        if (!result) {
+            res.sendStatus(500);
+            return;
+        }
+        res.sendStatus(200);
+    } 
+    
+    @AuthenticationDecorator("onderhoudsaannemers.add")
+    async AddContractgebied(req: Request, res: Response) {
+        const result = UserService.AddContractgebied(req.body.onderhoudsaannemer, req.body.contractgebiednummer);
         if (!result) {
             res.sendStatus(500);
             return;

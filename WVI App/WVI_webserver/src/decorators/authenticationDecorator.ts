@@ -8,7 +8,7 @@ export default function AuthenticationDecorator(permission: string) {
             const email = TokenService.GetEmail(args[0].cookies["login"])[0];
             const enforcer = await createEnforcer();
             if (!email) {
-                args[1].res.sendStatus(500);
+                args[1].sendStatus(500);
                 return null;
             }
             else if (!await enforcer.enforce(email.Email, "*") && !await enforcer.enforce(email.Email, permission)) {
