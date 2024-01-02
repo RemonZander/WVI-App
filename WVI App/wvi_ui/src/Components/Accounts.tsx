@@ -171,7 +171,7 @@ function Accounts() {
                                         }} className="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Verwijder account</a>
                                     </li>
                                     <li>
-                                        <a href="#" onClick={() => {
+                                        <a href="#" onClick={async () => {
                                             let boolarray = changeRole;
                                             for (var a = 0; a < boolarray.length; a++) {
                                                 if (a === index) {

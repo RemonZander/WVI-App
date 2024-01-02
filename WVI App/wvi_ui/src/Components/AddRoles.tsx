@@ -4,7 +4,8 @@ import { useSearchParams } from 'react-router-dom';
 import routes from '../Services/routes';
 import '../tailwind.css';
 import moreInfo from '../media/more_info.png';
-import { IWVIPermissions } from '../interfaces/interfaces';
+import { IWVI, IWVIPermissions } from '../interfaces/interfaces';
+import { AutoComplete } from 'primereact/autocomplete';
 
 function AddRoles() {
 
@@ -15,7 +16,24 @@ function AddRoles() {
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
     const [searchParams, setSearchParams] = useSearchParams();
     const [uniqueWVIs, setUniqueWVIs] = useState<IWVIPermissions[]>(new Array(0));
+    const [WVINames, setWVINames] = useState<string[]>([]);
+    const [filteredWVIs, setFilteredWVIs] = useState(null);
 
+    const searchWVIs = (event) => {
+        setTimeout(() => {
+            let _testitems;
+            if (!event.query.trim().length) {
+                _testitems = [...WVINames];
+            }
+            else {
+                _testitems = WVINames.filter((WVIname) => {
+                    return WVIname.toLowerCase().startsWith(event.query.toLowerCase());
+                });
+            }
+
+            setFilteredWVIs(_testitems);
+        }, 250);
+    }
 
     const MakePermissionString = (): string => {
         let permissions = "";
@@ -112,6 +130,10 @@ function AddRoles() {
             if (status === 401) window.location.replace('/');
         });
 
+        routes.GetWVIs().then((WVIs: IWVI[]) => {
+            setWVINames(WVIs.map((w: { PMP_enkelvoudige_objectnaam: string; }) => w.PMP_enkelvoudige_objectnaam))
+        });
+
         routes.ListRoles().then((data: any[]) => {
             setRoles(data.map((a: { Role: any; }) => a.Role));
             const editRole = searchParams.get("Role");
@@ -184,7 +206,6 @@ function AddRoles() {
                 }
             }
 
-            console.log(permissions);
             permissions = permissions.filter(item => item.includes("unique"));
 
             const grouped: { [key: string]: string[] } = {};
@@ -478,16 +499,16 @@ function AddRoles() {
             </div>
             <div className="border-t-4 border-dashed pt-[10px]">
                 <span className="text-lg ml-[15px]">Andere WVI toegang: </span>
-                <div className="grid grid-cols-4 gap-[10px] p-[10px] w-full border-2 overflow-y-scroll max-h-[260px]">
+                <div className="grid grid-cols-3 gap-[10px] p-[10px] w-full border-2 overflow-y-scroll max-h-[260px]">
                     {uniqueWVIs.map((wviPermissions, index) =>
                         <div className="border-2 h-fit flex flex-col p-[5px]">
                             <div className="flex">
                                 <span>naam: </span>
-                                <input onChange={(e) => {
+                                <AutoComplete onChange={(e) => {
                                     let tempArray = uniqueWVIs;
                                     tempArray[index].name = e.target.value;
                                     setUniqueWVIs([...tempArray]);
-                                }} value={uniqueWVIs[index].name} className="w-[110px] ml-[10px] text-black"></input>
+                                }} value={uniqueWVIs[index].name} dropdown suggestions={filteredWVIs} completeMethod={searchWVIs} virtualScrollerOptions={{ itemSize: 35 }} className="w-[180px] ml-[10px] text-black"></AutoComplete>
                             </div>
                             <div className="flex justify-between">
                                 <span>Toegang: </span>

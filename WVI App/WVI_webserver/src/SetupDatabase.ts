@@ -24,6 +24,7 @@ db.prepare(`CREATE TABLE "WVIs" (
 	"RD X-coordinaat"	NUMERIC,
 	"RD Y-coordinaat"	NUMERIC,
 	"Producent"	TEXT NOT NULL,
+	"Slaves"	TEXT,
 	"Endpoint"	TEXT NOT NULL,
 	FOREIGN KEY("Contractgebiednummer") REFERENCES "Aannemers"("Contractgebiednummer"),
 	PRIMARY KEY("ID" AUTOINCREMENT)

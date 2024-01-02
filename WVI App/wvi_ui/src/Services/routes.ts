@@ -48,7 +48,7 @@ export default class routes {
         }
     }
 
-    static async GetData(nodeId: string, endpoint: string, PMP_enkelvoudige_objectnaam: string) {
+    static async GetData(nodeId: string, endpoint: string, PMP_enkelvoudige_objectnaam: string, slaves: string) {
         try {
             return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/OPCUA/data`, {
                 method: "POST",
@@ -56,7 +56,7 @@ export default class routes {
                 headers: {
                     "Content-Type": "application/json"
                 },
-                body: JSON.stringify({ endpoint: endpoint, nodeId: nodeId, PMP_enkelvoudige_objectnaam: PMP_enkelvoudige_objectnaam })
+                body: JSON.stringify({ endpoint: endpoint, nodeId: nodeId, PMP_enkelvoudige_objectnaam: PMP_enkelvoudige_objectnaam, slaves: slaves })
             }).then((res) => {
                 if (res.status === 404) return "404";
                 return res.json();

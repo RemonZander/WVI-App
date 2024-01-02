@@ -108,6 +108,8 @@ export default class OPCUAclient {
     async GetData(req: Request, res: Response) {
         let client: OPCUAClient;
         let session: ClientSession;
+        let slaves: string[] = [];
+        if (req.body.slaves) slaves = req.body.slaves.split(";");
         res.setHeader('Content-Type', 'application/json');
 
         try {
@@ -128,7 +130,7 @@ export default class OPCUAclient {
             });
 
             let nodes = [];
-            await this.RecursiveBrowse(await session.browse(req.body.nodeId) as BrowseResult, session).then((results) => {
+            await this.RecursiveBrowse(await session.browse(req.body.nodeId) as BrowseResult, session, slaves, req.body.nodeId).then((results) => {
                 for (var a = 0; a < results.length; a++) {
                     if (results[a].NodeId.includes("ns=2") && !results[a].NodeId.includes("/0:Id")) {
                         nodes.push({ DisplayName: results[a].browseName, Nodes: results[a].NodeId, Data: "", dataType: results[a].dataType })
@@ -213,17 +215,18 @@ export default class OPCUAclient {
         return dataValues;
     }
 
-    private async RecursiveBrowse(browseResult: BrowseResult, session: ClientSession) {
+    private async RecursiveBrowse(browseResult: BrowseResult, session: ClientSession, slaves: string[], nodeId: string) {
         let result = [];
 
         for (var a = 0; a < browseResult.references.length; a++) {
-            if (browseResult.references[a].browseName.name === "Alarms") continue;
+            if (browseResult.references[a].browseName.name === "Alarms" ||
+                (slaves.filter(s => browseResult.references[a].browseName.name.includes(s)).length > 0 && !slaves.includes(nodeId))) continue;
             if (browseResult.references[a].nodeClass != 1) {
                 result.push({ browseName: browseResult.references[a].browseName.name, NodeId: browseResult.references[a].nodeId.toString(), dataType: Datamodel[browseResult.references[a].browseName.name] });
             }
             const browseResultNested = await session.browse(browseResult.references[a].nodeId.toString()) as BrowseResult;
 
-            await this.RecursiveBrowse(browseResultNested, session).then((data) => {
+            await this.RecursiveBrowse(browseResultNested, session, slaves, nodeId).then((data) => {
                 result = result.concat(data);
             });
         }

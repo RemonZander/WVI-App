@@ -24,6 +24,7 @@ export interface IWVI {
     "RD Y-coordinaat": number,
     Producent: string,
     Endpoint: string,
+    Slaves: string,
     Datamodel: string
 }
 

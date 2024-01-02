@@ -22,6 +22,7 @@ function AddWVI() {
         "Producent": "",
         "Endpoint": "",
         "Objecttype": "",
+        "Slaves": "",
         Aannemer: ""
     });
     const [errorText, setErrorText] = useState<string>();
@@ -32,6 +33,7 @@ function AddWVI() {
     const [oldname, setOldname] = useState<string>();
     const [onderhoudsaannemers, setOnderhoudsaannemers] = useState([{ Contractgebiednummer: 0, Onderhoudsaannemer: "" }]);
     const [contractgebiednummers, setContractgebiednummers] = useState<string[]>([]);
+    const [filteredDataModels, setFilteredDataModels] = useState(null);
 
     const search = (event) => {
         setTimeout(() => {
@@ -46,6 +48,22 @@ function AddWVI() {
             }
 
             setFilteredContractgebiednummers(_testitems);
+        }, 250);
+    }
+
+    const searchDatamodels = (event) => {
+        setTimeout(() => {
+            let _testitems;
+            if (!event.query.trim().length) {
+                _testitems = [...["1.7", "2.0", "2.1"]];
+            }
+            else {
+                _testitems = ["1.7", "2.0", "2.1"].filter((datamodel) => {
+                    return datamodel.toLowerCase().startsWith(event.query.toLowerCase());
+                });
+            }
+
+            setFilteredDataModels(_testitems);
         }, 250);
     }
 
@@ -74,6 +92,7 @@ function AddWVI() {
                     tempdata['RD X-coordinaat'] = currentWVI['RD X-coordinaat'];
                     tempdata['RD Y-coordinaat'] = currentWVI['RD Y-coordinaat'];
                     tempdata.Datamodel = currentWVI.Datamodel;
+                    tempdata.Slaves = currentWVI.Slaves;
                     setOldname(tempdata.PMP_enkelvoudige_objectnaam);
 
                     const result = aannemerData[aannemerData.findIndex(o => o.Contractgebiednummer === currentWVI.Contractgebiednummer)];
@@ -103,12 +122,20 @@ function AddWVI() {
                             </div>                           
                             <div className="flex justify-between">
                                 <span className="mr-[5px]">* Datamodel versie (1.7, 2.0, 2.1): </span>
-                                <input className="text-black max-w-[200px]" onChange={e => {
+                                <AutoComplete dropdown className="text-black max-w-[200px]" onChange={e => {
                                     let tempdata = WVIdata;
                                     WVIdata.Datamodel = e.target.value;
                                     setWVIdata({ ...tempdata });
-                                }} value={WVIdata.Datamodel}></input>
-                            </div>  
+                                }} value={WVIdata.Datamodel} suggestions={filteredDataModels} completeMethod={searchDatamodels} virtualScrollerOptions={{ itemSize: 35 }}></AutoComplete>
+                            </div> 
+                            {WVIdata.Datamodel === "1.7" ? <div className="flex justify-between">
+                                <span className="mr-[5px]">* Slave WVIs: </span>
+                                <input className="text-black max-w-[200px]" onChange={e => {
+                                    let tempdata = WVIdata;
+                                    WVIdata.Slaves = e.target.value;
+                                    setWVIdata({ ...tempdata });
+                                }} value={WVIdata.Slaves}></input>
+                            </div> : ""}
                             <div className="flex justify-between">
                                 <span className="mr-[5px]">* endpoint: </span>
                                 <input className="text-black max-w-[200px]" onChange={e => {
@@ -163,7 +190,7 @@ function AddWVI() {
                                     <input disabled className="text-black max-w-[150px]" type="number" min="0" step="1" value={WVIdata.Contractgebiednummer}></input>}
                             </div>
                             <div className="flex justify-between">
-                                <span className="mr-[5px]">* Aannemer: </span>
+                                <span className="mr-[5px]">Aannemer: </span>
                                 <input disabled className="text-black max-w-[150px]" type="text" value={WVIdata.Aannemer}></input>
                             </div>
                             <div className="flex justify-between">
@@ -231,14 +258,21 @@ function AddWVI() {
                             <button className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out w-fit">Test datamodel van WVI</button>
                             {searchParams.get("WVI") == null ? <button className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out w-fit" onClick={() => {
                                 setConnectionStatus(-1);
-                                if (WVIdata.PMP_enkelvoudige_objectnaam === "" || WVIdata.Endpoint === "" || WVIdata.Contractgebiednummer == null || WVIdata.Aannemer === "" || WVIdata.Datamodel === "") {
-                                    console.log(WVIdata);
+                                if (WVIdata.PMP_enkelvoudige_objectnaam === "" || WVIdata.Endpoint === "" || WVIdata.Contractgebiednummer == null || (WVIdata.Datamodel === "1.7" && WVIdata.Slaves === "") || WVIdata.Datamodel === "") {
                                     setErrorText("De waarden met een * ervoor zijn verplicht.");
+                                    return;
+                                }
+                                else if (!contractgebiednummers.includes(WVIdata.Contractgebiednummer.toString())) {
+                                    setErrorText("Dit contractgebied is niet bekend. Voeg deze eerst toe als u deze wilt gebruiken.");
+                                    return;
+                                }
+                                else if (!["1.7", "2.0", "2.1"].includes(WVIdata.Datamodel)) {
+                                    setErrorText("Dit datamodel is niet bekend. U kunt kiezen uit: 1.7, 2.0, 2.1");
                                     return;
                                 }
 
                                 routes.AddWVI([WVIdata.PMP_enkelvoudige_objectnaam, WVIdata.PPLG, WVIdata.Objecttype, WVIdata.Geocode, WVIdata.Contractgebiednummer,
-                                WVIdata.Equipmentnummer, WVIdata["RD X-coordinaat"], WVIdata["RD Y-coordinaat"], WVIdata.Producent, WVIdata.Endpoint, WVIdata.Datamodel, WVIdata.Aannemer]).then((status => {
+                                    WVIdata.Equipmentnummer, WVIdata["RD X-coordinaat"], WVIdata["RD Y-coordinaat"], WVIdata.Producent, WVIdata.Endpoint, WVIdata.Datamodel, WVIdata.Slaves, WVIdata.Aannemer]).then((status => {
                                     if (status === 409) {
                                         setErrorText("Dit contractgebied is al toegewezen aan een andere aannemer.");
                                     }
@@ -253,12 +287,11 @@ function AddWVI() {
                             }}>Opslaan</button> : <button className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out w-fit" onClick={() => {
                                     setConnectionStatus(-1);
                                     if (WVIdata.PMP_enkelvoudige_objectnaam === "" || WVIdata.Endpoint === "" || WVIdata.Contractgebiednummer == null || WVIdata.Aannemer === "" || WVIdata.Datamodel === "") {
-                                        console.log(WVIdata);
                                         setErrorText("De waarden met een * ervoor zijn verplicht.");
                                         return;
                                     }
 
-                                    routes.UpdateWVI([WVIdata.PMP_enkelvoudige_objectnaam, WVIdata.PPLG, WVIdata.Objecttype, WVIdata.Geocode, WVIdata.Contractgebiednummer, WVIdata.Equipmentnummer, WVIdata['RD X-coordinaat'], WVIdata['RD Y-coordinaat'], WVIdata.Producent, WVIdata.Endpoint, WVIdata.Datamodel, oldname, WVIdata.Aannemer]).then((status) => {
+                                    routes.UpdateWVI([WVIdata.PMP_enkelvoudige_objectnaam, WVIdata.PPLG, WVIdata.Objecttype, WVIdata.Geocode, WVIdata.Contractgebiednummer, WVIdata.Equipmentnummer, WVIdata['RD X-coordinaat'], WVIdata['RD Y-coordinaat'], WVIdata.Producent, WVIdata.Endpoint, WVIdata.Datamodel,WVIdata.Slaves, oldname, WVIdata.Aannemer]).then((status) => {
                                         if (status === 409) {
                                             setErrorText("Dit contractgebied is al toegewezen aan een andere aannemer.");
                                         }

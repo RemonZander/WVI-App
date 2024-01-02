@@ -26,20 +26,7 @@ class WVIRouter {
 
     @AuthenticationDecorator("wvi.add")
     async AddWVI(req: Request, res: Response) {
-        const aannemerdata: any = UserService.GetAannemerOnContractgebiednummer(req.body.data[4]);
-
-        if (aannemerdata.length === 0) {
-            const result = UserService.AddAannemer(req.body.data[4], req.body.data[11]);
-            if (result === false) {
-                res.sendStatus(500);
-                return;
-            }
-        }
-        else if (aannemerdata[0].Onderhoudsaannemer !== req.body.data[11]) {
-            res.sendStatus(409);
-            return;
-        }
-        const result = WVIService.AddWVI(req.body.data.splice(0, 11));
+        const result = WVIService.AddWVI(req.body.data.splice(0, 12));
         if (result === false) {
             res.sendStatus(500);
             return;
@@ -49,7 +36,7 @@ class WVIRouter {
 
     @AuthenticationDecorator("wvi.update")
     async UpdateWVI(req: Request, res: Response) {
-        const result = WVIService.UpdateWVI(req.body.data.splice(0, 12));
+        const result = WVIService.UpdateWVI(req.body.data.splice(0, 13));
         if (!result) {
             res.sendStatus(500);
         }

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { INewAccount } from '../interfaces/interfaces';
 import routes from '../Services/routes';
 import '../tailwind.css';
+import Onderhoudsaannemers from './Onderhoudsaannemers';
 
 function Addaccount() {
     const [acccountGegevens, setAccountGegevens] = useState<INewAccount>({
@@ -119,6 +120,10 @@ function Addaccount() {
                             }
                             else if (!roles.includes(acccountGegevens.Role)) {
                                 SetErrorText("Deze rol bestaat niet. U moet een bestaande rol uitkiezen of een nieuwe rol aanmaken.");
+                                return;
+                            }
+                            else if (acccountGegevens.Onderhoudsaannemer !== "" && !aannemers.includes(acccountGegevens.Onderhoudsaannemer)) {
+                                SetErrorText("Deze aannemer bestaat niet. Voeg deze eerst toe.");
                                 return;
                             }
                             SetErrorText("");

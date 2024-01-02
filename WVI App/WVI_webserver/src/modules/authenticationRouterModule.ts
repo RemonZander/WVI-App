@@ -19,7 +19,7 @@ class AuthenticationRouter {
         this.router.get('/validatetoken', this.ValidateToken);
         this.router.get('/logout', this.Logout);
         this.router.post('/haspermissions', this.HasPermissions);
-        this.router.get('rebuildenforcerpolicies', this.RebuildEnforcerPolicies);
+        this.router.get('/rebuildenforcerpolicies', this.RebuildEnforcerPolicies);
     }
 
     getRouter() {
