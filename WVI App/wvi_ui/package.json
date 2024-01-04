@@ -33,7 +33,8 @@
     "start:prod": "set PORT=3001 && env-cmd -f ../.env.production react-scripts start",
     "startlinux:local": "PORT=3001 env-cmd -f ../.env.local react-scripts start",
     "startlinux:prod": "PORT=3001 env-cmd -f ../.env.production react-scripts start",
-    "build": "react-scripts build",
+    "build:local": "set PORT=3001 && env-cmd -f ../.env.local react-scripts build",
+    "build:prod": "set PORT=3001 && env-cmd -f ../.env.production react-scripts build",
     "test": "react-scripts test",
     "eject": "react-scripts eject"
   },

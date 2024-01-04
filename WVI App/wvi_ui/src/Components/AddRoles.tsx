@@ -10,7 +10,7 @@ import { AutoComplete } from 'primereact/autocomplete';
 function AddRoles() {
 
     const [errorText, SetErrorText] = useState<string>();
-    const [checkboxes, setCheckboxes] = useState<boolean[]>(new Array(20).fill(false));
+    const [checkboxes, setCheckboxes] = useState<boolean[]>(new Array(21).fill(false));
     const [name, setName] = useState<string>();
     const [roles, setRoles] = useState<string[]>([]);
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -99,6 +99,9 @@ function AddRoles() {
                     break;
                 case 19:
                     permissions += "onderhoudsaannemers.remove;"
+                    break;
+                case 20:
+                    permissions += "wvi.defaultheatingcurve;"
                     break;
                 default:
             }
@@ -202,6 +205,9 @@ function AddRoles() {
                     case "onderhoudsaannemers.remove":
                         checkoxesTemp[19] = true;
                         break;
+                    case "wvi.defaultheatingcurve":
+                        checkoxesTemp[20] = true;
+                        break;
                     default:
                 }
             }
@@ -300,6 +306,17 @@ function AddRoles() {
                             <input className="ml-[10px]" type="checkbox" checked={checkboxes[2]} onChange={async (e) => {
                                 let checkboxesTemp = checkboxes;
                                 checkboxesTemp[2] = !checkboxes[2];
+                                setCheckboxes([...checkboxesTemp]);
+                            }} />
+                        </div>
+                        <div className="flex justify-between">
+                            <div className="flex">
+                                <img title="Dit is nodig als de aannemer de default heating curve moet kunnen aanpassen." className="w-[20px] h-[20px] self-center" src={moreInfo} alt="" />
+                                <span className="ml-[10px]">Default heating curve aanpassen: </span>
+                            </div>
+                            <input className="ml-[10px]" type="checkbox" checked={checkboxes[20]} onChange={async (e) => {
+                                let checkboxesTemp = checkboxes;
+                                checkboxesTemp[20] = !checkboxes[20];
                                 setCheckboxes([...checkboxesTemp]);
                             }} />
                         </div>
@@ -612,7 +629,7 @@ function AddRoles() {
                                 }
                             });
                         }}>Opslaan</button> : 
-                            <button onClick={() => {
+                            <button className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out w-fit" onClick={() => {
                                 const permissions = MakePermissionString();
                                 routes.UpdateRole(name, permissions).then((status) => {
                                     if (status === 200) {

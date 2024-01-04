@@ -211,19 +211,19 @@ function AddWVI() {
                             </div>
                             <div className="flex justify-between">
                                 <span className="mr-[5px]">RD X-coordinaat: </span>
-                                <input className="text-black max-w-[200px]" type="number" onChange={e => {
+                                <input className="text-black max-w-[200px]" onChange={e => {
                                     let tempdata = WVIdata;
-                                    WVIdata["RD X-coordinaat"] = Number.parseInt(e.target.value);
+                                    WVIdata['RD X-coordinaat'] = e.target.value;
                                     setWVIdata({ ...tempdata });
-                                }} value={WVIdata["RD X-coordinaat"]}></input>
+                                }} value={WVIdata['RD X-coordinaat']}></input>
                             </div>
                             <div className="flex justify-between">
                                 <span className="mr-[5px]">RD y-coordinaat: </span>
-                                <input className="text-black max-w-[200px]" type="number" onChange={e => {
+                                <input className="text-black max-w-[200px]" onChange={e => {
                                     let tempdata = WVIdata;
-                                    WVIdata["RD Y-coordinaat"] = Number.parseInt(e.target.value);
+                                    WVIdata['RD Y-coordinaat'] = e.target.value;
                                     setWVIdata({ ...tempdata });
-                                }} value={WVIdata["RD Y-coordinaat"]}></input>
+                                }} value={WVIdata['RD Y-coordinaat']}></input>
                             </div>
                         </div>
                     </div>
@@ -232,7 +232,7 @@ function AddWVI() {
                     <span className="text-lg ml-[15px]">Acties: </span>
                     <div className="flex gap-x-[50px] ml-[15px] mt-[2vh] justify-between">
                         <div className="flex flex-col gap-y-[20px]">
-                            {searchParams.get("WVI") == null ? <button className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out w-fit">Importeer WVI vanuit excel</button> :
+                            {searchParams.get("WVI") == null ? ""/*<button className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out w-fit">Importeer WVI vanuit excel</button>*/ :
                                 <button className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out w-fit" onClick={() => {
                                     routes.DeleteWVI(WVIdata.PMP_enkelvoudige_objectnaam);
                                     window.location.replace('/AddWVI');
@@ -255,7 +255,7 @@ function AddWVI() {
                             </div>
                         </div>
                         <div className="flex flex-col gap-y-[20px]">
-                            <button className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out w-fit">Test datamodel van WVI</button>
+                            {/*<button className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out w-fit">Test datamodel van WVI</button>*/}
                             {searchParams.get("WVI") == null ? <button className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out w-fit" onClick={() => {
                                 setConnectionStatus(-1);
                                 if (WVIdata.PMP_enkelvoudige_objectnaam === "" || WVIdata.Endpoint === "" || WVIdata.Contractgebiednummer == null || (WVIdata.Datamodel === "1.7" && WVIdata.Slaves === "") || WVIdata.Datamodel === "") {
@@ -281,9 +281,9 @@ function AddWVI() {
                                     }
                                     else {
                                         setErrorText("");
+                                        window.location.replace('/AddWVI');
                                     }
                                 }));
-                                window.location.replace('/AddWVI');
                             }}>Opslaan</button> : <button className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out w-fit" onClick={() => {
                                     setConnectionStatus(-1);
                                     if (WVIdata.PMP_enkelvoudige_objectnaam === "" || WVIdata.Endpoint === "" || WVIdata.Contractgebiednummer == null || WVIdata.Aannemer === "" || WVIdata.Datamodel === "") {
@@ -300,9 +300,9 @@ function AddWVI() {
                                         }
                                         else {
                                             setErrorText("");
+                                            window.location.replace('/WVI');
                                         }
                                     });
-                                    window.location.replace('/WVI');
                             }}>Bewerken</button>}
                         </div>
                     </div>

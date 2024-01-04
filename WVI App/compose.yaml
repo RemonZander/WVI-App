@@ -3,7 +3,7 @@ name: remonzander
 services:
   wvifrontend:
     mem_limit: 512m
-    image: remonzander/wvifrontend:0.6
+    image: remonzander/wvifrontend:1.0
     build:
       context: .
       target: wvifrontend
@@ -16,7 +16,7 @@ services:
         ipv4_address: 10.0.10.100
   wvibackend:
     mem_limit: 512m
-    image: remonzander/wvibackend:0.6
+    image: remonzander/wvibackend:1.0
     build:
       context: .
       target: wvibackend

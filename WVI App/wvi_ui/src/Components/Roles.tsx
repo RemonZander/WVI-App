@@ -6,10 +6,15 @@ import '../tailwind.css';
 function Roles() {
     const [roles, setRoles] = useState<IRoles[]>();
     const [show, setShow] = useState<boolean>(false);
+    const [ownRole, setOwnRole] = useState<string>();
 
     useEffect(() => {
         routes.ValidateToken().then((status) => {
             if (status === 401) window.location.replace('/');
+        });
+
+        routes.GetOwnRole().then((role) => {
+            setOwnRole(role);
         });
 
         routes.GetRolesAndPermissions().then((data) => {
@@ -44,7 +49,7 @@ function Roles() {
                                 ))}
                             </td>
                             <td className="px-6 py-4 flex flex-col gap-y-[5px]">
-                                {role.Role !== "beheerder" ? <button className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out" onClick={async () => {
+                                {role.Role !== "beheerder" && role.Role !== ownRole ? <button className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out" onClick={async () => {
                                     routes.RemoveRole(role.Role).then((status) => {
                                         if (status === 403) {
                                             alert('Er zijn nog accounts die deze rol gebruiken. Verwijder eerst deze accounts voordat u deze rol verwijderd');
@@ -56,7 +61,7 @@ function Roles() {
                                 }}>
                                     Verwijderen
                                 </button> : ""}
-                                {role.Role !== "beheerder" ? <button className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out" onClick={async () => {
+                                {role.Role !== "beheerder" && role.Role !== ownRole ? <button className="bg-[#181452] p-[5px] rounded-lg hover:text-[1.1rem] transition-all duration-300 ease-in-out" onClick={async () => {
                                     window.location.replace(`/AddRoles?Role=${role.Role}`);
                                 }}>
                                     Bewerken

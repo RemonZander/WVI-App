@@ -196,7 +196,7 @@ function Home() {
             {hasLoaded ? <div className="bg-[#2F2F31] w-full h-screen flex flex-col text-gray-300">
                 <div className="bg-[#2C2C39] w-full h-[120px] flex justify-between rounded-b-[0.5vw]">
                     <img className="ml-[1vw]" src={logo} alt="" width="120" height="120" />
-                    {!WVIview && !AddWVIview && !AccountView && !Addaccountview && !roleView && !addRoleView ? '' :
+                    {!WVIview && !AddWVIview && !AccountView && !Addaccountview && !roleView && !addRoleView && !onderhoudsaannemersView ? '' :
                         <>
                             <div className="mr-[8vw] text-lg self-center flex gap-x-[50px]">
                                 <span>Ingelogd als: {account}</span>

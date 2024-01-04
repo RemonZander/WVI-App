@@ -27,6 +27,7 @@ function Dashboard() {
     const [showOperateMenu, setShowOperateMenu] = useState<boolean>(false);
     const [canEditWVI, setCanEditWVI] = useState<boolean>(false);
     const [canOperateWVI, setCanOperateWVI] = useState<boolean>(false);
+    const [canOperateDefaultHatingCurve, setCanOperateDefaultHatingCurve] = useState<boolean>(false);
 
     let nodeDataVariable = [];
         
@@ -90,6 +91,13 @@ function Dashboard() {
                 setCanOperateWVI(true);
             }
             else setCanOperateWVI(false);
+        });
+
+        routes.HasPermissions(["wvi.defaultheatingcurve"]).then((status) => {
+            if (status === 200) {
+                setCanOperateDefaultHatingCurve(true);
+            }
+            else setCanOperateDefaultHatingCurve(false);
         });
 
         routes.HasPermissions(["wvi.update"]).then((status) => {
@@ -295,7 +303,7 @@ return (
                     </div>
                     <button onClick={() => { routes.SetHeatingCurve(Number(heatingCurve[0]), Number(heatingCurve[1]), "ns=2;s=" + currentNode.Node, currentNode.endpoint, currentNode.datamodel, currentNode.Node); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status, currentNode.datamodel, currentNode.Node, currentNode.slaves); setShowOperateMenu(!showOperateMenu); } } className="font-medium text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-sm px-5 py-2.5 text-center items-center">toepassen</button>
                 </div>
-                <div className="flex flex-col gap-[20px]">
+                {canOperateDefaultHatingCurve ? <div className="flex flex-col gap-[20px]">
                     <span className="text-[1.1rem]">Default heating curve:</span>
                     <div className="flex justify-between">
                         <span>SetPointHigh: </span>
@@ -305,10 +313,10 @@ return (
                         <span>SetPointLow: </span>
                         <input onChange={e => setDefaultHeatingCurve([defaultHeatingCurve[0], e.target.value])} className="text-black max-w-[50px] ml-[5px]" value={defaultHeatingCurve[1]} type="number" min="0"></input>
                     </div>
-                    <button onClick={() => { routes.SetDefaultHeatingCurve(Number(defaultHeatingCurve[0]), Number(defaultHeatingCurve[1]), "ns=2;s=" + currentNode.Node, currentNode.endpoint, currentNode.datamodel, currentNode.Node); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status, currentNode.datamodel, currentNode.Node, currentNode.slaves); setShowOperateMenu(!showOperateMenu); } } className="font-medium text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-sm px-5 py-2.5 text-center items-center">toepassen</button>
-                </div>
+                    <button onClick={() => { routes.SetDefaultHeatingCurve(Number(defaultHeatingCurve[0]), Number(defaultHeatingCurve[1]), "ns=2;s=" + currentNode.Node, currentNode.endpoint, currentNode.datamodel, currentNode.Node); GetData("ns=2;s=" + currentNode.Node, currentNode.endpoint, status, currentNode.datamodel, currentNode.Node, currentNode.slaves); setShowOperateMenu(!showOperateMenu); }} className="font-medium text-white bg-blue-700 hover:bg-blue-800 rounded-lg text-sm px-5 py-2.5 text-center items-center">toepassen</button>
+                </div> : ""}
             </div>
-        </div></div> : '' }     
+        </div></div> : '' }
     </div>
 );
 }

@@ -484,4 +484,17 @@ export default class routes {
 
         }
     }
+
+    static async GetOwnRole() {
+        try {
+            return await fetch(`http://${process.env.REACT_APP_SERVER}:3000/ownrole`, {
+                method: "GET",
+                credentials: 'include'
+            }).then((res) => {
+                return res.json();
+            });
+        } catch (e) {
+
+        }
+    }
 }

@@ -21,8 +21,8 @@ db.prepare(`CREATE TABLE "WVIs" (
 	"Datamodel"		TEXT NOT NULL,
 	"Equipmentnummer"	INTEGER,
 	"PUIC"	TEXT,
-	"RD X-coordinaat"	NUMERIC,
-	"RD Y-coordinaat"	NUMERIC,
+	"RD X-coordinaat"	TEXT,
+	"RD Y-coordinaat"	TEXT,
 	"Producent"	TEXT NOT NULL,
 	"Slaves"	TEXT,
 	"Endpoint"	TEXT NOT NULL,
@@ -106,3 +106,5 @@ db.prepare(`INSERT INTO "WVIs" ("PMP_enkelvoudige_objectnaam", "PPLG", "Objectty
 VALUES (?,?,?,?,?,?,?,?,?,?,?)`).run(["GK.ZLW.10", "ZLW", "Electrisch 230V", "625", "19", "2.1", "11594845", "104954,929", "411492,092", "Pro-Emium BV", `opc.tcp://${process.env.REACT_APP_GK_ZLW_10}:10007/OPCUA-Player`]);
 db.prepare(`INSERT INTO "WVIs" ("PMP_enkelvoudige_objectnaam", "PPLG", "Objecttype", "Geocode", "Contractgebiednummer", "Datamodel", "Equipmentnummer", "RD X-coordinaat", "RD Y-coordinaat", "Producent", "Endpoint") 
 VALUES (?,?,?,?,?,?,?,?,?,?,?)`).run(["GK.ZLW.11", "ZLW", "Electrisch 230V", "625", "19", "2.1", "11594846", "104563,713", "412461,022", "Pro-Emium BV", `opc.tcp://${process.env.REACT_APP_GK_ZLW_11}:10008/OPCUA-Player`]);
+db.prepare(`INSERT INTO "WVIs" ("PMP_enkelvoudige_objectnaam", "PPLG", "Objecttype", "Geocode", "Contractgebiednummer", "Datamodel", "Equipmentnummer", "RD X-coordinaat", "RD Y-coordinaat", "Producent", "Slaves", "Endpoint") 
+VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`).run(["WVI-00000002", "", "", "", "19", "1.7", "", "", "", "", "GK-TST-02;GK-TST-03", `opc.tcp://${process.env.REACT_APP_WVI_00000002}:10009/OPCUA-Player`]);

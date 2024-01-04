@@ -1,15 +1,15 @@
 {
   "compilerOptions": {
     "module": "commonjs",
-    "target": "es2022",
-    "lib": [ "es2022" ],
+    "target": "ES6",
     "sourceMap": true,
     "rootDir": "./src",
     "moduleResolution": "Node",
     "outDir": "./dist",
     "esModuleInterop": true,
     "experimentalDecorators": true,
-    "emitDecoratorMetadata": true
+    "emitDecoratorMetadata": true,
+    "strict": false
   },
   "exclude": [
     "node_modules"

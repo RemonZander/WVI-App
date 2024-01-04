@@ -25,7 +25,7 @@ app.disable('x-powered-by');
 
 app.use(cors({
     origin: function (origin, callback) {
-        const allowedOrigins = [`http://${process.env.REACT_APP_CLIENT}`];
+        const allowedOrigins = [`http://${process.env.REACT_APP_CLIENT}`, `http://localhost`];
         if (!origin || allowedOrigins.indexOf(origin) !== -1) {
             Logger(`allowed connection from origin: ${origin}`, "CORS", LogLevel.INFO);
             callback(null, true);

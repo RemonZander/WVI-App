@@ -3,7 +3,8 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "tsc --project .",
+    "build:local": "env-cmd -f ../.env.local tsc --build .",
+    "build:prod": "env-cmd -f ../.env.production tsc --build .",
     "start:local": "env-cmd -f ../.env.local nodemon ./src/server.ts",
     "start:prod": "env-cmd -f ../.env.production nodemon ./src/server.ts",
     "initDB:local": "env-cmd -f ../.env.local node ./src/SetupDatabase.ts",

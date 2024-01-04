@@ -3,7 +3,6 @@ import { Router } from 'express-serve-static-core';
 import { TokenService } from '../services/TokenService';
 import { UserService } from '../services/UserService';
 import bcrypt from "bcrypt";
-import { createEnforcer } from '../services/CasbinService';
 import AuthenticationDecorator from '../decorators/authenticationDecorator';
 
 class AccountRouter {
@@ -30,6 +29,7 @@ class AccountRouter {
         this.router.delete('/removecontractgebied', this.RemoveContractgebied);
         this.router.put('/updatecontractgebied', this.UpdateContractgebied);
         this.router.put('/addcontractgebied', this.AddContractgebied);
+        this.router.get('/ownrole', this.GetOwnRole);
     }
 
     getRouter() {
@@ -51,6 +51,11 @@ class AccountRouter {
 
     @AuthenticationDecorator("account.remove")
     async RemoveAccount(req: Request, res: Response) {
+        const email = TokenService.GetEmail(req.cookies["login"])[0].Email;
+        if (req.body.email === email || req.body.email === "beheer@prorail.nl") {
+            res.sendStatus(403);
+            return;
+        }
         const result = UserService.RemoveOne(req.body.email);
         if (!result) {
             res.sendStatus(500);
@@ -61,6 +66,11 @@ class AccountRouter {
 
     @AuthenticationDecorator("account.update")
     async RemoveOnderhoudsaannemer(req: Request, res: Response) {
+        const email = TokenService.GetEmail(req.cookies["login"])[0].Email;
+        if (req.body.email === email || req.body.email === "beheer@prorail.nl") {
+            res.sendStatus(403);
+            return;
+        }
         const result = UserService.UpdateOnderhoudsaannemer(req.body.onderhoudsaannemer, req.body.email);
         if (!result) {
             res.sendStatus(500);
@@ -83,6 +93,11 @@ class AccountRouter {
 
     @AuthenticationDecorator("account.update")
     async UpdateRoleInAccount(req: Request, res: Response) {
+        const email = TokenService.GetEmail(req.cookies["login"])[0].Email;
+        if (req.body.email === email || req.body.email === "beheer@prorail.nl") {
+            res.sendStatus(403);
+            return;
+        }
         const result = UserService.UpdateRoleInAccount(req.body.role, req.body.email);
         if (!result) {
             res.sendStatus(500);
@@ -119,6 +134,11 @@ class AccountRouter {
             return;
         }
         res.sendStatus(200);
+    }
+
+    async GetOwnRole(req: Request, res: Response) {
+        res.setHeader('Content-Type', 'application/json');
+        res.json(UserService.GetOne("Role", "Email", TokenService.GetEmail(req.cookies["login"])[0].Email)[0].Role);
     }
 
     @AuthenticationDecorator("onderhoudsaannemers.list")

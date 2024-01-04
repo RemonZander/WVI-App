@@ -13,10 +13,17 @@ function Accounts() {
     const [showRoles, setShowRoles] = useState(false);
     const [showOnderhoudsaannemers, setShowOnderhoudsaannemers] = useState(false);
     const [onderhoudsaannemers, setOnderhoudsaannemers] = useState<string[]>([]);
+    const [ownEmail, setOwnEmail] = useState<string>();
 
     useEffect(() => {
         routes.ValidateToken().then((status) => {
             if (status === 401) window.location.replace('/');
+        });
+
+        routes.GetEmail().then((res) => {
+            res.json().then((email) => {
+                setOwnEmail(email);
+            });
         });
 
         routes.GetAllAccounts().then((data: IAccount[]) => {
@@ -127,7 +134,7 @@ function Accounts() {
                                 </> : account.Role}
                         </td>
                         <td>
-                            <button id="dropdownDefaultButton" onClick={() => {
+                            {account.Email !== ownEmail && account.Email !== "beheer@prorail.nl" ? <button id="dropdownDefaultButton" onClick={() => {
                                 let boolarray = dropDown;
                                 for (var a = 0; a < boolarray.length; a++) {
                                     if (a === index) {
@@ -152,7 +159,7 @@ function Accounts() {
                                 <svg className="w-2.5 h-2.5 ml-2.5" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 10 6">
                                     <path stroke="currentColor" strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="m1 1 4 4 4-4" />
                                 </svg>
-                            </button>
+                            </button> : ""}
                             {dropDown[index] ? <div className="z-10 bg-white divide-y divide-gray-100 rounded-lg shadow w-44 dark:bg-gray-700">
                                 <ul className="py-2 text-sm text-gray-700 dark:text-gray-200" aria-labelledby="dropdownDefaultButton">
                                     <li>
