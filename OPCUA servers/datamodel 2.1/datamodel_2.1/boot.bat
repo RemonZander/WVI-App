@@ -1,0 +1,2 @@
+java -jar OPCUA-Controllable-Player.jar -configfile "WVI config.csv" -port 10010
+pause

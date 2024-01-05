@@ -1,0 +1,7 @@
+FROM eclipse-temurin:11 as GK.TST.2.1
+EXPOSE 10010
+RUN apt-get update
+RUN apt-get install iputils-ping -y
+RUN mkdir /opt/app
+COPY datamodel_2.1 /opt/app
+CMD java -jar /opt/app/OPCUA-Controllable-Player.jar -configfile "/opt/app/WVI config.csv" -port 10010

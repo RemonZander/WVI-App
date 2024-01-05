@@ -1,0 +1,34 @@
+version: '3.8'
+name: remonzander
+services:
+  wvifrontend:
+    mem_limit: 512m
+    image: remonzander/wvifrontend:1.0
+    build:
+      context: .
+      target: wvifrontend
+    ports:
+      - 3001:3001
+    expose:
+      - 3001
+    networks:
+      default:
+        ipv4_address: 10.0.10.100
+  wvibackend:
+    mem_limit: 512m
+    image: remonzander/wvibackend:1.0
+    build:
+      context: .
+      target: wvibackend
+    ports:
+      - 3000:3000
+    expose:
+      - 3000
+    networks:
+      default:
+        ipv4_address: 10.0.10.101
+      
+networks:
+  default:
+    name: wviNetwork
+    external: true

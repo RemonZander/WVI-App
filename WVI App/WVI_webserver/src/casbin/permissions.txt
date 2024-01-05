@@ -1,0 +1,24 @@
+wvi.own.status					<- get status of own wvis
+wvi.own.info					<- get info of own wvis
+wvi.own.list					<- list own wvis
+wvi.own.operate					<- operate own wvis
+wvi.unique.GK.AKM.03.list		<- list other wvi outside of own wvis				(current wvi name: GK.AKM.03)
+wvi.unique.GK.AKM.03.status		<- get status of other wvi outside of own wvis		(current wvi name: GK.AKM.03)
+wvi.unique.GK.AKM.03.info		<- get info of other wvi outside of own wvis		(current wvi name: GK.AKM.03)
+wvi.unique.GK.AKM.03.operate	<- operate other wvi outside of own wvis			(current wvi name: GK.AKM.03)
+*								<- all permissions, currently only applicable to the role beheer
+wvi.add							<- add new wvi
+wvi.update						<- update existing wvi
+wvi.remove						<- remove wvi
+account.list					<- list all accounts
+account.remove					<- remove any account
+account.update					<- update any account
+account.add						<- add an account
+roles.list						<- list all roles
+roles.remove					<- remove a role
+roles.add						<- add a role
+onderhoudsaannemers.list		<- list all onderhoudsaannemers
+onderhoudsaannemers.add			<- add new onderhoudsaannemers
+onderhoudsaannemers.update		<- update any onderhoudsaannemers
+onderhoudsaannemers.remove		<- remove any onderhoudsaannemers
+wvi.all.list					<- toegang tot alle wvi's

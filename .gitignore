@@ -400,3 +400,7 @@ FodyWeavers.xsd
 /WVI App/OPCUAServer/env
 /WVI App/WVI_webserver/src/database.db
 /WVI App/WVI_webserver/src/database.db-journal
+/WVI App/WVI_webserver/dist
+/WVI App/WVI_webserver/src/OPCUAPKI/trusted/certs
+/WVI App/WVI_webserver/src/OPCUAPKI/own/openssl.cnf
+/WVI App/WVI_webserver/src/OPCUAPKI/mutex.lock

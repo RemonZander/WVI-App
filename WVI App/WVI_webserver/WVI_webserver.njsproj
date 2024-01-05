@@ -30,6 +30,11 @@
     <DebugSymbols>true</DebugSymbols>
   </PropertyGroup>
   <ItemGroup>
+    <Content Include="src\casbin\model.conf" />
+    <Content Include="src\casbin\permissions.txt" />
+    <Content Include="src\casbin\policy.csv" />
+    <Content Include="src\certs\uaexpert.der" />
+    <Content Include="src\certs\uaexpert_key.pem" />
     <Content Include="src\modules\B64EncoderDecoder.ts" />
     <Content Include="tsconfig.json" />
     <Content Include="package.json" />
@@ -37,17 +42,28 @@
   </ItemGroup>
   <ItemGroup>
     <Folder Include="src\" />
+    <Folder Include="src\certs\" />
+    <Folder Include="src\decorators\" />
     <Folder Include="src\modules\" />
     <Folder Include="src\enums\" />
     <Folder Include="src\interfaces\" />
+    <Folder Include="src\casbin\" />
+    <Folder Include="src\OPCUAPKI\" />
     <Folder Include="src\services\" />
   </ItemGroup>
   <ItemGroup>
+    <TypeScriptCompile Include="src\decorators\authenticationDecorator.ts" />
     <TypeScriptCompile Include="src\enums\datamodel.ts" />
+    <TypeScriptCompile Include="src\enums\loglevelEnum.ts" />
     <TypeScriptCompile Include="src\interfaces\interfaces.ts" />
-    <TypeScriptCompile Include="src\modules\routerModule.ts" />
+    <TypeScriptCompile Include="src\modules\authenticationRouterModule.ts" />
+    <TypeScriptCompile Include="src\modules\loggerModule.ts" />
+    <TypeScriptCompile Include="src\modules\OPCUARouterModule.ts" />
+    <TypeScriptCompile Include="src\modules\AccountrouterRouterModule.ts" />
+    <TypeScriptCompile Include="src\modules\WVIRouterModule.ts" />
     <TypeScriptCompile Include="src\passportStragegies.ts" />
     <TypeScriptCompile Include="src\services\AuthenticationService.ts" />
+    <TypeScriptCompile Include="src\services\CasbinService.ts" />
     <TypeScriptCompile Include="src\services\DBService.ts" />
     <TypeScriptCompile Include="src\server.ts" />
     <TypeScriptCompile Include="src\modules\OPCUA_client.ts">

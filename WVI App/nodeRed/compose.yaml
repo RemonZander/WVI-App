@@ -1,0 +1,21 @@
+version: '3.8'
+name: remonzander
+services:
+  nodeRed:
+    mem_limit: 512m
+    image: remonzander/wvinoderedsimulation:0.1
+    build:
+      context: .
+      target: nodered
+    ports:
+      - 1880:1880
+    expose:
+      - 1880
+    networks:
+      default:
+        ipv4_address: 10.0.10.200
+      
+networks:
+  default:
+    name: wviNetwork
+    external: true

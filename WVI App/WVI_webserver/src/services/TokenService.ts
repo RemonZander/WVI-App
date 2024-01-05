@@ -2,7 +2,8 @@ import { All, Run, QueryNoParams } from './DBService';
 import date from 'date-and-time';
 
 export class TokenService {
-    public static InsertOne(Email: string, token: string) {
+
+    public static InsertOne(Email: string, token: string): string | boolean {
         const CreationDate = new Date();
         const ExpirationDate = date.addHours(CreationDate, 1);
 
@@ -16,9 +17,6 @@ export class TokenService {
 
         if (results.length === 0) return false;
         if (results[0].ExpirationDate < new Date()) {
-            console.log("ExpirationDate: " + results[0].ExpirationDate);
-            console.log("new Date()" + new Date());
-
             this.RemoveToken(token);
             return false;
         }
@@ -31,27 +29,31 @@ export class TokenService {
 
         if (results.length === 0) return false;
         if (results[0].ExpirationDate < new Date()) {
-            console.log("ExpirationDate: " + results[0].ExpirationDate);
-            console.log("new Date()" + new Date());
-
             this.RemoveToken(token);
             return false;
         }
         return true;
     }
 
-    public static RemoveToken(token: string) {
-        Run(`DELETE FROM "Tokens" WHERE "Token" = ?`, [token]);
-
-        return 200;
+    public static RemoveToken(token: string): string | boolean {
+        return Run(`DELETE FROM "Tokens" WHERE "Token" = ?`, [token]);
     }
 
-    public static UpdateToken(Email: string, Token: string) {
-        return Run(`UPDATE "Tokens" Set ExpirationDate = ? WHERE Email = ? AND Token = ?`, [date.format(date.addHours(new Date(), 1), "DD/MM/YYYY hh:mm:s:SSS"), Email, Token]);
+    public static RemoveTokenByEmail(token: string): string | boolean {
+        return Run(`DELETE FROM "Tokens" WHERE "Email" = ?`, [token]);
     }
 
-    public static UpdateTokenNoEmail(token: string) {
+    public static UpdateToken(Email: string, Token: string): string | boolean {
+        return Run(`UPDATE "Tokens" Set ExpirationDate = ? WHERE Email = ? AND Token = ?`, [date.format(date.addMinutes(new Date(), 10), "DD/MM/YYYY hh:mm:s:SSS"), Email, Token]);
+    }
+
+    public static UpdateTokenNoEmail(token: string): string | boolean {
         return Run(`UPDATE "Tokens" Set ExpirationDate = ? WHERE Token = ?`, [date.format(date.addHours(new Date(), 1), "DD/MM/YYYY hh:mm:s:SSS"), token]);
+    }
+
+    public static GetEmail(token: string): any[] | boolean {
+        return All(`SELECT "Email" FROM "Tokens" WHERE Token = ?`,
+            [token]);
     }
 }
 

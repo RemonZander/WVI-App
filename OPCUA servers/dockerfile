@@ -1,0 +1,79 @@
+FROM eclipse-temurin:11 as GK.AKM.03
+EXPOSE 10000
+RUN apt-get update
+RUN apt-get install iputils-ping -y
+RUN mkdir /opt/app
+COPY GK.AKM.03 /opt/app
+CMD java -jar /opt/app/OPCUA-Controllable-Player.jar -configfile "/opt/app/WVI config.csv" -port 10000
+
+FROM eclipse-temurin:11 as GK.GO.01
+EXPOSE 10001
+RUN apt-get update
+RUN apt-get install iputils-ping -y
+RUN mkdir /opt/app
+COPY GK.GO.01 /opt/app
+CMD java -jar /opt/app/OPCUA-Controllable-Player.jar -configfile "/opt/app/WVI config.csv" -port 10001
+
+FROM eclipse-temurin:11 as GK.KTR.01
+EXPOSE 10002
+RUN apt-get update
+RUN apt-get install iputils-ping -y
+RUN mkdir /opt/app
+COPY GK.KTR.01 /opt/app
+CMD java -jar /opt/app/OPCUA-Controllable-Player.jar -configfile "/opt/app/WVI config.csv" -port 10002
+
+FROM eclipse-temurin:11 as GK.MRB.01
+EXPOSE 10003
+RUN apt-get update
+RUN apt-get install iputils-ping -y
+RUN mkdir /opt/app
+COPY GK.MRB.01 /opt/app
+CMD java -jar /opt/app/OPCUA-Controllable-Player.jar -configfile "/opt/app/WVI config.csv" -port 10003
+
+FROM eclipse-temurin:11 as GK.RV.01
+EXPOSE 10004
+RUN apt-get update
+RUN apt-get install iputils-ping -y
+RUN mkdir /opt/app
+COPY GK.RV.01 /opt/app
+CMD java -jar /opt/app/OPCUA-Controllable-Player.jar -configfile "/opt/app/WVI config.csv" -port 10004
+
+FROM eclipse-temurin:11 as GK.RV.02
+EXPOSE 10005
+RUN apt-get update
+RUN apt-get install iputils-ping -y
+RUN mkdir /opt/app
+COPY GK.RV.02 /opt/app
+CMD java -jar /opt/app/OPCUA-Controllable-Player.jar -configfile "/opt/app/WVI config.csv" -port 10005
+
+FROM eclipse-temurin:11 as GK.WW.01
+EXPOSE 10006
+RUN apt-get update
+RUN apt-get install iputils-ping -y
+RUN mkdir /opt/app
+COPY GK.WW.01 /opt/app
+CMD java -jar /opt/app/OPCUA-Controllable-Player.jar -configfile "/opt/app/WVI config.csv" -port 10006
+
+FROM eclipse-temurin:11 as GK.ZLW.10
+EXPOSE 10007
+RUN apt-get update
+RUN apt-get install iputils-ping -y
+RUN mkdir /opt/app
+COPY GK.ZLW.10 /opt/app
+CMD java -jar /opt/app/OPCUA-Controllable-Player.jar -configfile "/opt/app/WVI config.csv" -port 10007
+
+FROM eclipse-temurin:11 as GK.ZLW.11
+EXPOSE 10008
+RUN apt-get update
+RUN apt-get install iputils-ping -y
+RUN mkdir /opt/app
+COPY GK.ZLW.11 /opt/app
+CMD java -jar /opt/app/OPCUA-Controllable-Player.jar -configfile "/opt/app/WVI config.csv" -port 10008
+
+FROM eclipse-temurin:11 as datamodel_1.7
+EXPOSE 10009
+RUN apt-get update
+RUN apt-get install iputils-ping -y
+RUN mkdir /opt/app
+COPY datamodel_1.7 /opt/app
+CMD java -jar /opt/app/OPCUA-Controllable-Player.jar -configfile "/opt/app/WVI config.csv" -port 10009

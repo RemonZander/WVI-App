@@ -2,25 +2,29 @@ import { All, Run, QueryNoParams } from './DBService';
 
 export class WVIService {
 
-    public static GetAll() : string {
+    public static GetAll() : string[] | boolean {
         return QueryNoParams(`SELECT * FROM WVIs`).all();
     }
 
-    public static GetOne(columns, filterColumn, value): string {
-        return All(`SELECT ${columns} FROM WVIs WHERE "${filterColumn}" = ?`, [value]);
+    public static GetWVIs(Contractgebiednummer: number): any[] {
+        return All('SELECT * FROM WVIs WHERE "Contractgebiednummer" = ?', [Contractgebiednummer]);
     }
 
-    public static GetOneAllColumns(filterColumn, value): string {
-        return All(`SELECT * FROM WVIs WHERE "${filterColumn}" = ?`, [value]);
+    public static GetWVIByName(name: string): any[] {
+        return All(`SELECT * FROM WVIs WHERE "PMP_enkelvoudige_objectnaam" = ?`, [name]);
     }
 
-    public static InsertOne(data) : string {
-        return Run(`INSERT INTO "WVIs" ("PMP enkelvoudige objectnaam", "PPLG", "Objecttype", "Geocode", "Contractgebiednummer", "Equipmentnummer", "RD X-coordinaat", "RD Y-coordinaat", "Template", "Producent") 
-            VALUES (?,?,?,?,?,?,?,?,?,?)`, data);
+    public static AddWVI(data) : string | boolean {
+        return Run(`INSERT INTO "WVIs" ("PMP_enkelvoudige_objectnaam", "PPLG", "Objecttype", "Geocode", "Contractgebiednummer", "Equipmentnummer", "RD X-coordinaat", "RD Y-coordinaat", "Producent", "Endpoint", "Datamodel", "Slaves") 
+            VALUES (?,?,?,?,?,?,?,?,?,?,?,?)`, data);
     }
 
-    public static RemoveOne(column, value) : string {
-        return Run(`DELETE FROM "WVIs" WHERE "${column}" = ?`, value);
+    public static UpdateWVI(data): boolean {
+        return Run(`UPDATE "WVIs" SET PMP_enkelvoudige_objectnaam = ?, PPLG = ?, Objecttype = ?, Geocode = ?, Contractgebiednummer = ?, Equipmentnummer = ?, "RD X-coordinaat" = ?, "RD Y-coordinaat" = ?, Producent = ?, Endpoint = ?, Datamodel = ?, Slaves = ? WHERE PMP_enkelvoudige_objectnaam = ?`, data);
+    }
+
+    public static RemoveWVI(name): boolean {
+        return Run(`DELETE FROM "WVIs" WHERE PMP_enkelvoudige_objectnaam = ?`, [name]);
     }
 }
 

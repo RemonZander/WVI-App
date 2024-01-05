@@ -13,15 +13,11 @@ const localStrategy = new LocalStrategy(
         try {
             const account: IAccount[] = UserService.GetOneByEmailAllColumns(email);
             if (account.length === 0) {
-                console.log("not found");
                 return done(null, false);
             }
-
+            
             bcrypt.compare(password, account[0].Wachtwoord).then(async hashResult => {
-                if (hashResult) {
-                    console.log("success");
-                    return done(null, account[0]);
-                }
+                if (hashResult) return done(null, account[0]);
                 else return done(null, false);
 
             }).catch(error => { throw error })

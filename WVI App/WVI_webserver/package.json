@@ -3,14 +3,18 @@
   "version": "0.0.0",
   "private": true,
   "scripts": {
-    "build": "tsc --project .",
-    "start": "nodemon ./src/server.ts"
+    "build:local": "env-cmd -f ../.env.local tsc --build .",
+    "build:prod": "env-cmd -f ../.env.production tsc --build .",
+    "start:local": "env-cmd -f ../.env.local nodemon ./src/server.ts",
+    "start:prod": "env-cmd -f ../.env.production nodemon ./src/server.ts",
+    "initDB:local": "env-cmd -f ../.env.local node ./src/SetupDatabase.ts",
+    "initDB:prod": "env-cmd -f ../.env.production node ./src/SetupDatabase.ts"
   },
   "description": "WVI_webserver",
   "author": {
     "name": ""
   },
-  "main": "app.js",
+  "main": "server.ts",
   "dependencies": {
     "@types/cookie-parser": "^1.4.4",
     "@types/passport": "^1.0.13",
@@ -22,9 +26,11 @@
     "cors": "^2.8.5",
     "date-and-time": "^3.0.3",
     "debug": "^2.2.0",
+    "dotenv": "^16.3.1",
+    "env-cmd": "^10.1.0",
     "express": "^4.14.0",
     "express-session": "^1.17.3",
-    "node-opcua-client": "^2.113.0",
+    "node-opcua": "^2.118.0",
     "nodemon": "^3.0.1",
     "passport": "^0.6.0",
     "passport-local": "^1.0.0",

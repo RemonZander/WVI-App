@@ -1,13 +1,16 @@
 import { Request, Response } from "express";
-import { AttributeIds, BrowseResult, ClientSession, DataType, DataValue, OPCUAClient, ReferenceDescription, StatusCodes, TimestampsToReturn, UserTokenType, DataTypeIds, FilterContextOnAddressSpace } from "node-opcua-client";
+import { AttributeIds, BrowseResult, ClientSession, DataType, DataValue, OPCUAClient, ReferenceDescription, StatusCodes, TimestampsToReturn, UserTokenType, DataTypeIds, FilterContextOnAddressSpace, MessageSecurityMode, SecurityPolicy, OPCUACertificateManager } from "node-opcua";
 import { Datamodel } from '../enums/datamodel';
+import { LogLevel } from "../enums/loglevelEnum";
+import Logger from "./loggerModule";
+import * as fs from 'fs';
+const path = require('path');
 
 export default class OPCUAclient {
 
     async IsOnline(req: Request, res: Response) {
         let client: OPCUAClient;
         let session: ClientSession;
-        const endpoint = "opc.tcp://localhost:53530/OPCUA/SimulationServer";
 
         try {
             client = OPCUAClient.create({
@@ -17,16 +20,34 @@ export default class OPCUAclient {
                     initialDelay: 2000,
                     maxDelay: 10 * 1000
                 },
+/*                securityMode: MessageSecurityMode.SignAndEncrypt,
+                securityPolicy: SecurityPolicy.Basic256Sha256,
+                certificateFile: path.resolve("./src/certs/OPCUA_client.der"),
+                privateKeyFile: path.resolve("./src/certs/OPCUA_client.pem"),
+                applicationUri: "urn:WVIAPP:OPCUA:client",
+                clientCertificateManager: new OPCUACertificateManager({
+                    automaticallyAcceptUnknownCertificate: true,
+                    rootFolder: path.resolve("./src/OPCUAPKI")
+                }),*/
             });
-            client.on("backoff", () => console.log("retrying connection"));
-            await client.connect(endpoint);
+            client.on("backoff", () => Logger("retrying connection", OPCUAclient.name, LogLevel.WARNING));
+            await client.connect(req.body.endpoint);
+
 
             session = await client.createSession({
+                type: UserTokenType.Anonymous
+            });
+
+/*            session = await client.createSession({
                 type: UserTokenType.UserName,
                 userName: "admin",
-                password: "admin",
-            });
-        } catch (e) {
+                password: "admin"
+            });*/
+
+
+        } catch (err) {
+            console.log(err);
+            Logger(err.stack, OPCUAclient.name, LogLevel.SERVERE);
             res.sendStatus(404);
             return;
         }
@@ -38,10 +59,8 @@ export default class OPCUAclient {
     async GetStatus(req: Request, res: Response) {
         let client: OPCUAClient;
         let session: ClientSession;
-        const endpoint = "opc.tcp://localhost:53530/OPCUA/SimulationServer";
-        const nodeId = `${req.body.nodeId}.cmdOperationMode`;
         res.setHeader('Content-Type', 'text/html');
-        res.setHeader('Access-Control-Allow-Origin', '*');
+
 
         try {
             client = OPCUAClient.create({
@@ -52,28 +71,36 @@ export default class OPCUAclient {
                     maxDelay: 10 * 1000
                 },
             });
-            client.on("backoff", () => console.log("retrying connection"));
+            client.on("backoff", () => Logger("retrying connection", OPCUAclient.name, LogLevel.WARNING));
 
-
-            await client.connect(endpoint);
+            await client.connect(req.body.endpoint);
 
             session = await client.createSession({
-                type: UserTokenType.UserName,
-                userName: "admin",
-                password: "admin",
+                type: UserTokenType.Anonymous
             });
 
-            let dataValue = await session.read({ nodeId, attributeId: AttributeIds.Value });
+            let nodeId = req.body.nodeId[0];
+            Logger(nodeId, "OPC UA client", LogLevel.INFO);
+            let data = [await session.read({ nodeId, attributeId: AttributeIds.Value })];
 
-            if (dataValue.statusCode !== StatusCodes.Good) {
+            if (data[0].statusCode !== StatusCodes.Good) {
                 console.log("Could not read ", nodeId);
             }
 
-            res.send(JSON.stringify(dataValue.value.value.toString()));
+            nodeId = req.body.nodeId[1];
+            Logger(nodeId, "OPC UA client", LogLevel.INFO);
+            data.push(await session.read({ nodeId, attributeId: AttributeIds.Value }));
+
+            if (data[1].statusCode !== StatusCodes.Good) {
+                console.log("Could not read ", nodeId);
+            }
+
+            res.json([data[0].value.value, data[1].value.value]);
         }
         catch (err)
         {
-            res.send(JSON.stringify(`Error: ${err}`));
+            Logger(err.stack, OPCUAclient.name, LogLevel.SERVERE);
+            res.json(`Error: ${err}`);
         }
         client.disconnect();
     }
@@ -81,7 +108,8 @@ export default class OPCUAclient {
     async GetData(req: Request, res: Response) {
         let client: OPCUAClient;
         let session: ClientSession;
-        const endpoint = "opc.tcp://localhost:53530/OPCUA/SimulationServer";
+        let slaves: string[] = [];
+        if (req.body.slaves) slaves = req.body.slaves.split(";");
         res.setHeader('Content-Type', 'application/json');
 
         try {
@@ -93,25 +121,21 @@ export default class OPCUAclient {
                     maxDelay: 10 * 1000
                 },
             });
-            client.on("backoff", () => console.log("retrying connection"));
+            client.on("backoff", () => Logger("retrying connection", OPCUAclient.name, LogLevel.WARNING));
 
-
-            await client.connect(endpoint);
+            await client.connect(req.body.endpoint);
 
             session = await client.createSession({
-                type: UserTokenType.UserName,
-                userName: "admin",
-                password: "admin",
+                type: UserTokenType.Anonymous
             });
 
             let nodes = [];
-            await this.RecursiveBrowse(await session.browse(req.body.nodeId) as BrowseResult, session).then((results) => {
-                results.forEach((result) => {
-                    if (result.NodeId.includes("ns=3")) {
-                        nodes.push({ DisplayName: result.browseName, Nodes: result.NodeId, Data: "", dataType: result.dataType })
-                    }                 
-                });
-
+            await this.RecursiveBrowse(await session.browse(req.body.nodeId) as BrowseResult, session, slaves, req.body.nodeId).then((results) => {
+                for (var a = 0; a < results.length; a++) {
+                    if (results[a].NodeId.includes("ns=2") && !results[a].NodeId.includes("/0:Id")) {
+                        nodes.push({ DisplayName: results[a].browseName, Nodes: results[a].NodeId, Data: "", dataType: results[a].dataType })
+                    }  
+                }
             });
 
             await this.ReadData(session, nodes).then((data) => {
@@ -119,10 +143,11 @@ export default class OPCUAclient {
                     nodes[a].Data = data[a].data;
                 }
             });
-            
-            res.send(JSON.stringify(nodes));
+
+            res.json(nodes);
         }
         catch (err) {
+            Logger(err.stack, OPCUAclient.name, LogLevel.SERVERE);
             res.sendStatus(404);
         }
         res.end();
@@ -134,9 +159,6 @@ export default class OPCUAclient {
         let client: OPCUAClient;
         let session: ClientSession;
         const nodes = req.body.nodes;
-
-        const endpoint = "opc.tcp://localhost:53530/OPCUA/SimulationServer";
-
         try {
             client = OPCUAClient.create({
                 endpointMustExist: false,
@@ -146,15 +168,13 @@ export default class OPCUAclient {
                     maxDelay: 10 * 1000
                 },
             });
-            client.on("backoff", () => console.log("retrying connection"));
+            client.on("backoff", () => Logger("retrying connection", OPCUAclient.name, LogLevel.WARNING));
 
 
-            await client.connect(endpoint);
+            await client.connect(req.body.endpoint);
 
             session = await client.createSession({
-                type: UserTokenType.UserName,
-                userName: "admin",
-                password: "admin",
+                type: UserTokenType.Anonymous
             });
 
             for (var a = 0; a < nodes.length; a++) {
@@ -177,6 +197,7 @@ export default class OPCUAclient {
 
         }
         catch (err) {
+            Logger(err.stack, OPCUAclient.name, LogLevel.SERVERE);
             res.send(`Error: ${err}`);
         }
         client.disconnect();
@@ -194,16 +215,18 @@ export default class OPCUAclient {
         return dataValues;
     }
 
-    private async RecursiveBrowse(browseResult: BrowseResult, session: ClientSession) {
+    private async RecursiveBrowse(browseResult: BrowseResult, session: ClientSession, slaves: string[], nodeId: string) {
         let result = [];
 
         for (var a = 0; a < browseResult.references.length; a++) {
+            if (browseResult.references[a].browseName.name === "Alarms" ||
+                (slaves.filter(s => browseResult.references[a].browseName.name.includes(s)).length > 0 && !slaves.includes(nodeId))) continue;
             if (browseResult.references[a].nodeClass != 1) {
                 result.push({ browseName: browseResult.references[a].browseName.name, NodeId: browseResult.references[a].nodeId.toString(), dataType: Datamodel[browseResult.references[a].browseName.name] });
             }
             const browseResultNested = await session.browse(browseResult.references[a].nodeId.toString()) as BrowseResult;
 
-            await this.RecursiveBrowse(browseResultNested, session).then((data) => {
+            await this.RecursiveBrowse(browseResultNested, session, slaves, nodeId).then((data) => {
                 result = result.concat(data);
             });
         }

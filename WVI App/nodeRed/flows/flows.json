@@ -1,0 +1,1441 @@
+[
+    {
+        "id": "f6f2187d.f17ca8",
+        "type": "tab",
+        "label": "Update statOperationMode",
+        "disabled": false,
+        "info": ""
+    },
+    {
+        "id": "3cc11d24.ff01a2",
+        "type": "comment",
+        "z": "f6f2187d.f17ca8",
+        "name": "WARNING: please check you have started this container with a volume that is mounted to /data\\n otherwise any flow changes are lost when you redeploy or upgrade the container\\n (e.g. upgrade to a more recent node-red docker image).\\n  If you are using named volumes you can ignore this warning.\\n Double click or see info side panel to learn how to start Node-RED in Docker to save your work",
+        "info": "\nTo start docker with a bind mount volume (-v option), for example:\n\n```\ndocker run -it -p 1880:1880 -v /home/user/node_red_data:/data --name mynodered nodered/node-red\n```\n\nwhere `/home/user/node_red_data` is a directory on your host machine where you want to store your flows.\n\nIf you do not do this then you can experiment and redploy flows, but if you restart or upgrade the container the flows will be disconnected and lost. \n\nThey will still exist in a hidden data volume, which can be recovered using standard docker techniques, but that is much more complex than just starting with a named volume as described above.",
+        "x": 350,
+        "y": 80,
+        "wires": []
+    },
+    {
+        "id": "77479159f75a559b",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "read status",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "2",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 360,
+        "wires": [
+            [
+                "0d4dac2ea9d830ec"
+            ]
+        ]
+    },
+    {
+        "id": "0d7e27678bf053a7",
+        "type": "OpcUa-Client",
+        "z": "f6f2187d.f17ca8",
+        "endpoint": "41523581ca3b3885",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "useTransport": false,
+        "maxChunkCount": 1,
+        "maxMessageSize": 8192,
+        "receiveBufferSize": 8192,
+        "sendBufferSize": 8192,
+        "name": "",
+        "x": 640,
+        "y": 360,
+        "wires": [
+            [
+                "a46bfeedb3371f83"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "0d4dac2ea9d830ec",
+        "type": "OpcUa-Item",
+        "z": "f6f2187d.f17ca8",
+        "item": "ns=2;s=GK.AKM.03.cmdOperationMode",
+        "datatype": "Int16",
+        "value": "",
+        "name": "",
+        "x": 380,
+        "y": 360,
+        "wires": [
+            [
+                "0d7e27678bf053a7"
+            ]
+        ]
+    },
+    {
+        "id": "a46bfeedb3371f83",
+        "type": "switch",
+        "z": "f6f2187d.f17ca8",
+        "name": "if operationmode != -1",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "neq",
+                "v": "-1",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 920,
+        "y": 360,
+        "wires": [
+            [
+                "7cd7e5b821f4bca2"
+            ]
+        ]
+    },
+    {
+        "id": "ea50dc0e66a5a326",
+        "type": "OpcUa-Client",
+        "z": "f6f2187d.f17ca8",
+        "endpoint": "41523581ca3b3885",
+        "action": "write",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "useTransport": false,
+        "maxChunkCount": 1,
+        "maxMessageSize": 8192,
+        "receiveBufferSize": 8192,
+        "sendBufferSize": 8192,
+        "name": "",
+        "x": 1300,
+        "y": 360,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "7cd7e5b821f4bca2",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "function 1",
+        "func": "msg.topic = \"ns=2;s=GK.AKM.03.statOperationMode;datatype=Int16\"\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1120,
+        "y": 360,
+        "wires": [
+            [
+                "ea50dc0e66a5a326"
+            ]
+        ]
+    },
+    {
+        "id": "df6d4392d16b3beb",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "read status",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 460,
+        "wires": [
+            [
+                "405c4238045c58be"
+            ]
+        ]
+    },
+    {
+        "id": "8938b176b70df94f",
+        "type": "OpcUa-Client",
+        "z": "f6f2187d.f17ca8",
+        "endpoint": "c916186e435e8716",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "useTransport": false,
+        "maxChunkCount": 1,
+        "maxMessageSize": 8192,
+        "receiveBufferSize": 8192,
+        "sendBufferSize": 8192,
+        "name": "",
+        "x": 640,
+        "y": 460,
+        "wires": [
+            [
+                "b9c4570c0b7e1b50"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "405c4238045c58be",
+        "type": "OpcUa-Item",
+        "z": "f6f2187d.f17ca8",
+        "item": "ns=2;s=GK.GO.01.cmdOperationMode",
+        "datatype": "Int16",
+        "value": "",
+        "name": "",
+        "x": 380,
+        "y": 460,
+        "wires": [
+            [
+                "8938b176b70df94f"
+            ]
+        ]
+    },
+    {
+        "id": "b9c4570c0b7e1b50",
+        "type": "switch",
+        "z": "f6f2187d.f17ca8",
+        "name": "if operationmode != -1",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "neq",
+                "v": "-1",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 920,
+        "y": 460,
+        "wires": [
+            [
+                "d087b19dddc430f9"
+            ]
+        ]
+    },
+    {
+        "id": "b56fea7746673ae9",
+        "type": "OpcUa-Client",
+        "z": "f6f2187d.f17ca8",
+        "endpoint": "c916186e435e8716",
+        "action": "write",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "useTransport": false,
+        "maxChunkCount": 1,
+        "maxMessageSize": 8192,
+        "receiveBufferSize": 8192,
+        "sendBufferSize": 8192,
+        "name": "",
+        "x": 1300,
+        "y": 460,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "d087b19dddc430f9",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "function 2",
+        "func": "msg.topic = \"ns=2;s=GK.GO.01.statOperationMode;datatype=Int16\"\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1120,
+        "y": 460,
+        "wires": [
+            [
+                "b56fea7746673ae9"
+            ]
+        ]
+    },
+    {
+        "id": "713fcdd06e17e57f",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "read status",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 560,
+        "wires": [
+            [
+                "cda7a0889fc92f60"
+            ]
+        ]
+    },
+    {
+        "id": "a5efbaab477ac2f1",
+        "type": "OpcUa-Client",
+        "z": "f6f2187d.f17ca8",
+        "endpoint": "bd373cb95087f902",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "useTransport": false,
+        "maxChunkCount": 1,
+        "maxMessageSize": 8192,
+        "receiveBufferSize": 8192,
+        "sendBufferSize": 8192,
+        "name": "",
+        "x": 640,
+        "y": 560,
+        "wires": [
+            [
+                "2fbe5662f82e1507"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "cda7a0889fc92f60",
+        "type": "OpcUa-Item",
+        "z": "f6f2187d.f17ca8",
+        "item": "ns=2;s=GK.KTR.01.cmdOperationMode",
+        "datatype": "Int16",
+        "value": "",
+        "name": "",
+        "x": 380,
+        "y": 560,
+        "wires": [
+            [
+                "a5efbaab477ac2f1"
+            ]
+        ]
+    },
+    {
+        "id": "2fbe5662f82e1507",
+        "type": "switch",
+        "z": "f6f2187d.f17ca8",
+        "name": "if operationmode != -1",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "neq",
+                "v": "-1",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 920,
+        "y": 560,
+        "wires": [
+            [
+                "a4d974d0d2c07cb3"
+            ]
+        ]
+    },
+    {
+        "id": "3082ac8ae76211a6",
+        "type": "OpcUa-Client",
+        "z": "f6f2187d.f17ca8",
+        "endpoint": "bd373cb95087f902",
+        "action": "write",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "useTransport": false,
+        "maxChunkCount": 1,
+        "maxMessageSize": 8192,
+        "receiveBufferSize": 8192,
+        "sendBufferSize": 8192,
+        "name": "",
+        "x": 1300,
+        "y": 560,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "a4d974d0d2c07cb3",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "function 3",
+        "func": "msg.topic = \"ns=2;s=GK.KTR.01.statOperationMode;datatype=Int16\"\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1120,
+        "y": 560,
+        "wires": [
+            [
+                "3082ac8ae76211a6"
+            ]
+        ]
+    },
+    {
+        "id": "d289f640ea871f64",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "read status",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 660,
+        "wires": [
+            [
+                "4051a89db8467b45"
+            ]
+        ]
+    },
+    {
+        "id": "e5f3e682c0dce31a",
+        "type": "OpcUa-Client",
+        "z": "f6f2187d.f17ca8",
+        "endpoint": "0a26481b9d407eff",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "useTransport": false,
+        "maxChunkCount": 1,
+        "maxMessageSize": 8192,
+        "receiveBufferSize": 8192,
+        "sendBufferSize": 8192,
+        "name": "",
+        "x": 640,
+        "y": 660,
+        "wires": [
+            [
+                "f68c42285e38c18b"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "4051a89db8467b45",
+        "type": "OpcUa-Item",
+        "z": "f6f2187d.f17ca8",
+        "item": "ns=2;s=GK.MRB.01.cmdOperationMode",
+        "datatype": "Int16",
+        "value": "",
+        "name": "",
+        "x": 380,
+        "y": 660,
+        "wires": [
+            [
+                "e5f3e682c0dce31a"
+            ]
+        ]
+    },
+    {
+        "id": "f68c42285e38c18b",
+        "type": "switch",
+        "z": "f6f2187d.f17ca8",
+        "name": "if operationmode != -1",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "neq",
+                "v": "-1",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 920,
+        "y": 660,
+        "wires": [
+            [
+                "6086daad01f4c82a"
+            ]
+        ]
+    },
+    {
+        "id": "bce2869cd627f598",
+        "type": "OpcUa-Client",
+        "z": "f6f2187d.f17ca8",
+        "endpoint": "0a26481b9d407eff",
+        "action": "write",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "useTransport": false,
+        "maxChunkCount": 1,
+        "maxMessageSize": 8192,
+        "receiveBufferSize": 8192,
+        "sendBufferSize": 8192,
+        "name": "",
+        "x": 1300,
+        "y": 660,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "6086daad01f4c82a",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "function 4",
+        "func": "msg.topic = \"ns=2;s=GK.MRB.01.statOperationMode;datatype=Int16\"\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1120,
+        "y": 660,
+        "wires": [
+            [
+                "bce2869cd627f598"
+            ]
+        ]
+    },
+    {
+        "id": "a60c69eb238aff69",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "read status",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 760,
+        "wires": [
+            [
+                "c753b0fe4a671930"
+            ]
+        ]
+    },
+    {
+        "id": "823c04942d8f855b",
+        "type": "OpcUa-Client",
+        "z": "f6f2187d.f17ca8",
+        "endpoint": "54ec652e3728a683",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "useTransport": false,
+        "maxChunkCount": 1,
+        "maxMessageSize": 8192,
+        "receiveBufferSize": 8192,
+        "sendBufferSize": 8192,
+        "name": "",
+        "x": 620,
+        "y": 760,
+        "wires": [
+            [
+                "5ef5efc344c9b249"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "c753b0fe4a671930",
+        "type": "OpcUa-Item",
+        "z": "f6f2187d.f17ca8",
+        "item": "ns=2;s=GK.RV.01.cmdOperationMode",
+        "datatype": "Int16",
+        "value": "",
+        "name": "",
+        "x": 360,
+        "y": 760,
+        "wires": [
+            [
+                "823c04942d8f855b"
+            ]
+        ]
+    },
+    {
+        "id": "5ef5efc344c9b249",
+        "type": "switch",
+        "z": "f6f2187d.f17ca8",
+        "name": "if operationmode != -1",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "neq",
+                "v": "-1",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 900,
+        "y": 760,
+        "wires": [
+            [
+                "952c77dc02d75574"
+            ]
+        ]
+    },
+    {
+        "id": "7b1f720bb6a46238",
+        "type": "OpcUa-Client",
+        "z": "f6f2187d.f17ca8",
+        "endpoint": "54ec652e3728a683",
+        "action": "write",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "useTransport": false,
+        "maxChunkCount": 1,
+        "maxMessageSize": 8192,
+        "receiveBufferSize": 8192,
+        "sendBufferSize": 8192,
+        "name": "",
+        "x": 1280,
+        "y": 760,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "952c77dc02d75574",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "function 5",
+        "func": "msg.topic = \"ns=2;s=GK.RV.01.statOperationMode;datatype=Int16\"\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1100,
+        "y": 760,
+        "wires": [
+            [
+                "7b1f720bb6a46238"
+            ]
+        ]
+    },
+    {
+        "id": "f18d52d009444453",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "read status",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 860,
+        "wires": [
+            [
+                "61ab3e4dd92bd3d7"
+            ]
+        ]
+    },
+    {
+        "id": "4a279d45716cef88",
+        "type": "OpcUa-Client",
+        "z": "f6f2187d.f17ca8",
+        "endpoint": "29f8e496c3a153dd",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "useTransport": false,
+        "maxChunkCount": 1,
+        "maxMessageSize": 8192,
+        "receiveBufferSize": 8192,
+        "sendBufferSize": 8192,
+        "name": "",
+        "x": 620,
+        "y": 860,
+        "wires": [
+            [
+                "07fdc40d345a5a3d"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "61ab3e4dd92bd3d7",
+        "type": "OpcUa-Item",
+        "z": "f6f2187d.f17ca8",
+        "item": "ns=2;s=GK.RV.02.cmdOperationMode",
+        "datatype": "Int16",
+        "value": "",
+        "name": "",
+        "x": 360,
+        "y": 860,
+        "wires": [
+            [
+                "4a279d45716cef88"
+            ]
+        ]
+    },
+    {
+        "id": "07fdc40d345a5a3d",
+        "type": "switch",
+        "z": "f6f2187d.f17ca8",
+        "name": "if operationmode != -1",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "neq",
+                "v": "-1",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 900,
+        "y": 860,
+        "wires": [
+            [
+                "b27b3d04068574ab"
+            ]
+        ]
+    },
+    {
+        "id": "639b1016a00174ae",
+        "type": "OpcUa-Client",
+        "z": "f6f2187d.f17ca8",
+        "endpoint": "29f8e496c3a153dd",
+        "action": "write",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "useTransport": false,
+        "maxChunkCount": 1,
+        "maxMessageSize": 8192,
+        "receiveBufferSize": 8192,
+        "sendBufferSize": 8192,
+        "name": "",
+        "x": 1280,
+        "y": 860,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "b27b3d04068574ab",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "function 6",
+        "func": "msg.topic = \"ns=2;s=GK.RV.02.statOperationMode;datatype=Int16\"\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1100,
+        "y": 860,
+        "wires": [
+            [
+                "639b1016a00174ae"
+            ]
+        ]
+    },
+    {
+        "id": "dd923d3f04c542f7",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "read status",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 150,
+        "y": 960,
+        "wires": [
+            [
+                "7e977ed702461231"
+            ]
+        ]
+    },
+    {
+        "id": "075598be0a22e0a8",
+        "type": "OpcUa-Client",
+        "z": "f6f2187d.f17ca8",
+        "endpoint": "bc3c2b0c631c6807",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "useTransport": false,
+        "maxChunkCount": 1,
+        "maxMessageSize": 8192,
+        "receiveBufferSize": 8192,
+        "sendBufferSize": 8192,
+        "name": "",
+        "x": 640,
+        "y": 960,
+        "wires": [
+            [
+                "adf0411821f5a3df"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "7e977ed702461231",
+        "type": "OpcUa-Item",
+        "z": "f6f2187d.f17ca8",
+        "item": "ns=2;s=GK.WW.01.cmdOperationMode",
+        "datatype": "Int16",
+        "value": "",
+        "name": "",
+        "x": 380,
+        "y": 960,
+        "wires": [
+            [
+                "075598be0a22e0a8"
+            ]
+        ]
+    },
+    {
+        "id": "adf0411821f5a3df",
+        "type": "switch",
+        "z": "f6f2187d.f17ca8",
+        "name": "if operationmode != -1",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "neq",
+                "v": "-1",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 920,
+        "y": 960,
+        "wires": [
+            [
+                "c826f939d1712d23"
+            ]
+        ]
+    },
+    {
+        "id": "20a11d259c1b9b7b",
+        "type": "OpcUa-Client",
+        "z": "f6f2187d.f17ca8",
+        "endpoint": "bc3c2b0c631c6807",
+        "action": "write",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "useTransport": false,
+        "maxChunkCount": 1,
+        "maxMessageSize": 8192,
+        "receiveBufferSize": 8192,
+        "sendBufferSize": 8192,
+        "name": "",
+        "x": 1300,
+        "y": 960,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "c826f939d1712d23",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "function 7",
+        "func": "msg.topic = \"ns=2;s=GK.WW.01.statOperationMode;datatype=Int16\"\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1120,
+        "y": 960,
+        "wires": [
+            [
+                "20a11d259c1b9b7b"
+            ]
+        ]
+    },
+    {
+        "id": "4d45b2160571d918",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "read status",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 1060,
+        "wires": [
+            [
+                "c369e5f40c84ca04"
+            ]
+        ]
+    },
+    {
+        "id": "cbe554bd1e862925",
+        "type": "OpcUa-Client",
+        "z": "f6f2187d.f17ca8",
+        "endpoint": "7ec4cd1fb19cb740",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "useTransport": false,
+        "maxChunkCount": 1,
+        "maxMessageSize": 8192,
+        "receiveBufferSize": 8192,
+        "sendBufferSize": 8192,
+        "name": "",
+        "x": 620,
+        "y": 1060,
+        "wires": [
+            [
+                "33bfb93c3c0f1b20"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "c369e5f40c84ca04",
+        "type": "OpcUa-Item",
+        "z": "f6f2187d.f17ca8",
+        "item": "ns=2;s=GK.ZLW.10.cmdOperationMode",
+        "datatype": "Int16",
+        "value": "",
+        "name": "",
+        "x": 360,
+        "y": 1060,
+        "wires": [
+            [
+                "cbe554bd1e862925"
+            ]
+        ]
+    },
+    {
+        "id": "33bfb93c3c0f1b20",
+        "type": "switch",
+        "z": "f6f2187d.f17ca8",
+        "name": "if operationmode != -1",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "neq",
+                "v": "-1",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 900,
+        "y": 1060,
+        "wires": [
+            [
+                "978995c1150940d7"
+            ]
+        ]
+    },
+    {
+        "id": "4cf49fdb9f8505c3",
+        "type": "OpcUa-Client",
+        "z": "f6f2187d.f17ca8",
+        "endpoint": "7ec4cd1fb19cb740",
+        "action": "write",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "useTransport": false,
+        "maxChunkCount": 1,
+        "maxMessageSize": 8192,
+        "receiveBufferSize": 8192,
+        "sendBufferSize": 8192,
+        "name": "",
+        "x": 1280,
+        "y": 1060,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "978995c1150940d7",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "function 8",
+        "func": "msg.topic = \"ns=2;s=GK.ZLW.10.statOperationMode;datatype=Int16\"\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1100,
+        "y": 1060,
+        "wires": [
+            [
+                "4cf49fdb9f8505c3"
+            ]
+        ]
+    },
+    {
+        "id": "7cc795338f12e508",
+        "type": "inject",
+        "z": "f6f2187d.f17ca8",
+        "name": "read status",
+        "props": [
+            {
+                "p": "payload"
+            }
+        ],
+        "repeat": "5",
+        "crontab": "",
+        "once": false,
+        "onceDelay": 0.1,
+        "topic": "",
+        "payload": "",
+        "payloadType": "date",
+        "x": 130,
+        "y": 1160,
+        "wires": [
+            [
+                "08047d2b833adf16"
+            ]
+        ]
+    },
+    {
+        "id": "58be00b3594141d5",
+        "type": "OpcUa-Client",
+        "z": "f6f2187d.f17ca8",
+        "endpoint": "3f08bd64f65d0cfd",
+        "action": "read",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "useTransport": false,
+        "maxChunkCount": 1,
+        "maxMessageSize": 8192,
+        "receiveBufferSize": 8192,
+        "sendBufferSize": 8192,
+        "name": "",
+        "x": 620,
+        "y": 1160,
+        "wires": [
+            [
+                "6faa452fbd83ad0f"
+            ],
+            []
+        ]
+    },
+    {
+        "id": "08047d2b833adf16",
+        "type": "OpcUa-Item",
+        "z": "f6f2187d.f17ca8",
+        "item": "ns=2;s=GK.ZLW.11.cmdOperationMode",
+        "datatype": "Int16",
+        "value": "",
+        "name": "",
+        "x": 360,
+        "y": 1160,
+        "wires": [
+            [
+                "58be00b3594141d5"
+            ]
+        ]
+    },
+    {
+        "id": "6faa452fbd83ad0f",
+        "type": "switch",
+        "z": "f6f2187d.f17ca8",
+        "name": "if operationmode != -1",
+        "property": "payload",
+        "propertyType": "msg",
+        "rules": [
+            {
+                "t": "neq",
+                "v": "-1",
+                "vt": "num"
+            }
+        ],
+        "checkall": "true",
+        "repair": false,
+        "outputs": 1,
+        "x": 900,
+        "y": 1160,
+        "wires": [
+            [
+                "185cda77452f69c3"
+            ]
+        ]
+    },
+    {
+        "id": "a87ad4b2730d05fb",
+        "type": "OpcUa-Client",
+        "z": "f6f2187d.f17ca8",
+        "endpoint": "3f08bd64f65d0cfd",
+        "action": "write",
+        "deadbandtype": "a",
+        "deadbandvalue": 1,
+        "time": 10,
+        "timeUnit": "s",
+        "certificate": "n",
+        "localfile": "",
+        "localkeyfile": "",
+        "securitymode": "None",
+        "securitypolicy": "None",
+        "folderName4PKI": "",
+        "useTransport": false,
+        "maxChunkCount": 1,
+        "maxMessageSize": 8192,
+        "receiveBufferSize": 8192,
+        "sendBufferSize": 8192,
+        "name": "",
+        "x": 1300,
+        "y": 1160,
+        "wires": [
+            [],
+            []
+        ]
+    },
+    {
+        "id": "185cda77452f69c3",
+        "type": "function",
+        "z": "f6f2187d.f17ca8",
+        "name": "function 9",
+        "func": "msg.topic = \"ns=2;s=GK.ZLW.11.statOperationMode;datatype=Int16\"\nreturn msg;",
+        "outputs": 1,
+        "timeout": 0,
+        "noerr": 0,
+        "initialize": "",
+        "finalize": "",
+        "libs": [],
+        "x": 1100,
+        "y": 1160,
+        "wires": [
+            [
+                "a87ad4b2730d05fb"
+            ]
+        ]
+    },
+    {
+        "id": "41523581ca3b3885",
+        "type": "OpcUa-Endpoint",
+        "endpoint": "opc.tcp://GK.AKM.03:10000/OPCUA-Player",
+        "secpol": "None",
+        "secmode": "None",
+        "none": true,
+        "login": false,
+        "usercert": false,
+        "usercertificate": "",
+        "userprivatekey": ""
+    },
+    {
+        "id": "c916186e435e8716",
+        "type": "OpcUa-Endpoint",
+        "endpoint": "opc.tcp://GK.GO.01:10001/OPCUA-Player",
+        "secpol": "None",
+        "secmode": "None",
+        "none": true,
+        "login": false,
+        "usercert": false,
+        "usercertificate": "",
+        "userprivatekey": ""
+    },
+    {
+        "id": "bd373cb95087f902",
+        "type": "OpcUa-Endpoint",
+        "endpoint": "opc.tcp://GK.KTR.01:10002/OPCUA-Player",
+        "secpol": "None",
+        "secmode": "None",
+        "none": true,
+        "login": false,
+        "usercert": false,
+        "usercertificate": "",
+        "userprivatekey": ""
+    },
+    {
+        "id": "0a26481b9d407eff",
+        "type": "OpcUa-Endpoint",
+        "endpoint": "opc.tcp://GK.MRB.01:10003/OPCUA-Player",
+        "secpol": "None",
+        "secmode": "None",
+        "none": true,
+        "login": false,
+        "usercert": false,
+        "usercertificate": "",
+        "userprivatekey": ""
+    },
+    {
+        "id": "54ec652e3728a683",
+        "type": "OpcUa-Endpoint",
+        "endpoint": "opc.tcp://GK.RV.01:10004/OPCUA-Player",
+        "secpol": "None",
+        "secmode": "None",
+        "none": true,
+        "login": false,
+        "usercert": false,
+        "usercertificate": "",
+        "userprivatekey": ""
+    },
+    {
+        "id": "29f8e496c3a153dd",
+        "type": "OpcUa-Endpoint",
+        "endpoint": "opc.tcp://GK.RV.02:10005/OPCUA-Player",
+        "secpol": "None",
+        "secmode": "None",
+        "none": true,
+        "login": false,
+        "usercert": false,
+        "usercertificate": "",
+        "userprivatekey": ""
+    },
+    {
+        "id": "bc3c2b0c631c6807",
+        "type": "OpcUa-Endpoint",
+        "endpoint": "opc.tcp://GK.WW.01:10006/OPCUA-Player",
+        "secpol": "None",
+        "secmode": "None",
+        "none": true,
+        "login": false,
+        "usercert": false,
+        "usercertificate": "",
+        "userprivatekey": ""
+    },
+    {
+        "id": "7ec4cd1fb19cb740",
+        "type": "OpcUa-Endpoint",
+        "endpoint": "opc.tcp://GK.ZLW.10:10007/OPCUA-Player",
+        "secpol": "None",
+        "secmode": "None",
+        "none": true,
+        "login": false,
+        "usercert": false,
+        "usercertificate": "",
+        "userprivatekey": ""
+    },
+    {
+        "id": "3f08bd64f65d0cfd",
+        "type": "OpcUa-Endpoint",
+        "endpoint": "opc.tcp://GK.ZLW.11:10008/OPCUA-Player",
+        "secpol": "None",
+        "secmode": "None",
+        "none": true,
+        "login": false,
+        "usercert": false,
+        "usercertificate": "",
+        "userprivatekey": ""
+    }
+]

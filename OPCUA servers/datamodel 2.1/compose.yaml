@@ -1,0 +1,15 @@
+version: '2'
+services:
+  gk.tst.2.1:
+    mem_limit: 256m
+    image: remonzander/opcuaserver:GK.TST.2.1
+    build:
+      context: .
+      target: GK.TST.2.1
+    ports:
+      - 10010:10010
+      
+networks:
+  default:
+    name: wviNetwork
+    external: true
