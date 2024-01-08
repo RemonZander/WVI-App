@@ -27,7 +27,7 @@ class WVIRouter {
     @AuthenticationDecorator("wvi.add")
     async AddWVI(req: Request, res: Response) {
         const result = WVIService.AddWVI(req.body.data.splice(0, 12));
-        if (result === false) {
+        if (!result) {
             res.sendStatus(500);
             return;
         }
@@ -58,7 +58,7 @@ class WVIRouter {
     async GetWVIs(req: Request, res: Response) {
         res.setHeader('Content-Type', 'application/json');
         const email = TokenService.GetEmail(req.cookies["login"])[0];
-        if (email == null) {
+        if (!email) {
             res.sendStatus(500);
             return;
         }

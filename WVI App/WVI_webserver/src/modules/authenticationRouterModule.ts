@@ -30,7 +30,7 @@ class AuthenticationRouter {
         const token = tokgen.generate();
         if (TokenService.TokenExists(req.body.email, req.cookies.login)) {
             const result = TokenService.UpdateToken(req.body.email, req.cookies.login); {
-                if (result == false) {
+                if (!result) {
                     res.sendStatus(500);
                     return;
                 }
@@ -39,12 +39,12 @@ class AuthenticationRouter {
             return;
         }
         let result = TokenService.RemoveTokenByEmail(req.body.email);
-        if (result == false) {
+        if (!result) {
             res.sendStatus(500);
             return;
         }
         result = TokenService.InsertOne(req.body.email, token);
-        if (result == false) {
+        if (!result) {
             res.sendStatus(500);
             return;
         }
@@ -55,7 +55,7 @@ class AuthenticationRouter {
     ValidateToken(req: Request, res: Response) {
         if (TokenService.TokenExistsByToken(req.cookies["login"])) {
             const result = TokenService.UpdateTokenNoEmail(req.cookies.login);
-            if (result == false) {
+            if (!result) {
                 res.sendStatus(500);
                 return;
             }
@@ -67,7 +67,7 @@ class AuthenticationRouter {
 
     Logout(req: Request, res: Response) {
         const result = TokenService.RemoveToken(req.cookies.login);
-        if (result == false) {
+        if (!result) {
             res.sendStatus(500);
             return;
         }
@@ -78,7 +78,7 @@ class AuthenticationRouter {
     async HasPermissions(req: Request, res: Response) {
         const enforcer = await createEnforcer();
         const email = TokenService.GetEmail(req.cookies["login"])[0];
-        if (email == null) {
+        if (!email) {
             res.sendStatus(500);
             return;
         }

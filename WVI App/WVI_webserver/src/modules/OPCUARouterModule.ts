@@ -20,7 +20,7 @@ OPCUARouter.post('/OPCUA/status',async (req: Request, res: Response) => {
     res.setHeader('Content-Type', 'application/json');
     const enforcer = await createEnforcer();
     const email = TokenService.GetEmail(req.cookies["login"])[0];
-    if (email == null)
+    if (!email)
     {
         res.sendStatus(500);
         return;
@@ -59,7 +59,7 @@ OPCUARouter.post('/OPCUA/status',async (req: Request, res: Response) => {
 OPCUARouter.post('/OPCUA/data', async (req: Request, res: Response) => {
     const enforcer = await createEnforcer();
     const email = TokenService.GetEmail(req.cookies["login"])[0];
-    if (email == null)
+    if (!email)
     {
         res.sendStatus(500);
         return;
@@ -103,7 +103,7 @@ OPCUARouter.post('/OPCUA/isonline', (req: Request, res: Response) => {
 OPCUARouter.put('/OPCUA/write', async (req: Request, res: Response) => {
     const enforcer = await createEnforcer();
     const email = TokenService.GetEmail(req.cookies["login"])[0];
-    if (email == null)
+    if (!email)
     {
         res.sendStatus(500);
         return;
