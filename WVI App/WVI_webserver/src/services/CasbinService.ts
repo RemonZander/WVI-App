@@ -15,6 +15,7 @@ export async function createEnforcer(): Promise<Enforcer> {
 }
 
 export async function BuildEnforcerPolicies() {
+    Logger("Rebuilding Enforcer", "CasbinService", LogLevel.WARNING);
     enforcerInstance.clearPolicy();
     const RolesAndPermissions = UserService.GetRolesAndPermissions();
     for (var a = 0; a < RolesAndPermissions.length; a++) {
@@ -27,8 +28,4 @@ export async function BuildEnforcerPolicies() {
     for (var c = 0; c < users.length; c++) {
         await enforcerInstance.addRoleForUser(users[c].Email, users[c].Role);
     }
-    const policies = await enforcerInstance.getPolicy();
-    const groups = await enforcerInstance.getGroupingPolicy();
-    console.log(policies);
-    console.log(groups);
 }

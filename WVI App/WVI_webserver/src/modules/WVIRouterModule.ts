@@ -80,7 +80,7 @@ class WVIRouter {
         }
         else if (await enforcer.enforce(user.Email, "wvi.own.list")) {
             const contractgebiednummers: any = UserService.GetContractgebiednummers(user.Onderhoudsaannemer);
-            if (contractgebiednummers == false) {
+            if (!contractgebiednummers) {
                 res.sendStatus(500);
                 return;
             }
